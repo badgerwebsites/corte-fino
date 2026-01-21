@@ -1,14 +1,25 @@
-import { View } from "./ui/View";
-import { Text } from "./ui/Text";
-import * as styles from "./styles/home.css";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import HomePage from './pages/HomePage';
+import BookingPage from './pages/BookingPage';
+import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/SignUpPage';
+import DashboardPage from './pages/DashboardPage';
+import RewardsPage from './pages/RewardsPage';
 
 export default function App() {
   return (
-    <View className={styles.container}>
-      <Text className={styles.title}>Corte Fino</Text>
-      <Text className={styles.subtitle}>
-        Precision cuts. Refined style.
-      </Text>
-    </View>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/book" element={<BookingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/rewards" element={<RewardsPage />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
