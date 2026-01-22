@@ -1,6 +1,7 @@
+// pages/RewardsPage.tsx
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
 import type { Reward } from '../types/database.types';
 import { Navigation } from '../components/Navigation';

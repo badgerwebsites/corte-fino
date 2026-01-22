@@ -1,6 +1,7 @@
+// pages/BookingPage.tsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
 import type { Barber, Service, BarberServicePricing } from '../types/database.types';
 import { Navigation } from '../components/Navigation';

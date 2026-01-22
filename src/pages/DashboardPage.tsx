@@ -1,6 +1,7 @@
+// pages/DashboardPage.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
 import type { BookingWithDetails } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
@@ -19,30 +20,31 @@ export default function DashboardPage() {
       navigate('/login');
       return;
     }
-
+  
+    const loadBookings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('bookings')
+          .select(`
+            *,
+            barber:barbers(*),
+            service:services(*)
+          `)
+          .eq('customer_id', user.id)
+          .order('booking_date', { ascending: false });
+  
+        if (error) throw error;
+        setBookings(data || []);
+      } catch (error) {
+        console.error('Error loading bookings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
     loadBookings();
   }, [user, navigate]);
-
-  const loadBookings = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select(`
-          *,
-          barber:barbers(*),
-          service:services(*)
-        `)
-        .eq('customer_id', user?.id)
-        .order('booking_date', { ascending: false });
-
-      if (error) throw error;
-      setBookings(data || []);
-    } catch (error) {
-      console.error('Error loading bookings:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   const handleSignOut = async () => {
     await signOut();

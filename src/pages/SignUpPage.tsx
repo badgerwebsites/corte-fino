@@ -1,10 +1,12 @@
+// pages/SignUpPage.tsx
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../auth/useAuth.ts';
 import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/auth.css';
+import logo from '../assets/WhiteLogoExtra.svg';
 
 export default function SignUpPage() {
   const [firstName, setFirstName] = useState('');
@@ -12,23 +14,23 @@ export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
   const { signUp } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const redirectTo =
+    new URLSearchParams(location.search).get('redirect') || '/dashboard';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (password !== confirmPassword) {
+    if (password !== confirm) {
       setError('Passwords do not match');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
       return;
     }
 
@@ -36,9 +38,9 @@ export default function SignUpPage() {
 
     try {
       await signUp(email, password, firstName, lastName, phone);
-      navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Failed to create account');
+      navigate(redirectTo);
+    } catch {
+      setError('Failed to create account');
     } finally {
       setLoading(false);
     }
@@ -47,114 +49,113 @@ export default function SignUpPage() {
   return (
     <>
       <Navigation />
+
       <View className={styles.container}>
         <View className={styles.formCard}>
-        <Text className={styles.title}>Create Account</Text>
-        <Text className={styles.subtitle}>Join Corte Fino today</Text>
+          <View className={styles.logoWrapper}>
+            <img
+              src={logo}
+              alt="Corte Fino"
+              className={styles.logo}
+            />
+          </View>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          {error && (
-            <View className={styles.error}>
-              <Text>{error}</Text>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            {error && (
+              <View className={styles.error}>
+                <Text>{error}</Text>
+              </View>
+            )}
+
+            <View className={styles.inputRow}>
+              <View className={styles.inputGroup}>
+                <input
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className={styles.input}
+                  placeholder="First Name"
+                  required
+                />
+              </View>
+
+              <View className={styles.inputGroup}>
+                <input
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className={styles.input}
+                  placeholder="Last Name"
+                  required
+                />
+              </View>
             </View>
-          )}
 
-          <View className={styles.inputRow}>
             <View className={styles.inputGroup}>
-              <label htmlFor="firstName" className={styles.label}>First Name</label>
               <input
-                id="firstName"
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className={styles.input}
+                placeholder="Email"
                 required
               />
             </View>
 
             <View className={styles.inputGroup}>
-              <label htmlFor="lastName" className={styles.label}>Last Name</label>
               <input
-                id="lastName"
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 className={styles.input}
+                placeholder="Phone Number"
                 required
               />
             </View>
+
+            <View className={styles.inputGroup}>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={styles.input}
+                placeholder="Password"
+                required
+              />
+            </View>
+
+            <View className={styles.inputGroup}>
+              <input
+                type="password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                className={styles.input}
+                placeholder="Confirm Password"
+                required
+              />
+            </View>
+
+            <button
+              type="submit"
+              className={styles.submitButton}
+              disabled={loading}
+            >
+              {loading ? 'Creating…' : 'Create Account'}
+            </button>
+          </form>
+
+          <View className={styles.footer}>
+            <Text className={styles.footerText}>
+              Already have an account?
+            </Text>
+
+            <Link
+              to={`/login?redirect=${encodeURIComponent(redirectTo)}`}
+              className={styles.link}
+            >
+              Login
+            </Link>
           </View>
-
-          <View className={styles.inputGroup}>
-            <label htmlFor="email" className={styles.label}>Email</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles.input}
-              required
-            />
-          </View>
-
-          <View className={styles.inputGroup}>
-            <label htmlFor="phone" className={styles.label}>Phone</label>
-            <input
-              id="phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className={styles.input}
-              placeholder="(555) 123-4567"
-              required
-            />
-          </View>
-
-          <View className={styles.inputGroup}>
-            <label htmlFor="password" className={styles.label}>Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={styles.input}
-              required
-            />
-          </View>
-
-          <View className={styles.inputGroup}>
-            <label htmlFor="confirmPassword" className={styles.label}>Confirm Password</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className={styles.input}
-              required
-            />
-          </View>
-
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={loading}
-          >
-            {loading ? 'Creating account...' : 'Create Account'}
-          </button>
-        </form>
-
-        <View className={styles.footer}>
-          <Text className={styles.footerText}>
-            Already have an account?{' '}
-            <Link to="/login" className={styles.link}>Sign in</Link>
-          </Text>
-        </View>
-
-        <View className={styles.backLink}>
-          <Link to="/" className={styles.link}>← Back to Home</Link>
+          
         </View>
       </View>
-    </View>
     </>
   );
 }
