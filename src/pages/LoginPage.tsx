@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/auth.css';
@@ -29,7 +30,9 @@ export default function LoginPage() {
   };
 
   return (
-    <View className={styles.container}>
+    <>
+      <Navigation />
+      <View className={styles.container}>
       <View className={styles.formCard}>
         <Text className={styles.title}>Welcome Back</Text>
         <Text className={styles.subtitle}>Sign in to your account</Text>
@@ -86,5 +89,6 @@ export default function LoginPage() {
         </View>
       </View>
     </View>
+    </>
   );
 }

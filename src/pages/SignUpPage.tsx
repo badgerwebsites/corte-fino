@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/auth.css';
@@ -44,8 +45,10 @@ export default function SignUpPage() {
   };
 
   return (
-    <View className={styles.container}>
-      <View className={styles.formCard}>
+    <>
+      <Navigation />
+      <View className={styles.container}>
+        <View className={styles.formCard}>
         <Text className={styles.title}>Create Account</Text>
         <Text className={styles.subtitle}>Join Corte Fino today</Text>
 
@@ -152,5 +155,6 @@ export default function SignUpPage() {
         </View>
       </View>
     </View>
+    </>
   );
 }

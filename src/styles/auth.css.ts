@@ -6,33 +6,47 @@ export const container = style({
   alignItems: "center",
   justifyContent: "center",
   minHeight: "100vh",
-  backgroundColor: "#0e0e0e",
-  color: "#ffffff",
-  padding: 24,
+  backgroundColor: "#fafafa",
+  color: "#1a1a1a",
+  padding: 16,
+  paddingTop: 72,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 24,
+      paddingTop: 84,
+    },
+  },
 });
 
 export const formCard = style({
   width: "100%",
   maxWidth: 480,
-  padding: 48,
-  backgroundColor: "#1a1a1a",
-  borderRadius: 12,
-  border: "1px solid #2a2a2a",
+  padding: 32,
+  backgroundColor: "#ffffff",
+  borderRadius: 2,
+  border: "1px solid #e5e5e5",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 48,
+    },
+  },
 });
 
 export const title = style({
   fontSize: 32,
-  fontWeight: 700,
+  fontWeight: 300,
   marginBottom: 8,
   textAlign: "center",
-  color: "#ffffff",
+  letterSpacing: "-0.01em",
+  color: "#1a1a1a",
 });
 
 export const subtitle = style({
   fontSize: 16,
-  color: "#888",
+  color: "#666",
   textAlign: "center",
   marginBottom: 32,
+  fontWeight: 300,
 });
 
 export const form = style({
@@ -56,36 +70,38 @@ export const inputGroup = style({
 export const label = style({
   fontSize: 14,
   fontWeight: 500,
-  color: "#e0e0e0",
+  color: "#1a1a1a",
 });
 
 export const input = style({
   padding: "12px 16px",
   fontSize: 16,
-  backgroundColor: "#0e0e0e",
-  color: "#ffffff",
-  border: "1px solid #2a2a2a",
-  borderRadius: 8,
+  backgroundColor: "#ffffff",
+  color: "#1a1a1a",
+  border: "1px solid #e5e5e5",
+  borderRadius: 2,
   outline: "none",
   transition: "border-color 0.2s",
   ":focus": {
-    borderColor: "#dc2626",
+    borderColor: "#1a1a1a",
   },
 });
 
 export const submitButton = style({
   padding: "14px 24px",
   fontSize: 16,
-  fontWeight: 600,
-  backgroundColor: "#dc2626",
+  fontWeight: 500,
+  backgroundColor: "#1a1a1a",
   color: "#ffffff",
   border: "none",
-  borderRadius: 8,
+  borderRadius: 2,
   cursor: "pointer",
   marginTop: 8,
-  transition: "background-color 0.2s",
+  transition: "all 0.3s ease",
+  letterSpacing: "0.05em",
   ":hover": {
-    backgroundColor: "#b91c1c",
+    backgroundColor: "#333",
+    transform: "translateY(-2px)",
   },
   ":disabled": {
     opacity: 0.5,
@@ -95,10 +111,11 @@ export const submitButton = style({
 
 export const error = style({
   padding: 12,
-  backgroundColor: "#7f1d1d",
-  color: "#fca5a5",
-  borderRadius: 8,
+  backgroundColor: "#fef2f2",
+  color: "#991b1b",
+  borderRadius: 2,
   fontSize: 14,
+  border: "1px solid #fecaca",
 });
 
 export const footer = style({
@@ -108,15 +125,16 @@ export const footer = style({
 
 export const footerText = style({
   fontSize: 14,
-  color: "#888",
+  color: "#666",
+  fontWeight: 300,
 });
 
 export const link = style({
-  color: "#dc2626",
+  color: "#1a1a1a",
   textDecoration: "none",
   fontWeight: 500,
   ":hover": {
-    textDecoration: "underline",
+    opacity: 0.6,
   },
 });
 

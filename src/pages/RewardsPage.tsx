@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { Reward } from '../types/database.types';
+import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/rewards.css';
@@ -68,14 +69,19 @@ export default function RewardsPage() {
 
   if (loading) {
     return (
-      <View className={styles.container}>
-        <Text>Loading rewards...</Text>
-      </View>
+      <>
+        <Navigation />
+        <View className={styles.container}>
+          <Text>Loading rewards...</Text>
+        </View>
+      </>
     );
   }
 
   return (
-    <View className={styles.container}>
+    <>
+      <Navigation />
+      <View className={styles.container}>
       <View className={styles.header}>
         <Text className={styles.title}>Rewards Program</Text>
         <Text className={styles.subtitle}>
@@ -168,5 +174,6 @@ export default function RewardsPage() {
         </Link>
       </View>
     </View>
+    </>
   );
 }

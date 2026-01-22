@@ -2,76 +2,139 @@ import { style } from "@vanilla-extract/css";
 
 export const container = style({
   minHeight: "100vh",
-  backgroundColor: "#0e0e0e",
-  color: "#ffffff",
-  padding: 24,
+  backgroundColor: "#fafafa",
+  color: "#1a1a1a",
+  padding: 16,
+  paddingTop: 72,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 24,
+      paddingTop: 84,
+    },
+  },
 });
 
 export const header = style({
   maxWidth: 1200,
-  margin: "0 auto 48px",
+  margin: "0 auto 32px",
   textAlign: "center",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      marginBottom: 48,
+    },
+  },
 });
 
 export const title = style({
-  fontSize: 48,
-  fontWeight: 700,
-  marginBottom: 16,
-  color: "#ffffff",
+  fontSize: 32,
+  fontWeight: 300,
+  marginBottom: 12,
+  color: "#1a1a1a",
+  letterSpacing: "-0.01em",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 48,
+      marginBottom: 16,
+    },
+  },
 });
 
 export const subtitle = style({
-  fontSize: 18,
-  color: "#888",
-  marginBottom: 32,
+  fontSize: 16,
+  color: "#666",
+  marginBottom: 24,
+  fontWeight: 300,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 18,
+      marginBottom: 32,
+    },
+  },
 });
 
 export const pointsDisplay = style({
   display: "inline-block",
-  padding: "24px 48px",
-  backgroundColor: "#1a1a1a",
-  borderRadius: 12,
-  border: "2px solid #dc2626",
-  marginTop: 24,
+  padding: "20px 32px",
+  backgroundColor: "#ffffff",
+  borderRadius: 4,
+  border: "2px solid #1a1a1a",
+  marginTop: 20,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: "24px 48px",
+      marginTop: 24,
+    },
+  },
 });
 
 export const pointsValue = style({
-  fontSize: 64,
-  fontWeight: 700,
-  color: "#dc2626",
+  fontSize: 48,
+  fontWeight: 300,
+  color: "#1a1a1a",
   textAlign: "center",
-  marginBottom: 8,
+  marginBottom: 6,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 64,
+      marginBottom: 8,
+    },
+  },
 });
 
 export const pointsLabel = style({
-  fontSize: 14,
-  color: "#888",
+  fontSize: 12,
+  color: "#666",
   textTransform: "uppercase",
-  letterSpacing: "0.05em",
+  letterSpacing: "0.1em",
   textAlign: "center",
+  fontWeight: 500,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 14,
+    },
+  },
 });
 
 export const howItWorks = style({
   maxWidth: 1200,
-  margin: "0 auto 64px",
-  padding: 32,
-  backgroundColor: "#1a1a1a",
-  borderRadius: 12,
-  border: "1px solid #2a2a2a",
+  margin: "0 auto 48px",
+  padding: 24,
+  backgroundColor: "#ffffff",
+  borderRadius: 4,
+  border: "1px solid #e5e5e5",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      marginBottom: 64,
+      padding: 32,
+    },
+  },
 });
 
 export const sectionTitle = style({
-  fontSize: 24,
-  fontWeight: 700,
-  marginBottom: 24,
+  fontSize: 20,
+  fontWeight: 300,
+  marginBottom: 20,
   textAlign: "center",
-  color: "#ffffff",
+  color: "#1a1a1a",
+  letterSpacing: "-0.01em",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 24,
+      marginBottom: 24,
+    },
+  },
 });
 
 export const stepsList = style({
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-  gap: 24,
+  gridTemplateColumns: "1fr",
+  gap: 20,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+      gap: 24,
+    },
+  },
 });
 
 export const step = style({
@@ -88,34 +151,54 @@ export const stepNumber = style({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: "#dc2626",
+  backgroundColor: "#1a1a1a",
   color: "#ffffff",
   fontSize: 24,
-  fontWeight: 700,
+  fontWeight: 500,
   borderRadius: "50%",
 });
 
 export const stepText = style({
   fontSize: 16,
-  color: "#e0e0e0",
+  color: "#666",
+  fontWeight: 300,
 });
 
 export const rewardsGrid = style({
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-  gap: 24,
+  gridTemplateColumns: "1fr",
+  gap: 16,
   maxWidth: 1200,
-  margin: "0 auto 48px",
+  margin: "0 auto 32px",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+      gap: 24,
+      marginBottom: 48,
+    },
+  },
 });
 
 export const rewardCard = style({
-  padding: 24,
-  backgroundColor: "#1a1a1a",
-  borderRadius: 12,
-  border: "1px solid #2a2a2a",
+  padding: 20,
+  backgroundColor: "#ffffff",
+  borderRadius: 4,
+  border: "1px solid #e5e5e5",
   display: "flex",
   flexDirection: "column",
-  gap: 16,
+  gap: 14,
+  transition: "all 0.3s ease",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 24,
+      gap: 16,
+    },
+  },
+  ":hover": {
+    transform: "translateY(-2px)",
+    boxShadow: "0 8px 16px rgba(0,0,0,0.08)",
+    borderColor: "#1a1a1a",
+  },
 });
 
 export const rewardHeader = style({
@@ -127,60 +210,68 @@ export const rewardHeader = style({
 
 export const rewardName = style({
   fontSize: 20,
-  fontWeight: 700,
-  color: "#ffffff",
+  fontWeight: 500,
+  color: "#1a1a1a",
   flex: 1,
 });
 
 export const pointsBadge = style({
   padding: "6px 12px",
-  backgroundColor: "#dc2626",
+  backgroundColor: "#1a1a1a",
   color: "#ffffff",
   fontSize: 14,
-  fontWeight: 600,
-  borderRadius: 6,
+  fontWeight: 500,
+  borderRadius: 2,
   whiteSpace: "nowrap",
 });
 
 export const rewardDescription = style({
   fontSize: 14,
-  color: "#888",
+  color: "#666",
   lineHeight: 1.5,
+  fontWeight: 300,
 });
 
 export const progressBar = style({
   width: "100%",
   height: 8,
-  backgroundColor: "#2a2a2a",
+  backgroundColor: "#f0f0f0",
   borderRadius: 4,
   overflow: "hidden",
 });
 
 export const progressFill = style({
   height: "100%",
-  backgroundColor: "#dc2626",
+  backgroundColor: "#1a1a1a",
   transition: "width 0.3s ease",
 });
 
 export const progressText = style({
   fontSize: 12,
-  color: "#888",
+  color: "#666",
   textAlign: "center",
+  fontWeight: 400,
 });
 
 export const redeemButton = style({
   padding: "12px 24px",
   fontSize: 14,
-  fontWeight: 600,
-  backgroundColor: "#dc2626",
+  fontWeight: 500,
+  backgroundColor: "#1a1a1a",
   color: "#ffffff",
   border: "none",
-  borderRadius: 8,
+  borderRadius: 2,
   cursor: "pointer",
-  transition: "background-color 0.2s",
+  transition: "all 0.3s ease",
   marginTop: "auto",
+  letterSpacing: "0.05em",
   ":hover": {
-    backgroundColor: "#b91c1c",
+    backgroundColor: "#333",
+    transform: "translateY(-2px)",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+  },
+  ":active": {
+    transform: "translateY(0)",
   },
 });
 
@@ -188,7 +279,9 @@ export const disabled = style({
   opacity: 0.5,
   cursor: "not-allowed",
   ":hover": {
-    backgroundColor: "#dc2626",
+    backgroundColor: "#1a1a1a",
+    transform: "none",
+    boxShadow: "none",
   },
 });
 
@@ -196,9 +289,9 @@ export const signInPrompt = style({
   maxWidth: 600,
   margin: "48px auto",
   padding: 32,
-  backgroundColor: "#1a1a1a",
-  borderRadius: 12,
-  border: "1px solid #2a2a2a",
+  backgroundColor: "#ffffff",
+  borderRadius: 4,
+  border: "1px solid #e5e5e5",
   textAlign: "center",
 });
 
@@ -207,16 +300,22 @@ export const signInButton = style({
   marginTop: 16,
   padding: "12px 32px",
   fontSize: 16,
-  fontWeight: 600,
-  backgroundColor: "#dc2626",
+  fontWeight: 500,
+  backgroundColor: "#1a1a1a",
   color: "#ffffff",
   border: "none",
-  borderRadius: 8,
+  borderRadius: 2,
   textDecoration: "none",
   cursor: "pointer",
-  transition: "background-color 0.2s",
+  transition: "all 0.3s ease",
+  letterSpacing: "0.05em",
   ":hover": {
-    backgroundColor: "#b91c1c",
+    backgroundColor: "#333",
+    transform: "translateY(-2px)",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+  },
+  ":active": {
+    transform: "translateY(0)",
   },
 });
 
@@ -227,11 +326,12 @@ export const backLink = style({
 });
 
 export const link = style({
-  color: "#dc2626",
+  color: "#1a1a1a",
   textDecoration: "none",
   fontSize: 16,
-  fontWeight: 500,
+  fontWeight: 400,
+  transition: "opacity 0.2s",
   ":hover": {
-    textDecoration: "underline",
+    opacity: 0.6,
   },
 });

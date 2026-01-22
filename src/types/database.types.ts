@@ -6,6 +6,7 @@ export interface Customer {
   last_name: string;
   stripe_customer_id?: string;
   reward_points: number;
+  is_admin: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -20,6 +21,10 @@ export interface Barber {
   image_url?: string;
   base_price_multiplier: number;
   is_active: boolean;
+  regular_hours_start: string;
+  regular_hours_end: string;
+  evening_hours_start: string;
+  evening_hours_end: string;
   created_at: string;
   updated_at: string;
 }
@@ -106,6 +111,10 @@ export interface ShopSettings {
   google_maps_url?: string;
   cancellation_hours: number;
   cancellation_fee_percentage: number;
+  regular_hours_start: string;
+  regular_hours_end: string;
+  evening_hours_start: string;
+  evening_hours_end: string;
   created_at: string;
   updated_at: string;
 }
@@ -121,4 +130,16 @@ export interface TimeSlot {
   time: string;
   available: boolean;
   barberId?: string;
+}
+
+export type TimePeriod = 'regular' | 'evening';
+
+export interface BarberServicePricing {
+  id: string;
+  barber_id: string;
+  service_id: string;
+  time_period: TimePeriod;
+  price: number;
+  created_at: string;
+  updated_at: string;
 }

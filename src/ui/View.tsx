@@ -1,11 +1,12 @@
 import type { ReactNode, CSSProperties } from "react";
 
 type ViewProps = {
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
   style?: CSSProperties;
+  onClick?: () => void;
 };
 
-export function View({ children, className, style }: ViewProps) {
-  return <div className={className} style={style}>{children}</div>;
+export function View({ children, className, style, onClick }: ViewProps) {
+  return <div className={className} style={style} onClick={onClick}>{children}</div>;
 }

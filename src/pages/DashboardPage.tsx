@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { BookingWithDetails } from '../types/database.types';
+import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/dashboard.css';
@@ -57,8 +58,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <View className={styles.container}>
-      <View className={styles.header}>
+    <>
+      <Navigation />
+      <View className={styles.container}>
+        <View className={styles.header}>
         <View>
           <Text className={styles.title}>My Dashboard</Text>
           <Text className={styles.subtitle}>
@@ -138,6 +141,15 @@ export default function DashboardPage() {
           View Available Rewards →
         </Link>
       </View>
+
+      {customer?.is_admin && (
+        <View className={styles.section}>
+          <Link to="/admin" className={styles.adminLink}>
+            🔧 Admin Dashboard
+          </Link>
+        </View>
+      )}
     </View>
+    </>
   );
 }

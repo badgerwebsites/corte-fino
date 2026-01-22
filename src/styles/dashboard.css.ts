@@ -2,9 +2,16 @@ import { style } from "@vanilla-extract/css";
 
 export const container = style({
   minHeight: "100vh",
-  backgroundColor: "#0e0e0e",
-  color: "#ffffff",
-  padding: 24,
+  backgroundColor: "#fafafa",
+  color: "#1a1a1a",
+  padding: 16,
+  paddingTop: 72,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 24,
+      paddingTop: 84,
+    },
+  },
 });
 
 export const header = style({
@@ -12,112 +19,174 @@ export const header = style({
   justifyContent: "space-between",
   alignItems: "center",
   maxWidth: 1200,
-  margin: "0 auto 48px",
+  margin: "0 auto 32px",
   flexWrap: "wrap",
-  gap: 16,
+  gap: 12,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      marginBottom: 48,
+      gap: 16,
+    },
+  },
 });
 
 export const title = style({
-  fontSize: 36,
-  fontWeight: 700,
-  color: "#ffffff",
-  marginBottom: 8,
+  fontSize: 28,
+  fontWeight: 300,
+  color: "#1a1a1a",
+  letterSpacing: "-0.01em",
+  marginBottom: 6,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 36,
+      marginBottom: 8,
+    },
+  },
 });
 
 export const subtitle = style({
-  fontSize: 18,
-  color: "#888",
+  fontSize: 16,
+  color: "#666",
+  fontWeight: 300,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 18,
+    },
+  },
 });
 
 export const signOutButton = style({
   padding: "10px 20px",
   fontSize: 14,
-  fontWeight: 600,
+  fontWeight: 400,
   backgroundColor: "transparent",
-  color: "#dc2626",
-  border: "1px solid #dc2626",
-  borderRadius: 8,
+  color: "#666",
+  border: "1px solid #e5e5e5",
+  borderRadius: 2,
   cursor: "pointer",
   transition: "all 0.2s",
   ":hover": {
-    backgroundColor: "#dc2626",
-    color: "#ffffff",
+    borderColor: "#1a1a1a",
+    color: "#1a1a1a",
   },
 });
 
 export const statsGrid = style({
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-  gap: 24,
+  gridTemplateColumns: "repeat(2, 1fr)",
+  gap: 16,
   maxWidth: 1200,
-  margin: "0 auto 48px",
+  margin: "0 auto 32px",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+      gap: 24,
+      marginBottom: 48,
+    },
+  },
 });
 
 export const statCard = style({
-  padding: 32,
-  backgroundColor: "#1a1a1a",
-  borderRadius: 12,
-  border: "1px solid #2a2a2a",
+  padding: 24,
+  backgroundColor: "#ffffff",
+  borderRadius: 2,
+  border: "1px solid #e5e5e5",
   textAlign: "center",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 32,
+    },
+  },
 });
 
 export const statValue = style({
-  fontSize: 48,
-  fontWeight: 700,
-  color: "#dc2626",
-  marginBottom: 8,
+  fontSize: 36,
+  fontWeight: 300,
+  color: "#1a1a1a",
+  marginBottom: 6,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 48,
+      marginBottom: 8,
+    },
+  },
 });
 
 export const statLabel = style({
-  fontSize: 14,
-  color: "#888",
+  fontSize: 10,
+  color: "#999",
   textTransform: "uppercase",
-  letterSpacing: "0.05em",
+  letterSpacing: "0.1em",
+  fontWeight: 500,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 12,
+    },
+  },
 });
 
 export const section = style({
   maxWidth: 1200,
-  margin: "0 auto 48px",
+  margin: "0 auto 32px",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      marginBottom: 48,
+    },
+  },
 });
 
 export const sectionHeader = style({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  marginBottom: 24,
+  marginBottom: 20,
   flexWrap: "wrap",
-  gap: 16,
+  gap: 12,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      marginBottom: 24,
+      gap: 16,
+    },
+  },
 });
 
 export const sectionTitle = style({
-  fontSize: 24,
-  fontWeight: 700,
-  color: "#ffffff",
+  fontSize: 20,
+  fontWeight: 300,
+  color: "#1a1a1a",
+  letterSpacing: "-0.01em",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 24,
+    },
+  },
 });
 
 export const bookButton = style({
   padding: "12px 24px",
   fontSize: 14,
-  fontWeight: 600,
-  backgroundColor: "#dc2626",
+  fontWeight: 500,
+  backgroundColor: "#1a1a1a",
   color: "#ffffff",
   border: "none",
-  borderRadius: 8,
+  borderRadius: 2,
   cursor: "pointer",
   textDecoration: "none",
   display: "inline-block",
-  transition: "background-color 0.2s",
+  transition: "all 0.3s ease",
+  letterSpacing: "0.05em",
   ":hover": {
-    backgroundColor: "#b91c1c",
+    backgroundColor: "#333",
+    transform: "translateY(-2px)",
   },
 });
 
 export const emptyState = style({
   padding: 64,
   textAlign: "center",
-  backgroundColor: "#1a1a1a",
-  borderRadius: 12,
-  border: "1px solid #2a2a2a",
+  backgroundColor: "#ffffff",
+  borderRadius: 2,
+  border: "1px solid #e5e5e5",
 });
 
 export const bookingsList = style({
@@ -128,9 +197,9 @@ export const bookingsList = style({
 
 export const bookingCard = style({
   padding: 24,
-  backgroundColor: "#1a1a1a",
-  borderRadius: 12,
-  border: "1px solid #2a2a2a",
+  backgroundColor: "#ffffff",
+  borderRadius: 2,
+  border: "1px solid #e5e5e5",
 });
 
 export const bookingHeader = style({
@@ -144,42 +213,42 @@ export const bookingHeader = style({
 
 export const bookingDate = style({
   fontSize: 18,
-  fontWeight: 600,
-  color: "#ffffff",
+  fontWeight: 500,
+  color: "#1a1a1a",
 });
 
 export const statusBadge = style({
   padding: "6px 12px",
-  fontSize: 12,
-  fontWeight: 600,
-  borderRadius: 6,
+  fontSize: 11,
+  fontWeight: 500,
+  borderRadius: 2,
   textTransform: "uppercase",
-  letterSpacing: "0.05em",
+  letterSpacing: "0.1em",
 });
 
 export const pending = style({
-  backgroundColor: "#713f12",
-  color: "#fbbf24",
+  backgroundColor: "#fef3c7",
+  color: "#92400e",
 });
 
 export const confirmed = style({
-  backgroundColor: "#065f46",
-  color: "#34d399",
+  backgroundColor: "#d1fae5",
+  color: "#065f46",
 });
 
 export const completed = style({
-  backgroundColor: "#1e3a8a",
-  color: "#60a5fa",
+  backgroundColor: "#dbeafe",
+  color: "#1e3a8a",
 });
 
 export const cancelled = style({
-  backgroundColor: "#7f1d1d",
-  color: "#fca5a5",
+  backgroundColor: "#fee2e2",
+  color: "#991b1b",
 });
 
 export const no_show = style({
-  backgroundColor: "#3f3f46",
-  color: "#a1a1aa",
+  backgroundColor: "#f4f4f5",
+  color: "#52525b",
 });
 
 export const bookingDetails = style({
@@ -190,34 +259,53 @@ export const bookingDetails = style({
 
 export const bookingTime = style({
   fontSize: 16,
-  fontWeight: 600,
-  color: "#dc2626",
+  fontWeight: 500,
+  color: "#1a1a1a",
 });
 
 export const bookingService = style({
   fontSize: 16,
-  color: "#e0e0e0",
+  color: "#666",
+  fontWeight: 300,
 });
 
 export const bookingBarber = style({
   fontSize: 14,
-  color: "#888",
+  color: "#999",
+  fontWeight: 300,
 });
 
 export const bookingPrice = style({
   fontSize: 18,
-  fontWeight: 700,
-  color: "#ffffff",
+  fontWeight: 500,
+  color: "#1a1a1a",
   marginTop: 8,
 });
 
 export const rewardsLink = style({
   display: "inline-block",
   fontSize: 16,
-  color: "#dc2626",
+  color: "#1a1a1a",
   textDecoration: "none",
   fontWeight: 500,
   ":hover": {
-    textDecoration: "underline",
+    opacity: 0.6,
+  },
+});
+
+export const adminLink = style({
+  display: "inline-block",
+  fontSize: 14,
+  color: "#ffffff",
+  textDecoration: "none",
+  fontWeight: 500,
+  padding: "12px 24px",
+  backgroundColor: "#1a1a1a",
+  borderRadius: 2,
+  transition: "all 0.3s ease",
+  letterSpacing: "0.05em",
+  ":hover": {
+    backgroundColor: "#333",
+    transform: "translateY(-2px)",
   },
 });
