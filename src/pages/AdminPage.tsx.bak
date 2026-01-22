@@ -5,7 +5,6 @@ import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
 import type { Barber, Service, BarberServicePricing } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
-import { BarberScheduleManager } from '../components/BarberScheduleManager';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/admin.css';
@@ -17,7 +16,7 @@ export default function AdminPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'pricing' | 'services' | 'barbers' | 'schedule'>('pricing');
+  const [activeTab, setActiveTab] = useState<'pricing' | 'services' | 'barbers'>('pricing');
 
   // Barber form state
   const [editingBarber, setEditingBarber] = useState<Barber | null>(null);
@@ -78,13 +77,6 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatTimeTo12Hour = (time: string): string => {
-    const [hours, minutes] = time.split(':').map(Number);
-    const period = hours >= 12 ? 'PM' : 'AM';
-    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
   const getPrice = (barberId: string, serviceId: string, timePeriod: 'regular' | 'evening'): number => {
@@ -328,12 +320,6 @@ export default function AdminPage() {
         >
           Barbers
         </button>
-        <button
-          className={`${styles.tab} ${activeTab === 'schedule' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('schedule')}
-        >
-          Schedule
-        </button>
       </View>
 
       {activeTab === 'pricing' && (
@@ -361,7 +347,7 @@ export default function AdminPage() {
                     <View>
                       <Text className={styles.barberNameCell}>{barber.name}</Text>
                       <Text className={styles.barberTimeInfo}>
-                        Regular: {formatTimeTo12Hour(barber.regular_hours_start)}-{formatTimeTo12Hour(barber.regular_hours_end)}
+                        Regular: {barber.regular_hours_start}-{barber.regular_hours_end}
                       </Text>
                     </View>
 
@@ -402,7 +388,7 @@ export default function AdminPage() {
                         />
                       </View>
                       <Text className={styles.barberTimeInfo}>
-                        Evening: {formatTimeTo12Hour(barber.evening_hours_start)}-{formatTimeTo12Hour(barber.evening_hours_end)}
+                        Evening: {barber.evening_hours_start}-{barber.evening_hours_end}
                       </Text>
                     </View>
                   </View>
@@ -721,10 +707,6 @@ export default function AdminPage() {
             ))}
           </View>
         </View>
-      )}
-
-      {activeTab === 'schedule' && (
-        <BarberScheduleManager barbers={barbers} onUpdate={loadData} />
       )}
     </View>
     </>

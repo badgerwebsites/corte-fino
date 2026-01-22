@@ -37,6 +37,22 @@ export const hero = style({
   },
 });
 
+export const heroLogo = style({
+  width: "100%",
+  maxWidth: 500,
+  height: 200,
+  objectFit: "cover",
+  objectPosition: "center",
+  marginBottom: 32,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      maxWidth: 700,
+      height: 250,
+      marginBottom: 48,
+    },
+  },
+});
+
 export const heroImagePlaceholder = style({
   width: "100%",
   maxWidth: 600,
@@ -318,6 +334,18 @@ export const barberCard = style({
     transform: "translateY(-8px)",
     boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
     borderColor: "#1a1a1a",
+  },
+});
+
+export const barberImage = style({
+  width: "100%",
+  height: 200,
+  objectFit: "cover",
+  display: "block",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      height: 280,
+    },
   },
 });
 

@@ -38,11 +38,12 @@ export default function HomePage() {
       <View className={styles.container}>
         {/* Hero */}
         <View className={styles.hero}>
-          <View className={styles.heroImagePlaceholder}>
-            Hero Image
-          </View>
+          <img
+            src="/images/hero-logo.png"
+            alt="Corte Fino"
+            className={styles.heroLogo}
+          />
 
-          <Text className={styles.title}>Corte Fino</Text>
           <Text className={styles.subtitle}>
             Precision cuts. Refined style.
           </Text>
@@ -102,9 +103,17 @@ export default function HomePage() {
             <View className={styles.barbersGrid}>
               {barbers.map((barber) => (
                 <View key={barber.id} className={styles.barberCard}>
-                  <View className={styles.barberImagePlaceholder}>
-                    Barber Photo
-                  </View>
+                  {barber.image_url ? (
+                    <img
+                      src={barber.image_url}
+                      alt={barber.name}
+                      className={styles.barberImage}
+                    />
+                  ) : (
+                    <View className={styles.barberImagePlaceholder}>
+                      Barber Photo
+                    </View>
+                  )}
 
                   <View className={styles.barberInfo}>
                     <Text className={styles.barberName}>{barber.name}</Text>

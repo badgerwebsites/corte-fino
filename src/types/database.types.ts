@@ -143,3 +143,24 @@ export interface BarberServicePricing {
   created_at: string;
   updated_at: string;
 }
+
+export interface BarberAvailability {
+  id: string;
+  barber_id: string;
+  day_of_week: number; // 0 = Sunday, 6 = Saturday
+  start_time: string;
+  end_time: string;
+  is_available: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BarberTimeOff {
+  id: string;
+  barber_id: string;
+  start_date: string;
+  end_date: string;
+  reason?: string;
+  created_at: string;
+  updated_at: string;
+}

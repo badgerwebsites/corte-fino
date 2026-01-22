@@ -353,6 +353,27 @@ export const barberCard = style({
   },
 });
 
+export const barberImageWrapper = style({
+  width: 80,
+  height: 80,
+  borderRadius: "50%",
+  overflow: "hidden",
+  marginBottom: 16,
+  border: "2px solid #e5e5e5",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      width: 100,
+      height: 100,
+    },
+  },
+});
+
+export const barberImage = style({
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
+});
+
 export const barberName = style({
   fontSize: 18,
   fontWeight: 500,

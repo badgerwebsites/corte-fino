@@ -1,13 +1,17 @@
 // pages/BookingPage.tsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { DayPicker } from 'react-day-picker';
+import { addDays, format, isBefore, startOfDay, getDay } from 'date-fns';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
-import type { Barber, Service, BarberServicePricing } from '../types/database.types';
+import type { Barber, Service, BarberServicePricing, BarberAvailability, BarberTimeOff } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/booking.css';
+import * as calendarStyles from '../styles/calendar.css';
+import 'react-day-picker/dist/style.css';
 
 type BookingStep = 1 | 2 | 3 | 4;
 
@@ -21,12 +25,14 @@ export default function BookingPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
+  const [availability, setAvailability] = useState<BarberAvailability[]>([]);
+  const [timeOff, setTimeOff] = useState<BarberTimeOff[]>([]);
 
   // Booking selections
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
   const [anyBarber, setAnyBarber] = useState(false);
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState('');
 
   useEffect(() => {
@@ -35,10 +41,12 @@ export default function BookingPage() {
 
   const loadData = async () => {
     try {
-      const [servicesRes, barbersRes, pricingRes] = await Promise.all([
+      const [servicesRes, barbersRes, pricingRes, availabilityRes, timeOffRes] = await Promise.all([
         supabase.from('services').select('*').order('name'),
         supabase.from('barbers').select('*').eq('is_active', true).order('name'),
         supabase.from('barber_service_pricing').select('*'),
+        supabase.from('barber_availability').select('*'),
+        supabase.from('barber_time_off').select('*'),
       ]);
 
       if (servicesRes.error) throw servicesRes.error;
@@ -48,6 +56,8 @@ export default function BookingPage() {
       setServices(servicesRes.data || []);
       setBarbers(barbersRes.data || []);
       setPricing(pricingRes.data || []);
+      setAvailability(availabilityRes.data || []);
+      setTimeOff(timeOffRes.data || []);
     } catch (error) {
       console.error('Error loading booking data:', error);
       alert('Failed to load booking options');
@@ -67,8 +77,12 @@ export default function BookingPage() {
     setStep(3);
   };
 
-  const handleDateTimeSelect = (date: string, time: string) => {
+  const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
+    setSelectedTime(''); // Reset time when date changes
+  };
+
+  const handleTimeSelect = (time: string) => {
     setSelectedTime(time);
     setStep(4);
   };
@@ -113,42 +127,156 @@ export default function BookingPage() {
     alert('Payment integration coming next! This will require Stripe setup.');
   };
 
-  const generateTimeSlots = (): string[] => {
+
+
+  // Check if a date is available for the selected barber
+  const isDateAvailable = (date: Date): boolean => {
+    const dayOfWeek = getDay(date); // 0 = Sunday, 6 = Saturday
+    const dateString = format(date, 'yyyy-MM-dd');
+
+    if (!selectedBarber && anyBarber) {
+      // If "any barber", check if ANY barber is available on this day
+      const hasAnyBarberAvailable = barbers.some(barber => {
+        const hasAvailability = availability.some(
+          a => a.barber_id === barber.id &&
+               a.day_of_week === dayOfWeek &&
+               a.is_available
+        );
+
+        const hasTimeOff = timeOff.some(
+          t => t.barber_id === barber.id &&
+               dateString >= t.start_date &&
+               dateString <= t.end_date
+        );
+
+        return hasAvailability && !hasTimeOff;
+      });
+
+      return hasAnyBarberAvailable;
+    }
+
+    if (!selectedBarber) return true;
+
+    // Check if barber has availability for this day of week
+    const hasAvailability = availability.some(
+      a => a.barber_id === selectedBarber.id &&
+           a.day_of_week === dayOfWeek &&
+           a.is_available
+    );
+
+    if (!hasAvailability) return false;
+
+    // Check if barber has time off on this date
+    const hasTimeOff = timeOff.some(
+      t => t.barber_id === selectedBarber.id &&
+           dateString >= t.start_date &&
+           dateString <= t.end_date
+    );
+
+    return !hasTimeOff;
+  };
+
+  // Get available time slots for selected date and barber
+  const getAvailableTimeSlots = (): string[] => {
+    if (!selectedDate) return [];
+
+    const dayOfWeek = getDay(selectedDate);
+    const dateString = format(selectedDate, 'yyyy-MM-dd');
+
+    // If "any barber" selected, collect all time slots from all available barbers
+    if (!selectedBarber && anyBarber) {
+      const allSlots = new Set<string>();
+
+      barbers.forEach(barber => {
+        // Check if this barber is available on this date
+        const hasAvailability = availability.some(
+          a => a.barber_id === barber.id &&
+               a.day_of_week === dayOfWeek &&
+               a.is_available
+        );
+
+        const hasTimeOff = timeOff.some(
+          t => t.barber_id === barber.id &&
+               dateString >= t.start_date &&
+               dateString <= t.end_date
+        );
+
+        if (hasAvailability && !hasTimeOff) {
+          // Get this barber's availability slots
+          const barberAvailability = availability.filter(
+            a => a.barber_id === barber.id &&
+                 a.day_of_week === dayOfWeek &&
+                 a.is_available
+          );
+
+          barberAvailability.forEach(avail => {
+            const [startHour, startMin] = avail.start_time.split(':').map(Number);
+            const [endHour, endMin] = avail.end_time.split(':').map(Number);
+
+            const startMinutes = startHour * 60 + startMin;
+            const endMinutes = endHour * 60 + endMin;
+
+            // Generate 30-minute slots
+            for (let minutes = startMinutes; minutes < endMinutes; minutes += 30) {
+              const hours = Math.floor(minutes / 60);
+              const mins = minutes % 60;
+              allSlots.add(`${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`);
+            }
+          });
+        }
+      });
+
+      return Array.from(allSlots).sort();
+    }
+
+    // Specific barber selected
+    if (!selectedBarber) return [];
+
+    const barberAvailability = availability.filter(
+      a => a.barber_id === selectedBarber.id &&
+           a.day_of_week === dayOfWeek &&
+           a.is_available
+    );
+
+    if (barberAvailability.length === 0) return [];
+
     const slots: string[] = [];
-    const startHour = 9;
-    const endHour = 21;
 
-    for (let hour = startHour; hour < endHour; hour++) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      slots.push(`${hour.toString().padStart(2, '0')}:30`);
-    }
+    barberAvailability.forEach(avail => {
+      const [startHour, startMin] = avail.start_time.split(':').map(Number);
+      const [endHour, endMin] = avail.end_time.split(':').map(Number);
 
-    return slots;
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+
+      // Generate 30-minute slots
+      for (let minutes = startMinutes; minutes < endMinutes; minutes += 30) {
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        slots.push(`${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`);
+      }
+    });
+
+    return slots.sort();
   };
 
-  const getNextAvailableDates = (): string[] => {
-    const dates: string[] = [];
-    const today = new Date();
-
-    for (let i = 0; i < 14; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-      dates.push(date.toISOString().split('T')[0]);
-    }
-
-    return dates;
+  const formatDate = (date: Date | string): string => {
+    const dateObj = typeof date === "string" ? new Date(date) : date;
+    return dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   };
 
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const formatTimeTo12Hour = (time: string): string => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
   const resetBooking = () => {
     setSelectedService(null);
     setSelectedBarber(null);
     setAnyBarber(false);
-    setSelectedDate('');
+    setSelectedDate(undefined);
     setSelectedTime('');
     setStep(1);
   };
@@ -163,6 +291,9 @@ export default function BookingPage() {
       </>
     );
   }
+
+  const today = startOfDay(new Date());
+  const twoMonthsFromNow = addDays(today, 60);
 
   return (
     <>
@@ -244,6 +375,15 @@ export default function BookingPage() {
                 className={styles.barberCard}
                 onClick={() => handleBarberSelect(barber, false)}
               >
+                {barber.image_url && (
+                  <View className={styles.barberImageWrapper}>
+                    <img
+                      src={barber.image_url}
+                      alt={barber.name}
+                      className={styles.barberImage}
+                    />
+                  </View>
+                )}
                 <Text className={styles.barberName}>{barber.name}</Text>
                 {barber.bio && (
                   <Text className={styles.barberBio}>{barber.bio}</Text>
@@ -269,44 +409,48 @@ export default function BookingPage() {
             {selectedService?.name} with {anyBarber ? 'any available barber' : selectedBarber?.name}
           </Text>
 
-          <View className={styles.dateTimeContainer}>
-            <View className={styles.dateSection}>
-              <Text className={styles.sectionLabel}>Select Date</Text>
-              <View className={styles.dateGrid}>
-                {getNextAvailableDates().map((date) => (
-                  <button
-                    key={date}
-                    className={`${styles.dateButton} ${selectedDate === date ? styles.dateButtonActive : ''}`}
-                    onClick={() => setSelectedDate(date)}
-                  >
-                    {formatDate(date)}
-                  </button>
-                ))}
-              </View>
+          <View className={calendarStyles.calendarContainer}>
+            <View className={calendarStyles.calendarWrapper}>
+              <DayPicker
+                mode="single"
+                selected={selectedDate}
+                onSelect={handleDateSelect}
+                disabled={(date) => {
+                  return isBefore(date, today) || !isDateAvailable(date);
+                }}
+                startMonth={today}
+                endMonth={twoMonthsFromNow}
+                modifiers={{
+                  unavailable: (date) => !isDateAvailable(date),
+                }}
+              />
             </View>
 
             {selectedDate && (
-              <View className={styles.timeSection}>
-                <Text className={styles.sectionLabel}>Select Time</Text>
+              <View className={calendarStyles.timeSelectionWrapper}>
+                <Text className={calendarStyles.timeLabel}>Available Times</Text>
                 <View className={styles.timeGrid}>
-                  {generateTimeSlots().map((time) => {
-                    // If specific barber selected, show their pricing period
-                    let timePeriodLabel = '';
-                    if (selectedBarber) {
-                      const period = getTimePeriod(time, selectedBarber);
-                      timePeriodLabel = period === 'evening' ? ' (Evening)' : '';
-                    }
+                  {getAvailableTimeSlots().length > 0 ? (
+                    getAvailableTimeSlots().map((time) => {
+                      // Show time period label only if specific barber is selected
+                      const timePeriodLabel = selectedBarber ?
+                        (getTimePeriod(time, selectedBarber) === 'evening' ? ' (Evening)' : '') : '';
 
-                    return (
-                      <button
-                        key={time}
-                        className={`${styles.timeButton} ${selectedTime === time ? styles.timeButtonActive : ''}`}
-                        onClick={() => handleDateTimeSelect(selectedDate, time)}
-                      >
-                        {time}{timePeriodLabel}
-                      </button>
-                    );
-                  })}
+                      return (
+                        <button
+                          key={time}
+                          className={`${styles.timeButton} ${selectedTime === time ? styles.timeButtonActive : ''}`}
+                          onClick={() => handleTimeSelect(time)}
+                        >
+                          {formatTimeTo12Hour(time)}{timePeriodLabel}
+                        </button>
+                      );
+                    })
+                  ) : (
+                    <Text className={calendarStyles.noTimesMessage}>
+                      No available times for this date. Please select another date.
+                    </Text>
+                  )}
                 </View>
               </View>
             )}
@@ -341,8 +485,8 @@ export default function BookingPage() {
 
             <View className={styles.confirmSection}>
               <Text className={styles.confirmLabel}>Date & Time</Text>
-              <Text className={styles.confirmValue}>{formatDate(selectedDate)}</Text>
-              <Text className={styles.confirmDetail}>{selectedTime}</Text>
+              <Text className={styles.confirmValue}>{selectedDate ? formatDate(selectedDate) : ''}</Text>
+              <Text className={styles.confirmDetail}>{selectedTime ? formatTimeTo12Hour(selectedTime) : ''}</Text>
             </View>
 
             {selectedBarber && (
@@ -351,8 +495,8 @@ export default function BookingPage() {
                 <Text className={styles.priceAmount}>${calculatePrice().toFixed(2)}</Text>
                 <Text className={styles.confirmDetail}>
                   {getTimePeriod(selectedTime, selectedBarber) === 'evening'
-                    ? `Evening rate (${selectedBarber.evening_hours_start}-${selectedBarber.evening_hours_end})`
-                    : `Regular rate (${selectedBarber.regular_hours_start}-${selectedBarber.regular_hours_end})`}
+                    ? `Evening rate (${formatTimeTo12Hour(selectedBarber.evening_hours_start)}-${formatTimeTo12Hour(selectedBarber.evening_hours_end)})`
+                    : `Regular rate (${formatTimeTo12Hour(selectedBarber.regular_hours_start)}-${formatTimeTo12Hour(selectedBarber.regular_hours_end)})`}
                 </Text>
               </View>
             )}
