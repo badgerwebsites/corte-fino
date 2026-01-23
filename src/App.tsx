@@ -5,7 +5,7 @@
 // import BookingPage from './pages/BookingPage';
 // import LoginPage from './pages/LoginPage';
 // import SignUpPage from './pages/SignUpPage';
-// import DashboardPage from './pages/DashboardPage';
+// import DashboardPage from './pages/CustomerDashboardPage';
 // import RewardsPage from './pages/RewardsPage';
 // import AdminPage from './pages/AdminPage';
 
@@ -34,11 +34,10 @@ import HomePage from './pages/HomePage';
 import BookingPage from './pages/BookingPage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
-import DashboardPage from './pages/DashboardPage';
 import RewardsPage from './pages/RewardsPage';
 import AdminPage from './pages/AdminPage';
-
-import DashboardRouter from './routes/DashboardRouter';
+import CustomerDashboardPage from './pages/CustomerDashboardPage';
+import DashboardRouter from './pages/DashboardRouter';
 
 export default function App() {
   return (
@@ -52,7 +51,7 @@ export default function App() {
 
           <Route path="/dashboard" element={<DashboardRouter />} />
 
-          <Route path="/dashboard/home" element={<DashboardPage />} />
+          <Route path="/dashboard/customer" element={<CustomerDashboardPage />} />
           <Route path="/admin" element={<AdminPage />} />
 
           <Route path="/rewards" element={<RewardsPage />} />

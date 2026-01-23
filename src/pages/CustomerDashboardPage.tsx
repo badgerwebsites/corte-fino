@@ -2,18 +2,27 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
-import { supabase } from '../lib/supabase';
-import type { BookingWithDetails } from '../types/database.types';
-import { Navigation } from '../components/Navigation';
-import { View } from '../ui/View';
-import { Text } from '../ui/Text';
-import * as styles from '../styles/dashboard.css';
+import { supabase } from '../lib/supabase.ts';
+import type { BookingWithDetails } from '../types/database.types.ts';
+import { Navigation } from '../components/Navigation.tsx';
+import { View } from '../ui/View.tsx';
+import { Text } from '../ui/Text.tsx';
+import * as styles from '../styles/dashboard.css.ts';
 
-export default function DashboardPage() {
+export default function CustomerDashboardPage() {
   const { user, customer, signOut } = useAuth();
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  // const { customer, loading } = useAuth();
+
+  useEffect(() => {
+    if (loading) return;
+  
+    if (customer?.is_admin) {
+      navigate('/admin', { replace: true });
+    }
+  }, [customer, loading, navigate]);
 
   useEffect(() => {
     if (!user) {

@@ -28,7 +28,7 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password);
-      navigate(redirectTo);
+      navigate('/dashboard', { replace: true });
     } catch {
       setError('Invalid email or password');
     } finally {
