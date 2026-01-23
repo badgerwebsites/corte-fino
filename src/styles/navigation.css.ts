@@ -147,8 +147,8 @@ export const bookNowButton = style({
   ...baseButton,
   padding: '6px 8px',
   fontSize: 12,
-  backgroundColor: '#1a1a1a',
-  color: '#ffffff',
+  backgroundColor: '#c6ecf4',
+  color: '#1a1a1a',
   border: 'none',
   borderRadius: 6,
 
@@ -162,7 +162,7 @@ export const bookNowButton = style({
   },
 
   ':hover': {
-    backgroundColor: '#333',
+    backgroundColor: '#a8dce8',
   },
 
   ':active': {

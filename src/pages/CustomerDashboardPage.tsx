@@ -8,6 +8,7 @@ import { Navigation } from '../components/Navigation.tsx';
 import { View } from '../ui/View.tsx';
 import { Text } from '../ui/Text.tsx';
 import * as styles from '../styles/dashboard.css.ts';
+import calendarCheckIcon from '../assets/calendar-check.svg';
 
 export default function CustomerDashboardPage() {
   const { user, customer, signOut } = useAuth();
@@ -105,9 +106,13 @@ export default function CustomerDashboardPage() {
 
         {bookings.length === 0 ? (
           <View className={styles.emptyState}>
-            <Text>No bookings yet</Text>
+            <img src={calendarCheckIcon} alt="" className={styles.emptyStateIcon} />
+            <Text className={styles.emptyStateTitle}>No appointments yet</Text>
+            <Text className={styles.emptyStateText}>
+              Book your first appointment and start earning reward points with every visit.
+            </Text>
             <Link to="/book" className={styles.bookButton}>
-              Book Your First Appointment
+              Book Appointment
             </Link>
           </View>
         ) : (
@@ -148,15 +153,24 @@ export default function CustomerDashboardPage() {
       </View>
 
       <View className={styles.section}>
-        <Link to="/rewards" className={styles.rewardsLink}>
-          View Available Rewards →
-        </Link>
+        <View className={styles.rewardsCard}>
+          <View className={styles.rewardsInfo}>
+            <Text className={styles.rewardsIcon}>&#127873;</Text>
+            <View className={styles.rewardsText}>
+              <Text className={styles.rewardsTitle}>Rewards Program</Text>
+              <Text className={styles.rewardsSubtitle}>Redeem your points for free services</Text>
+            </View>
+          </View>
+          <Link to="/rewards" className={styles.rewardsLink}>
+            View Rewards
+          </Link>
+        </View>
       </View>
 
       {customer?.is_admin && (
         <View className={styles.section}>
           <Link to="/admin" className={styles.adminLink}>
-            🔧 Admin Dashboard
+            Admin Dashboard
           </Link>
         </View>
       )}

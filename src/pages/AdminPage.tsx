@@ -80,11 +80,11 @@ export default function AdminPage() {
     }
   };
 
-  const formatTimeTo12Hour = (time: string): string => {
-    const [hours, minutes] = time.split(':').map(Number);
-    const period = hours >= 12 ? 'PM' : 'AM';
+  const formatTimeShort = (time: string): string => {
+    const [hours] = time.split(':').map(Number);
+    const period = hours >= 12 ? 'pm' : 'am';
     const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+    return `${displayHours}${period}`;
   };
 
   const getPrice = (barberId: string, serviceId: string, timePeriod: 'regular' | 'evening'): number => {
@@ -339,9 +339,6 @@ export default function AdminPage() {
       {activeTab === 'pricing' && (
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>Set Prices by Barber & Time</Text>
-          <Text className={styles.sectionDescription}>
-            Set individual prices for each barber based on their personal time periods.
-          </Text>
 
           {services.map((service) => (
             <View key={service.id} className={styles.serviceSection}>
@@ -350,40 +347,33 @@ export default function AdminPage() {
               </Text>
 
               <View className={styles.pricingGrid}>
-                <View className={styles.pricingHeader}>
-                  <Text className={styles.pricingHeaderCell}>Barber</Text>
-                  <Text className={styles.pricingHeaderCell}>Regular Hours</Text>
-                  <Text className={styles.pricingHeaderCell}>Evening Hours</Text>
-                </View>
-
                 {barbers.map((barber) => (
                   <View key={barber.id} className={styles.pricingRow}>
-                    <View>
-                      <Text className={styles.barberNameCell}>{barber.name}</Text>
-                      <Text className={styles.barberTimeInfo}>
-                        Regular: {formatTimeTo12Hour(barber.regular_hours_start)}-{formatTimeTo12Hour(barber.regular_hours_end)}
-                      </Text>
+                    <Text className={styles.barberNameCell}>{barber.name}</Text>
+
+                    <View className={styles.priceInputWrapper}>
+                      <Text className={styles.priceInputLabel}>Regular <span className={styles.priceTimeHint}>{formatTimeShort(barber.regular_hours_start)}–{formatTimeShort(barber.regular_hours_end)}</span></Text>
+                      <View className={styles.priceInputCell}>
+                        <Text className={styles.dollarSign}>$</Text>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          className={styles.priceInput}
+                          value={getPrice(barber.id, service.id, 'regular') || ''}
+                          onChange={(e) => handlePriceUpdate(
+                            barber.id,
+                            service.id,
+                            'regular',
+                            parseFloat(e.target.value) || 0
+                          )}
+                          placeholder="0"
+                        />
+                      </View>
                     </View>
 
-                    <View className={styles.priceInputCell}>
-                      <Text className={styles.dollarSign}>$</Text>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        className={styles.priceInput}
-                        value={getPrice(barber.id, service.id, 'regular') || ''}
-                        onChange={(e) => handlePriceUpdate(
-                          barber.id,
-                          service.id,
-                          'regular',
-                          parseFloat(e.target.value) || 0
-                        )}
-                        placeholder="0.00"
-                      />
-                    </View>
-
-                    <View>
+                    <View className={styles.priceInputWrapper}>
+                      <Text className={styles.priceInputLabel}>Evening <span className={styles.priceTimeHint}>{formatTimeShort(barber.evening_hours_start)}–{formatTimeShort(barber.evening_hours_end)}</span></Text>
                       <View className={styles.priceInputCell}>
                         <Text className={styles.dollarSign}>$</Text>
                         <input
@@ -398,12 +388,9 @@ export default function AdminPage() {
                             'evening',
                             parseFloat(e.target.value) || 0
                           )}
-                          placeholder="0.00"
+                          placeholder="0"
                         />
                       </View>
-                      <Text className={styles.barberTimeInfo}>
-                        Evening: {formatTimeTo12Hour(barber.evening_hours_start)}-{formatTimeTo12Hour(barber.evening_hours_end)}
-                      </Text>
                     </View>
                   </View>
                 ))}
@@ -535,14 +522,18 @@ export default function AdminPage() {
             {barbers.map((barber) => (
               <View key={barber.id} className={styles.barberCard}>
                 <View className={styles.barberInfo}>
-                  <Text className={styles.barberName}>{barber.name}</Text>
-                  {barber.instagram_handle && (
-                    <Text className={styles.barberDetail}>
-                      Instagram: @{barber.instagram_handle}
-                    </Text>
-                  )}
-                  <View className={styles.statusBadge}>
-                    <Text>{barber.is_active ? '✓ Active' : '✗ Inactive'}</Text>
+                  <View className={styles.barberNameRow}>
+                    <Text className={styles.barberName}>{barber.name}</Text>
+                    {barber.is_active && (
+                      <View className={styles.statusBadge}>
+                        <Text>✓ Active</Text>
+                      </View>
+                    )}
+                    {!barber.is_active && (
+                      <View className={styles.statusBadgeInactive}>
+                        <Text>✗ Inactive</Text>
+                      </View>
+                    )}
                   </View>
                 </View>
                 <View className={styles.barberActions}>
@@ -633,52 +624,52 @@ export default function AdminPage() {
               />
             </View>
 
-            <View className={styles.formGroup}>
-              <label className={styles.label}>Hours & Pricing Periods</label>
-              <Text className={styles.sectionDescription}>
-                Define when this barber charges regular vs evening rates
+            <View className={styles.pricingPeriodsCard}>
+              <Text className={styles.pricingPeriodsTitle}>Pricing Time Periods</Text>
+              <Text className={styles.pricingPeriodsHint}>
+                Set when regular and evening pricing applies
               </Text>
-            </View>
 
-            <View className={styles.timeInputRow}>
-              <View className={styles.formGroup}>
-                <label className={styles.label}>Regular Hours Start</label>
-                <input
-                  type="time"
-                  className={styles.input}
-                  value={barberForm.regular_hours_start}
-                  onChange={(e) => setBarberForm({ ...barberForm, regular_hours_start: e.target.value })}
-                />
-              </View>
-              <View className={styles.formGroup}>
-                <label className={styles.label}>Regular Hours End</label>
-                <input
-                  type="time"
-                  className={styles.input}
-                  value={barberForm.regular_hours_end}
-                  onChange={(e) => setBarberForm({ ...barberForm, regular_hours_end: e.target.value })}
-                />
-              </View>
-            </View>
+              <View className={styles.pricingTimeline}>
+                <View className={styles.pricingTimeBlock}>
+                  <label className={styles.pricingTimeLabel}>Regular Starts</label>
+                  <input
+                    type="time"
+                    className={styles.input}
+                    value={barberForm.regular_hours_start}
+                    onChange={(e) => setBarberForm({ ...barberForm, regular_hours_start: e.target.value })}
+                  />
+                  <span className={`${styles.pricingPeriodBadge} ${styles.regularBadge}`}>Regular pricing</span>
+                </View>
 
-            <View className={styles.timeInputRow}>
-              <View className={styles.formGroup}>
-                <label className={styles.label}>Evening Hours Start</label>
-                <input
-                  type="time"
-                  className={styles.input}
-                  value={barberForm.evening_hours_start}
-                  onChange={(e) => setBarberForm({ ...barberForm, evening_hours_start: e.target.value })}
-                />
-              </View>
-              <View className={styles.formGroup}>
-                <label className={styles.label}>Evening Hours End</label>
-                <input
-                  type="time"
-                  className={styles.input}
-                  value={barberForm.evening_hours_end}
-                  onChange={(e) => setBarberForm({ ...barberForm, evening_hours_end: e.target.value })}
-                />
+                <View className={styles.pricingTimeArrow}>→</View>
+
+                <View className={styles.pricingTimeBlock}>
+                  <label className={styles.pricingTimeLabel}>Evening Starts</label>
+                  <input
+                    type="time"
+                    className={styles.input}
+                    value={barberForm.regular_hours_end}
+                    onChange={(e) => setBarberForm({
+                      ...barberForm,
+                      regular_hours_end: e.target.value,
+                      evening_hours_start: e.target.value
+                    })}
+                  />
+                  <span className={`${styles.pricingPeriodBadge} ${styles.eveningBadge}`}>Evening pricing</span>
+                </View>
+
+                <View className={styles.pricingTimeArrow}>→</View>
+
+                <View className={styles.pricingTimeBlock}>
+                  <label className={styles.pricingTimeLabel}>Evening Ends</label>
+                  <input
+                    type="time"
+                    className={styles.input}
+                    value={barberForm.evening_hours_end}
+                    onChange={(e) => setBarberForm({ ...barberForm, evening_hours_end: e.target.value })}
+                  />
+                </View>
               </View>
             </View>
 

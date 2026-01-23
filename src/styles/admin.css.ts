@@ -346,15 +346,31 @@ export const barberDetail = style({
   },
 });
 
+export const barberNameRow = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.75rem',
+  flexWrap: 'wrap',
+});
+
 export const statusBadge = style({
   display: 'inline-block',
-  marginTop: '0.5rem',
-  padding: '0.25rem 0.75rem',
-  background: '#c6f6d5',
-  color: '#22543d',
+  padding: '0.2rem 0.6rem',
+  background: '#c6ecf4',
+  color: '#1a1a1a',
   borderRadius: '1rem',
-  fontSize: '0.875rem',
-  fontWeight: '600',
+  fontSize: '0.75rem',
+  fontWeight: '500',
+});
+
+export const statusBadgeInactive = style({
+  display: 'inline-block',
+  padding: '0.2rem 0.6rem',
+  background: '#f0f0f0',
+  color: '#666',
+  borderRadius: '1rem',
+  fontSize: '0.75rem',
+  fontWeight: '500',
 });
 
 export const barberActions = style({
@@ -365,10 +381,10 @@ export const barberActions = style({
 
 export const editButton = style({
   padding: '0.5rem 0.875rem',
-  background: '#1a1a1a',
-  color: '#ffffff',
-  border: 'none',
-  borderRadius: '2px',
+  background: 'transparent',
+  color: '#0e7490',
+  border: '1px solid #a5d8e6',
+  borderRadius: '4px',
   fontSize: '0.8125rem',
   fontWeight: '500',
   cursor: 'pointer',
@@ -376,56 +392,60 @@ export const editButton = style({
   whiteSpace: 'nowrap',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.5rem 1rem',
-      fontSize: '0.875rem',
+      padding: '0.625rem 1.25rem',
+      fontSize: '0.9375rem',
     },
   },
   ':hover': {
-    background: '#333',
+    background: '#c6ecf4',
+    borderColor: '#c6ecf4',
+    color: '#1a1a1a',
   },
 });
 
 export const toggleButton = style({
   padding: '0.5rem 0.875rem',
-  background: '#ecc94b',
-  color: '#744210',
-  border: 'none',
-  borderRadius: '2px',
+  background: 'transparent',
+  color: '#1a1a1a',
+  border: '1px solid #1a1a1a',
+  borderRadius: '4px',
   fontSize: '0.8125rem',
   fontWeight: '500',
   cursor: 'pointer',
   whiteSpace: 'nowrap',
+  transition: 'all 0.2s',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.5rem 1rem',
-      borderRadius: '0.5rem',
-      fontSize: '0.875rem',
+      padding: '0.625rem 1.25rem',
+      fontSize: '0.9375rem',
     },
   },
   ':hover': {
-    background: '#d69e2e',
+    background: '#1a1a1a',
+    color: '#ffffff',
   },
 });
 
 export const deleteButton = style({
   padding: '0.5rem 0.875rem',
-  background: '#fc8181',
-  color: '#742a2a',
-  border: 'none',
-  borderRadius: '2px',
+  background: 'transparent',
+  color: '#b91c1c',
+  border: '1px solid #e5a3a3',
+  borderRadius: '4px',
   fontSize: '0.8125rem',
   fontWeight: '500',
   cursor: 'pointer',
   whiteSpace: 'nowrap',
+  transition: 'all 0.2s',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.5rem 1rem',
-      borderRadius: '0.5rem',
-      fontSize: '0.875rem',
+      padding: '0.625rem 1.25rem',
+      fontSize: '0.9375rem',
     },
   },
   ':hover': {
-    background: '#f56565',
+    background: '#fef2f2',
+    borderColor: '#d4a3a3',
   },
 });
 
@@ -475,47 +495,45 @@ export const priceControl = style({
   gap: '0.5rem',
 });
 
-export const priceLabel = style({
-  fontWeight: '600',
-  color: '#2d3748',
-});
-
 export const priceInput = style({
-  width: '120px',
-  padding: '0.5rem',
-  border: '2px solid #cbd5e0',
-  borderRadius: '0.5rem',
-  fontSize: '1rem',
-  fontWeight: '600',
+  width: '70px',
+  padding: '0.375rem 0.5rem',
+  border: '1px solid #e5e5e5',
+  borderRadius: '4px',
+  fontSize: '0.9rem',
+  fontWeight: '500',
   textAlign: 'right',
+  transition: 'border-color 0.2s',
   ':focus': {
     outline: 'none',
-    borderColor: '#667eea',
+    borderColor: '#1a1a1a',
   },
 });
 
 export const serviceSection = style({
-  marginBottom: '1.5rem',
-  padding: '1rem',
-  background: '#f7fafc',
+  marginBottom: '1rem',
+  padding: '0.75rem',
+  background: '#fafafa',
   borderRadius: '0.5rem',
+  border: '1px solid #e5e5e5',
   '@media': {
     'screen and (min-width: 768px)': {
-      marginBottom: '2rem',
-      padding: '1.5rem',
-      borderRadius: '0.75rem',
+      marginBottom: '1.25rem',
+      padding: '1rem',
     },
   },
 });
 
 export const serviceSectionTitle = style({
-  fontSize: '1.125rem',
+  fontSize: '1rem',
   fontWeight: 600,
-  color: '#1a202c',
-  marginBottom: '1rem',
+  color: '#1a1a1a',
+  marginBottom: '0.75rem',
+  paddingBottom: '0.5rem',
+  borderBottom: '1px solid #e5e5e5',
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: '1.25rem',
+      fontSize: '1.1rem',
     },
   },
 });
@@ -526,56 +544,30 @@ export const pricingGrid = style({
   gap: '0.5rem',
 });
 
-export const pricingHeader = style({
-  display: 'none',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr 1fr',
-      gap: '1rem',
-      padding: '0.75rem 1rem',
-      background: '#e2e8f0',
-      borderRadius: '0.5rem',
-      fontWeight: '600',
-    },
-  },
-});
-
-export const pricingHeaderCell = style({
-  color: '#2d3748',
-  fontSize: '0.875rem',
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-});
-
 export const pricingRow = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.75rem',
-  padding: '1rem',
+  gap: '0.625rem',
+  padding: '0.75rem',
   background: 'white',
-  borderRadius: '0.5rem',
+  borderRadius: '4px',
+  border: '1px solid #e5e5e5',
   '@media': {
     'screen and (min-width: 768px)': {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr 1fr',
-      gap: '1rem',
-      padding: '0.75rem 1rem',
-      alignItems: 'center',
+      padding: '1rem',
+      gap: '0.75rem',
     },
   },
 });
 
 export const barberNameCell = style({
-  fontSize: '1rem',
+  fontSize: '0.9rem',
   fontWeight: '500',
-  color: '#1a202c',
+  color: '#1a1a1a',
 });
 
 export const barberTimeInfo = style({
-  fontSize: '0.75rem',
-  color: '#718096',
-  marginTop: '0.25rem',
+  display: 'none',
 });
 
 export const priceInputCell = style({
@@ -584,10 +576,28 @@ export const priceInputCell = style({
   gap: '0.25rem',
 });
 
+export const priceInputWrapper = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
+});
+
+export const priceInputLabel = style({
+  fontSize: '0.7rem',
+  fontWeight: '500',
+  color: '#1a1a1a',
+  letterSpacing: '0.02em',
+});
+
+export const priceTimeHint = style({
+  fontWeight: '400',
+  color: '#999',
+});
+
 export const dollarSign = style({
-  fontSize: '1rem',
-  fontWeight: '600',
-  color: '#4a5568',
+  fontSize: '0.85rem',
+  fontWeight: '500',
+  color: '#666',
 });
 
 export const timeSettingsGrid = style({
@@ -620,4 +630,144 @@ export const timeInputRow = style({
 export const timeInputGroup = style({
   display: 'flex',
   flexDirection: 'column',
+});
+
+// Schedule manager styles
+export const scheduleTimeRow = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.75rem',
+  marginLeft: '0',
+  marginTop: '0.75rem',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      flexDirection: 'row',
+      gap: '1rem',
+      marginLeft: '2rem',
+      marginTop: '0',
+    },
+  },
+});
+
+export const scheduleTimeInput = style({
+  flex: 1,
+  minWidth: 0,
+  maxWidth: '140px',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      maxWidth: 'none',
+    },
+  },
+});
+
+export const scheduleDayCard = style({
+  padding: '0.75rem',
+  borderRadius: '0.5rem',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '1rem',
+    },
+  },
+});
+
+export const scheduleDayHeader = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.75rem',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      gap: '1rem',
+    },
+  },
+});
+
+// Pricing Time Periods styles
+export const pricingPeriodsCard = style({
+  background: '#f8fafc',
+  border: '1px solid #e2e8f0',
+  borderRadius: '0.5rem',
+  padding: '1rem',
+  marginTop: '0.5rem',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '1.25rem',
+    },
+  },
+});
+
+export const pricingPeriodsTitle = style({
+  fontSize: '0.9rem',
+  fontWeight: '600',
+  color: '#1a1a1a',
+  marginBottom: '0.5rem',
+});
+
+export const pricingPeriodsHint = style({
+  fontSize: '0.8rem',
+  color: '#64748b',
+  marginBottom: '1rem',
+});
+
+export const pricingTimeline = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      gap: '0.75rem',
+    },
+  },
+});
+
+export const pricingTimeBlock = style({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.375rem',
+});
+
+export const pricingTimeLabel = style({
+  fontSize: '0.75rem',
+  fontWeight: '500',
+  color: '#475569',
+  textTransform: 'uppercase',
+  letterSpacing: '0.03em',
+});
+
+export const pricingTimeArrow = style({
+  display: 'none',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#94a3b8',
+      fontSize: '1.25rem',
+      paddingBottom: '0.5rem',
+    },
+  },
+});
+
+export const pricingPeriodBadge = style({
+  display: 'inline-block',
+  padding: '0.25rem 0.625rem',
+  borderRadius: '0.25rem',
+  fontSize: '0.7rem',
+  fontWeight: '500',
+  marginTop: '0.25rem',
+  borderLeft: '3px solid transparent',
+});
+
+export const regularBadge = style({
+  background: '#f0f9ff',
+  color: '#0369a1',
+  borderLeftColor: '#0ea5e9',
+});
+
+export const eveningBadge = style({
+  background: '#f1f5f9',
+  color: '#0369a1',
+  borderLeftColor: '#0ea5e9',
 });

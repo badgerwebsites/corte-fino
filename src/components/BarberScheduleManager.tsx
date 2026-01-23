@@ -80,15 +80,18 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
     if (!selectedBarber) return;
 
     try {
-      if (currentlyAvailable) {
+      const existingAvailability = availability.find(a => a.day_of_week === dayOfWeek);
+
+      if (existingAvailability) {
+        // Update existing record
         const { error } = await supabase
           .from('barber_availability')
-          .delete()
-          .eq('barber_id', selectedBarber.id)
-          .eq('day_of_week', dayOfWeek);
+          .update({ is_available: !currentlyAvailable })
+          .eq('id', existingAvailability.id);
 
         if (error) throw error;
       } else {
+        // Insert new record (only when toggling ON and no record exists)
         const { error } = await supabase
           .from('barber_availability')
           .insert({
@@ -244,19 +247,18 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                 return (
                   <div
                     key={day.value}
+                    className={styles.scheduleDayCard}
                     style={{
-                      padding: '1rem',
                       backgroundColor: isAvailable ? '#f0f9ff' : '#f7fafc',
-                      borderRadius: '0.5rem',
                       border: isAvailable ? '2px solid #1a1a1a' : '2px solid #e5e5e5',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: isAvailable ? '0.75rem' : '0' }}>
+                    <div className={styles.scheduleDayHeader}>
                       <input
                         type="checkbox"
                         checked={isAvailable}
                         onChange={() => handleToggleDay(day.value, isAvailable)}
-                        style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                        style={{ width: '20px', height: '20px', cursor: 'pointer', flexShrink: 0 }}
                       />
                       <span style={{ fontSize: '1rem', fontWeight: 500 }}>
                         {day.label}
@@ -264,8 +266,8 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                     </div>
 
                     {isAvailable && dayAvail && (
-                      <div style={{ display: 'flex', gap: '1rem', marginLeft: '2rem' }}>
-                        <div style={{ flex: 1 }}>
+                      <div className={styles.scheduleTimeRow}>
+                        <div className={styles.scheduleTimeInput}>
                           <label className={styles.label}>Start Time</label>
                           <input
                             type="time"
@@ -274,7 +276,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                             onChange={(e) => handleUpdateTime(dayAvail.id, 'start_time', e.target.value)}
                           />
                         </div>
-                        <div style={{ flex: 1 }}>
+                        <div className={styles.scheduleTimeInput}>
                           <label className={styles.label}>End Time</label>
                           <input
                             type="time"

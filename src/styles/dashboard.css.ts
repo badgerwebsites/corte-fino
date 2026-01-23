@@ -18,51 +18,51 @@ export const header = style({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  maxWidth: 1200,
+  maxWidth: 800,
   margin: "0 auto 32px",
   flexWrap: "wrap",
   gap: 12,
   "@media": {
     "screen and (min-width: 768px)": {
-      marginBottom: 48,
+      marginBottom: 40,
       gap: 16,
     },
   },
 });
 
 export const title = style({
-  fontSize: 28,
+  fontSize: 24,
   fontWeight: 300,
   color: "#1a1a1a",
   letterSpacing: "-0.01em",
-  marginBottom: 6,
+  marginBottom: 4,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 36,
-      marginBottom: 8,
+      fontSize: 32,
+      marginBottom: 6,
     },
   },
 });
 
 export const subtitle = style({
-  fontSize: 16,
-  color: "#666",
-  fontWeight: 300,
+  fontSize: 15,
+  color: "#64748b",
+  fontWeight: 400,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 18,
+      fontSize: 16,
     },
   },
 });
 
 export const signOutButton = style({
-  padding: "10px 20px",
+  padding: "8px 16px",
   fontSize: 14,
-  fontWeight: 400,
+  fontWeight: 500,
   backgroundColor: "transparent",
-  color: "#666",
-  border: "1px solid #e5e5e5",
-  borderRadius: 2,
+  color: "#64748b",
+  border: "1px solid #e2e8f0",
+  borderRadius: 4,
   cursor: "pointer",
   transition: "all 0.2s",
   ":hover": {
@@ -74,63 +74,61 @@ export const signOutButton = style({
 export const statsGrid = style({
   display: "grid",
   gridTemplateColumns: "repeat(2, 1fr)",
-  gap: 16,
-  maxWidth: 1200,
-  margin: "0 auto 32px",
+  gap: 12,
+  maxWidth: 800,
+  margin: "0 auto 24px",
   "@media": {
     "screen and (min-width: 768px)": {
-      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-      gap: 24,
-      marginBottom: 48,
+      gap: 16,
+      marginBottom: 32,
     },
   },
 });
 
 export const statCard = style({
-  padding: 24,
+  padding: 20,
   backgroundColor: "#ffffff",
-  borderRadius: 2,
-  border: "1px solid #e5e5e5",
-  textAlign: "center",
+  borderRadius: 8,
+  border: "1px solid #e2e8f0",
+  borderTop: "3px solid #0ea5e9",
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: 32,
+      padding: 24,
     },
   },
 });
 
 export const statValue = style({
-  fontSize: 36,
-  fontWeight: 300,
+  fontSize: 32,
+  fontWeight: 600,
   color: "#1a1a1a",
-  marginBottom: 6,
+  marginBottom: 4,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 48,
-      marginBottom: 8,
+      fontSize: 40,
     },
   },
 });
 
 export const statLabel = style({
-  fontSize: 10,
-  color: "#999",
+  fontSize: 12,
+  color: "#64748b",
   textTransform: "uppercase",
-  letterSpacing: "0.1em",
+  letterSpacing: "0.05em",
   fontWeight: 500,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 12,
+      fontSize: 13,
     },
   },
 });
 
 export const section = style({
-  maxWidth: 1200,
-  margin: "0 auto 32px",
+  maxWidth: 800,
+  margin: "0 auto 24px",
   "@media": {
     "screen and (min-width: 768px)": {
-      marginBottom: 48,
+      marginBottom: 32,
     },
   },
 });
@@ -139,91 +137,148 @@ export const sectionHeader = style({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  marginBottom: 20,
+  marginBottom: 16,
   flexWrap: "wrap",
   gap: 12,
   "@media": {
     "screen and (min-width: 768px)": {
-      marginBottom: 24,
-      gap: 16,
+      marginBottom: 20,
     },
   },
 });
 
 export const sectionTitle = style({
-  fontSize: 20,
-  fontWeight: 300,
+  fontSize: 18,
+  fontWeight: 600,
   color: "#1a1a1a",
-  letterSpacing: "-0.01em",
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 24,
+      fontSize: 20,
     },
   },
 });
 
 export const bookButton = style({
-  padding: "12px 24px",
+  padding: "10px 20px",
   fontSize: 14,
   fontWeight: 500,
   backgroundColor: "#1a1a1a",
   color: "#ffffff",
   border: "none",
-  borderRadius: 2,
+  borderRadius: 6,
   cursor: "pointer",
   textDecoration: "none",
   display: "inline-block",
-  transition: "all 0.3s ease",
-  letterSpacing: "0.05em",
+  transition: "all 0.2s ease",
+  letterSpacing: "0.02em",
   ":hover": {
     backgroundColor: "#333",
-    transform: "translateY(-2px)",
+  },
+  ":active": {
+    transform: "scale(0.98)",
   },
 });
 
 export const emptyState = style({
-  padding: 64,
+  padding: "48px 24px",
   textAlign: "center",
   backgroundColor: "#ffffff",
-  borderRadius: 2,
-  border: "1px solid #e5e5e5",
+  borderRadius: 8,
+  border: "1px solid #e2e8f0",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: "64px 32px",
+    },
+  },
+});
+
+export const emptyStateIcon = style({
+  fontSize: 48,
+  marginBottom: 16,
+  opacity: 0.4,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 56,
+    },
+  },
+});
+
+export const emptyStateTitle = style({
+  fontSize: 18,
+  fontWeight: 600,
+  color: "#1a1a1a",
+  marginBottom: 8,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 20,
+    },
+  },
+});
+
+export const emptyStateText = style({
+  fontSize: 14,
+  color: "#64748b",
+  marginBottom: 24,
+  maxWidth: 300,
+  marginLeft: "auto",
+  marginRight: "auto",
+  lineHeight: 1.5,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 15,
+    },
+  },
 });
 
 export const bookingsList = style({
   display: "flex",
   flexDirection: "column",
-  gap: 16,
+  gap: 12,
 });
 
 export const bookingCard = style({
-  padding: 24,
+  padding: 16,
   backgroundColor: "#ffffff",
-  borderRadius: 2,
-  border: "1px solid #e5e5e5",
+  borderRadius: 8,
+  border: "1px solid #e2e8f0",
+  transition: "border-color 0.2s",
+  ":hover": {
+    borderColor: "#cbd5e1",
+  },
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 20,
+    },
+  },
 });
 
 export const bookingHeader = style({
   display: "flex",
   justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: 16,
+  alignItems: "flex-start",
+  marginBottom: 12,
   flexWrap: "wrap",
-  gap: 12,
+  gap: 8,
 });
 
 export const bookingDate = style({
-  fontSize: 18,
-  fontWeight: 500,
+  fontSize: 15,
+  fontWeight: 600,
   color: "#1a1a1a",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
 });
 
 export const statusBadge = style({
-  padding: "6px 12px",
+  padding: "4px 10px",
   fontSize: 11,
   fontWeight: 500,
-  borderRadius: 2,
+  borderRadius: 4,
   textTransform: "uppercase",
-  letterSpacing: "0.1em",
+  letterSpacing: "0.05em",
 });
 
 export const pending = style({
@@ -232,64 +287,157 @@ export const pending = style({
 });
 
 export const confirmed = style({
-  backgroundColor: "#d1fae5",
-  color: "#065f46",
+  backgroundColor: "#e0f2fe",
+  color: "#0369a1",
 });
 
 export const completed = style({
-  backgroundColor: "#dbeafe",
-  color: "#1e3a8a",
+  backgroundColor: "#f0f9ff",
+  color: "#0c4a6e",
 });
 
 export const cancelled = style({
-  backgroundColor: "#fee2e2",
-  color: "#991b1b",
+  backgroundColor: "#fef2f2",
+  color: "#b91c1c",
 });
 
 export const no_show = style({
-  backgroundColor: "#f4f4f5",
-  color: "#52525b",
+  backgroundColor: "#f1f5f9",
+  color: "#475569",
 });
 
 export const bookingDetails = style({
   display: "flex",
   flexDirection: "column",
-  gap: 8,
+  gap: 4,
 });
 
 export const bookingTime = style({
-  fontSize: 16,
+  fontSize: 14,
   fontWeight: 500,
-  color: "#1a1a1a",
+  color: "#0369a1",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 15,
+    },
+  },
 });
 
 export const bookingService = style({
-  fontSize: 16,
-  color: "#666",
-  fontWeight: 300,
+  fontSize: 15,
+  color: "#1a1a1a",
+  fontWeight: 500,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
 });
 
 export const bookingBarber = style({
-  fontSize: 14,
-  color: "#999",
-  fontWeight: 300,
+  fontSize: 13,
+  color: "#64748b",
+  fontWeight: 400,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 14,
+    },
+  },
 });
 
 export const bookingPrice = style({
-  fontSize: 18,
-  fontWeight: 500,
+  fontSize: 16,
+  fontWeight: 600,
   color: "#1a1a1a",
   marginTop: 8,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 17,
+    },
+  },
+});
+
+// Rewards card styles
+export const rewardsCard = style({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: 20,
+  backgroundColor: "#ffffff",
+  borderRadius: 8,
+  border: "1px solid #e2e8f0",
+  gap: 16,
+  flexWrap: "wrap",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 24,
+    },
+  },
+});
+
+export const rewardsInfo = style({
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+});
+
+export const rewardsIcon = style({
+  fontSize: 24,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 28,
+    },
+  },
+});
+
+export const rewardsText = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 2,
+});
+
+export const rewardsTitle = style({
+  fontSize: 15,
+  fontWeight: 600,
+  color: "#1a1a1a",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
+});
+
+export const rewardsSubtitle = style({
+  fontSize: 13,
+  color: "#64748b",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 14,
+    },
+  },
 });
 
 export const rewardsLink = style({
-  display: "inline-block",
-  fontSize: 16,
-  color: "#1a1a1a",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  fontSize: 14,
+  color: "#0369a1",
   textDecoration: "none",
   fontWeight: 500,
+  padding: "8px 16px",
+  borderRadius: 6,
+  border: "1px solid #e0f2fe",
+  backgroundColor: "#f0f9ff",
+  transition: "all 0.2s",
   ":hover": {
-    opacity: 0.6,
+    backgroundColor: "#e0f2fe",
+    borderColor: "#bae6fd",
+  },
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 14,
+    },
   },
 });
 
@@ -299,13 +447,12 @@ export const adminLink = style({
   color: "#ffffff",
   textDecoration: "none",
   fontWeight: 500,
-  padding: "12px 24px",
+  padding: "10px 20px",
   backgroundColor: "#1a1a1a",
-  borderRadius: 2,
-  transition: "all 0.3s ease",
-  letterSpacing: "0.05em",
+  borderRadius: 6,
+  transition: "all 0.2s ease",
+  letterSpacing: "0.02em",
   ":hover": {
     backgroundColor: "#333",
-    transform: "translateY(-2px)",
   },
 });
