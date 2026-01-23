@@ -36,34 +36,32 @@ export default function HomePage() {
     <>
       <Navigation />
 
-      <View className={styles.container}>
-        {/* Hero */}
-        <View className={styles.hero}>
+      {/* Full-Screen Hero */}
+      <View className={styles.heroFullScreen}>
+        <View className={styles.heroOverlay} />
+        <View className={styles.heroContent}>
           <img
             src={logo}
             alt="Corte Fino"
-            className={styles.heroLogo}
+            className={styles.heroLogoLarge}
           />
-
-          <Text className={styles.subtitle}>
+          <Text className={styles.heroTagline}>
             Precision cuts. Refined style.
           </Text>
-
-          <View className={styles.buttonGroup}>
-            <button
-              className={styles.primaryButton}
-              onClick={() => navigate('/book')}
-            >
-              Book Now
-            </button>
-            <button
-              className={styles.secondaryButton}
-              onClick={() => navigate('/rewards')}
-            >
-              Rewards Program
-            </button>
-          </View>
+          <button
+            className={styles.heroBookButton}
+            onClick={() => navigate('/book')}
+          >
+            Book Your Appointment
+          </button>
         </View>
+        <View className={styles.scrollIndicator}>
+          <Text className={styles.scrollText}>Scroll to explore</Text>
+          <Text className={styles.scrollArrow}>↓</Text>
+        </View>
+      </View>
+
+      <View className={styles.container}>
 
         {/* Why Choose Us */}
         <View className={styles.section}>

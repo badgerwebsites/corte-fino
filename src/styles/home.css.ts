@@ -457,3 +457,143 @@ export const footerText = style({
     },
   },
 });
+
+// Full-Screen Hero Styles
+const bounce = keyframes({
+  "0%, 100%": { transform: "translateY(0)" },
+  "50%": { transform: "translateY(10px)" },
+});
+
+export const heroFullScreen = style({
+  position: "relative",
+  width: "100%",
+  height: "100vh",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  overflow: "hidden",
+  backgroundImage: "url('/images/hero-background.webp')",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+  backgroundColor: "#1a1a1a",
+});
+
+export const heroOverlay = style({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(26, 26, 26, 0.7)",
+  zIndex: 1,
+});
+
+export const heroContent = style({
+  position: "relative",
+  zIndex: 2,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  textAlign: "center",
+  padding: "24px",
+  animation: `${fadeIn} 1s ease-out`,
+});
+
+export const heroLogoLarge = style({
+  width: "100%",
+  maxWidth: 400,
+  height: "auto",
+  marginBottom: 32,
+  filter: "brightness(0) invert(1)",
+  animation: `${fadeInUp} 1s ease-out 0.2s backwards`,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      maxWidth: 600,
+      marginBottom: 48,
+    },
+  },
+});
+
+export const heroTagline = style({
+  fontSize: 18,
+  color: "#ffffff",
+  fontWeight: 300,
+  letterSpacing: "0.15em",
+  marginBottom: 48,
+  textTransform: "uppercase",
+  animation: `${fadeInUp} 1s ease-out 0.4s backwards`,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 24,
+      marginBottom: 64,
+    },
+  },
+});
+
+export const heroBookButton = style({
+  padding: "18px 48px",
+  fontSize: 16,
+  fontWeight: 500,
+  backgroundColor: "#c6ecf4",
+  color: "#1a1a1a",
+  border: "none",
+  borderRadius: 2,
+  cursor: "pointer",
+  transition: "all 0.3s ease",
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  animation: `${fadeInUp} 1s ease-out 0.6s backwards`,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: "20px 64px",
+      fontSize: 18,
+    },
+  },
+  ":hover": {
+    backgroundColor: "#f0f0f0",
+    transform: "translateY(-2px)",
+    boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
+  },
+  ":active": {
+    transform: "translateY(0)",
+  },
+});
+
+export const scrollIndicator = style({
+  position: "absolute",
+  bottom: 32,
+  left: "50%",
+  transform: "translateX(-50%)",
+  zIndex: 2,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 8,
+  animation: `${fadeIn} 1s ease-out 1s backwards`,
+});
+
+export const scrollText = style({
+  fontSize: 12,
+  color: "#ffffff",
+  letterSpacing: "0.15em",
+  textTransform: "uppercase",
+  fontWeight: 300,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 13,
+    },
+  },
+});
+
+export const scrollArrow = style({
+  fontSize: 20,
+  color: "#ffffff",
+  animation: `${bounce} 2s ease-in-out infinite`,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 24,
+    },
+  },
+});
