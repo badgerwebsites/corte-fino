@@ -7,6 +7,7 @@ import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/home.css';
+import logo from '../assets/BigLogo.svg';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export default function HomePage() {
         {/* Hero */}
         <View className={styles.hero}>
           <img
-            src="/images/hero-logo.png"
+            src={logo}
             alt="Corte Fino"
             className={styles.heroLogo}
           />

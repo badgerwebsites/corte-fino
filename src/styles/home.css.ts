@@ -40,14 +40,15 @@ export const hero = style({
 export const heroLogo = style({
   width: "100%",
   maxWidth: 500,
-  height: 200,
+  // height: 200,
   objectFit: "cover",
   objectPosition: "center",
   marginBottom: 32,
+  background: "#1a1a1a",
   "@media": {
     "screen and (min-width: 768px)": {
       maxWidth: 700,
-      height: 250,
+      // height: 250,
       marginBottom: 48,
     },
   },
