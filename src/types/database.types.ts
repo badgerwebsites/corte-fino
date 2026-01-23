@@ -15,6 +15,7 @@ export interface Barber {
   id: string;
   name: string;
   bio?: string;
+  phone?: string;
   instagram_handle?: string;
   facebook_url?: string;
   tiktok_handle?: string;

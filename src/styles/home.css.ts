@@ -228,6 +228,9 @@ export const features = style({
 });
 
 export const feature = style({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
   padding: "24px 16px",
   textAlign: "center",
   transition: "all 0.3s ease",
@@ -273,14 +276,27 @@ export const featureIcon = style({
   },
 });
 
+export const featureIconImg = style({
+  width: 32,
+  height: 32,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      width: 40,
+      height: 40,
+    },
+  },
+});
+
 export const featureTitle = style({
   fontSize: 18,
   fontWeight: 500,
+  marginTop: 16,
   marginBottom: 12,
   color: "#1a1a1a",
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 20,
+      marginTop: 20,
       marginBottom: 16,
     },
   },
@@ -372,6 +388,10 @@ export const barberImagePlaceholder = style({
 });
 
 export const barberInfo = style({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  textAlign: "center",
   padding: 20,
   "@media": {
     "screen and (min-width: 768px)": {
@@ -411,14 +431,76 @@ export const barberSocial = style({
   fontWeight: 400,
 });
 
+export const barberSocialLink = style({
+  textDecoration: "none",
+  transition: "opacity 0.2s ease",
+  ":hover": {
+    opacity: 0.7,
+  },
+});
+
+export const barberSocialRow = style({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 6,
+});
+
+export const barberSocialIcon = style({
+  width: 14,
+  height: 14,
+});
+
+export const barberPhoneLink = style({
+  textDecoration: "none",
+  transition: "opacity 0.2s ease",
+  marginTop: 8,
+  ":hover": {
+    opacity: 0.7,
+  },
+});
+
+export const barberPhoneRow = style({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+});
+
+export const barberPhoneIcon = style({
+  width: 16,
+  height: 16,
+  color: "#666",
+});
+
+export const barberPhone = style({
+  fontSize: 13,
+  color: "#666",
+  fontWeight: 400,
+});
+
+export const contactSection = style({
+  padding: "32px 16px",
+  maxWidth: 1200,
+  margin: "0 auto",
+  width: "100%",
+  backgroundColor: "#fafafa",
+  borderTop: "1px solid #e5e5e5",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: "48px 24px",
+    },
+  },
+});
+
 export const contactInfo = style({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  gap: 6,
+  gap: 16,
   "@media": {
     "screen and (min-width: 768px)": {
-      gap: 8,
+      gap: 20,
     },
   },
 });
@@ -430,6 +512,34 @@ export const contactText = style({
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 16,
+    },
+  },
+});
+
+export const contactLink = style({
+  textDecoration: "none",
+  transition: "opacity 0.2s ease",
+  ":hover": {
+    opacity: 0.7,
+  },
+});
+
+export const contactRow = style({
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  justifyContent: "center",
+});
+
+export const contactIcon = style({
+  width: 20,
+  height: 20,
+  color: "#666",
+  flexShrink: 0,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      width: 22,
+      height: 22,
     },
   },
 });
