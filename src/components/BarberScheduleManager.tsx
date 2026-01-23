@@ -34,6 +34,13 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
     reason: '',
   });
 
+  // Auto-select the barber if only one is provided
+  useEffect(() => {
+    if (barbers.length === 1 && !selectedBarber) {
+      setSelectedBarber(barbers[0]);
+    }
+  }, [barbers, selectedBarber]);
+
   useEffect(() => {
     if (selectedBarber) {
       loadBarberSchedule(selectedBarber.id);
@@ -198,24 +205,26 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
         </View>
       </View>
 
-      <View className={styles.formGroup}>
-        <label className={styles.label}>Select Barber</label>
-        <select
-          className={styles.input}
-          value={selectedBarber?.id || ''}
-          onChange={(e) => {
-            const barber = barbers.find(b => b.id === e.target.value);
-            setSelectedBarber(barber || null);
-          }}
-        >
-          <option value="">-- Select a barber --</option>
-          {barbers.map((barber) => (
-            <option key={barber.id} value={barber.id}>
-              {barber.name}
-            </option>
-          ))}
-        </select>
-      </View>
+      {barbers.length > 1 && (
+        <View className={styles.formGroup}>
+          <label className={styles.label}>Select Barber</label>
+          <select
+            className={styles.input}
+            value={selectedBarber?.id || ''}
+            onChange={(e) => {
+              const barber = barbers.find(b => b.id === e.target.value);
+              setSelectedBarber(barber || null);
+            }}
+          >
+            <option value="">-- Select a barber --</option>
+            {barbers.map((barber) => (
+              <option key={barber.id} value={barber.id}>
+                {barber.name}
+              </option>
+            ))}
+          </select>
+        </View>
+      )}
 
       {selectedBarber && !loading && (
         <>

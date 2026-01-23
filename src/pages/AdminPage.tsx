@@ -1,6 +1,6 @@
 // pages/AdminPage.tsx
 import { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
 import type { Barber, Service, BarberServicePricing } from '../types/database.types';
@@ -17,7 +17,7 @@ export default function AdminPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'pricing' | 'services' | 'barbers' | 'schedule'>('pricing');
+  const [activeTab, setActiveTab] = useState<'pricing' | 'services' | 'barbers'>('pricing');
 
   // Barber form state
   const [editingBarber, setEditingBarber] = useState<Barber | null>(null);
@@ -304,9 +304,15 @@ export default function AdminPage() {
       <View className={styles.container}>
       <View className={styles.header}>
         <Text className={styles.title}>Admin Dashboard</Text>
-        <Link to="/dashboard" className={styles.backLink}>
-          ← Back to Dashboard
-        </Link>
+        <button
+          className={styles.backLink}
+          onClick={async () => {
+            await supabase.auth.signOut();
+            navigate('/login');
+          }}
+        >
+          Log Out →
+        </button>
       </View>
 
       <View className={styles.tabs}>
@@ -327,12 +333,6 @@ export default function AdminPage() {
           onClick={() => setActiveTab('barbers')}
         >
           Barbers
-        </button>
-        <button
-          className={`${styles.tab} ${activeTab === 'schedule' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('schedule')}
-        >
-          Schedule
         </button>
       </View>
 
@@ -529,7 +529,48 @@ export default function AdminPage() {
 
       {activeTab === 'barbers' && (
         <View className={styles.section}>
-          <View className={styles.sectionHeader}>
+          {/* Current Barbers List */}
+          <View className={styles.barbersList}>
+            <Text className={styles.sectionTitle}>Current Barbers</Text>
+            {barbers.map((barber) => (
+              <View key={barber.id} className={styles.barberCard}>
+                <View className={styles.barberInfo}>
+                  <Text className={styles.barberName}>{barber.name}</Text>
+                  {barber.instagram_handle && (
+                    <Text className={styles.barberDetail}>
+                      Instagram: @{barber.instagram_handle}
+                    </Text>
+                  )}
+                  <View className={styles.statusBadge}>
+                    <Text>{barber.is_active ? '✓ Active' : '✗ Inactive'}</Text>
+                  </View>
+                </View>
+                <View className={styles.barberActions}>
+                  <button
+                    className={styles.editButton}
+                    onClick={() => handleEditBarber(barber)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className={styles.toggleButton}
+                    onClick={() => handleToggleBarberActive(barber)}
+                  >
+                    {barber.is_active ? 'Deactivate' : 'Activate'}
+                  </button>
+                  <button
+                    className={styles.deleteButton}
+                    onClick={() => handleDeleteBarber(barber.id)}
+                  >
+                    Delete
+                  </button>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          {/* Add/Edit Barber Form */}
+          <View className={styles.sectionHeader} style={{ marginTop: '3rem' }}>
             <Text className={styles.sectionTitle}>
               {editingBarber ? 'Edit Barber' : 'Add New Barber'}
             </Text>
@@ -682,49 +723,13 @@ export default function AdminPage() {
             </View>
           </form>
 
-          <View className={styles.barbersList}>
-            <Text className={styles.sectionTitle}>Current Barbers</Text>
-            {barbers.map((barber) => (
-              <View key={barber.id} className={styles.barberCard}>
-                <View className={styles.barberInfo}>
-                  <Text className={styles.barberName}>{barber.name}</Text>
-                  {barber.instagram_handle && (
-                    <Text className={styles.barberDetail}>
-                      Instagram: @{barber.instagram_handle}
-                    </Text>
-                  )}
-                  <View className={styles.statusBadge}>
-                    <Text>{barber.is_active ? '✓ Active' : '✗ Inactive'}</Text>
-                  </View>
-                </View>
-                <View className={styles.barberActions}>
-                  <button
-                    className={styles.editButton}
-                    onClick={() => handleEditBarber(barber)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className={styles.toggleButton}
-                    onClick={() => handleToggleBarberActive(barber)}
-                  >
-                    {barber.is_active ? 'Deactivate' : 'Activate'}
-                  </button>
-                  <button
-                    className={styles.deleteButton}
-                    onClick={() => handleDeleteBarber(barber.id)}
-                  >
-                    Delete
-                  </button>
-                </View>
-              </View>
-            ))}
-          </View>
+          {/* Schedule Management - only show when editing a barber */}
+          {editingBarber && (
+            <View style={{ marginTop: '3rem' }}>
+              <BarberScheduleManager barbers={[editingBarber]} onUpdate={loadData} />
+            </View>
+          )}
         </View>
-      )}
-
-      {activeTab === 'schedule' && (
-        <BarberScheduleManager barbers={barbers} onUpdate={loadData} />
       )}
     </View>
     </>
