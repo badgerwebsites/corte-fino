@@ -3,20 +3,38 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
-import type { Reward } from '../types/database.types';
+import type { Reward, RewardRedemptionWithDetails } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/rewards.css';
 
+// Generate a random 6-character alphanumeric code
+const generateRedemptionCode = (): string => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed confusing chars: I, O, 0, 1
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+};
+
 export default function RewardsPage() {
   const { user, customer } = useAuth();
   const [rewards, setRewards] = useState<Reward[]>([]);
+  const [pendingRedemptions, setPendingRedemptions] = useState<RewardRedemptionWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeCode, setActiveCode] = useState<string | null>(null);
 
   useEffect(() => {
     loadRewards();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      loadPendingRedemptions();
+    }
+  }, [user]);
 
   const loadRewards = async () => {
     try {
@@ -35,6 +53,27 @@ export default function RewardsPage() {
     }
   };
 
+  const loadPendingRedemptions = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('reward_redemptions')
+        .select(`
+          *,
+          reward:rewards(*)
+        `)
+        .eq('customer_id', user.id)
+        .eq('fulfilled', false)
+        .order('redeemed_at', { ascending: false });
+
+      if (error) throw error;
+      setPendingRedemptions(data || []);
+    } catch (error) {
+      console.error('Error loading pending redemptions:', error);
+    }
+  };
+
   const handleRedeem = async (rewardId: string, pointsRequired: number) => {
     if (!user || !customer) {
       alert('Please sign in to redeem rewards');
@@ -46,25 +85,46 @@ export default function RewardsPage() {
       return;
     }
 
+    const redemptionCode = generateRedemptionCode();
+
     try {
+      // Create pending redemption - points will be deducted when barber confirms
       const { error } = await supabase.from('reward_redemptions').insert({
         customer_id: user.id,
         reward_id: rewardId,
         points_spent: pointsRequired,
+        redemption_code: redemptionCode,
+        fulfilled: false,
       });
 
       if (error) throw error;
 
-      await supabase
-        .from('customers')
-        .update({ reward_points: customer.reward_points - pointsRequired })
-        .eq('id', user.id);
+      // Show the code to the customer
+      setActiveCode(redemptionCode);
 
-      alert('Reward redeemed successfully!');
-      window.location.reload();
+      // Reload pending redemptions
+      loadPendingRedemptions();
     } catch (error) {
       console.error('Error redeeming reward:', error);
       alert('Failed to redeem reward');
+    }
+  };
+
+  const handleCancelRedemption = async (redemptionId: string) => {
+    if (!confirm('Cancel this redemption request?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('reward_redemptions')
+        .delete()
+        .eq('id', redemptionId)
+        .eq('fulfilled', false);
+
+      if (error) throw error;
+      loadPendingRedemptions();
+    } catch (error) {
+      console.error('Error cancelling redemption:', error);
+      alert('Failed to cancel redemption');
     }
   };
 
@@ -95,6 +155,63 @@ export default function RewardsPage() {
           </View>
         )}
       </View>
+
+      {/* Redemption Code Modal */}
+      {activeCode && (
+        <View className={styles.codeModal}>
+          <View className={styles.codeModalContent}>
+            <Text className={styles.codeModalTitle}>Your Redemption Code</Text>
+            <Text className={styles.codeModalSubtitle}>
+              Show this code to your barber to claim your reward
+            </Text>
+            <View className={styles.codeDisplay}>
+              <Text className={styles.codeText}>{activeCode}</Text>
+            </View>
+            <Text className={styles.codeModalHint}>
+              Points will be deducted when the barber confirms your redemption
+            </Text>
+            <button
+              className={styles.codeModalButton}
+              onClick={() => setActiveCode(null)}
+            >
+              Got It
+            </button>
+          </View>
+        </View>
+      )}
+
+      {/* Pending Redemptions */}
+      {pendingRedemptions.length > 0 && (
+        <View className={styles.pendingSection}>
+          <Text className={styles.sectionTitle}>Pending Redemptions</Text>
+          <Text className={styles.pendingHint}>
+            Show these codes to your barber to claim your rewards
+          </Text>
+          <View className={styles.pendingList}>
+            {pendingRedemptions.map((redemption) => (
+              <View key={redemption.id} className={styles.pendingCard}>
+                <View className={styles.pendingInfo}>
+                  <Text className={styles.pendingReward}>
+                    {redemption.reward?.name || 'Reward'}
+                  </Text>
+                  <Text className={styles.pendingPoints}>
+                    {redemption.points_spent} points
+                  </Text>
+                </View>
+                <View className={styles.pendingCodeBox}>
+                  <Text className={styles.pendingCode}>{redemption.redemption_code}</Text>
+                </View>
+                <button
+                  className={styles.cancelButton}
+                  onClick={() => handleCancelRedemption(redemption.id)}
+                >
+                  Cancel
+                </button>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
 
       <View className={styles.howItWorks}>
         <Text className={styles.sectionTitle}>How It Works</Text>

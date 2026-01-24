@@ -31,15 +31,15 @@ export const header = style({
 });
 
 export const title = style({
-  fontSize: 24,
-  fontWeight: 300,
+  fontSize: 26,
+  fontWeight: 600,
   color: "#1a1a1a",
   letterSpacing: "-0.01em",
-  marginBottom: 4,
+  marginBottom: 8,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 32,
-      marginBottom: 6,
+      marginBottom: 10,
     },
   },
 });
@@ -48,6 +48,7 @@ export const subtitle = style({
   fontSize: 15,
   color: "#64748b",
   fontWeight: 400,
+  lineHeight: 1.4,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 16,
@@ -74,38 +75,40 @@ export const signOutButton = style({
 export const statsGrid = style({
   display: "grid",
   gridTemplateColumns: "repeat(2, 1fr)",
-  gap: 12,
+  gap: 16,
   maxWidth: 800,
-  margin: "0 auto 24px",
+  margin: "0 auto 32px",
   "@media": {
     "screen and (min-width: 768px)": {
-      gap: 16,
-      marginBottom: 32,
+      gap: 20,
+      marginBottom: 40,
     },
   },
 });
 
 export const statCard = style({
-  padding: 20,
+  padding: "24px 20px",
   backgroundColor: "#ffffff",
   borderRadius: 8,
   border: "1px solid #e2e8f0",
   borderTop: "3px solid #0ea5e9",
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: 24,
+      padding: "28px 24px",
     },
   },
 });
 
 export const statValue = style({
-  fontSize: 32,
+  fontSize: 36,
   fontWeight: 600,
   color: "#1a1a1a",
-  marginBottom: 4,
+  marginBottom: 8,
+  lineHeight: 1,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 40,
+      fontSize: 44,
+      marginBottom: 10,
     },
   },
 });
@@ -116,6 +119,7 @@ export const statLabel = style({
   textTransform: "uppercase",
   letterSpacing: "0.05em",
   fontWeight: 500,
+  marginTop: 4,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 13,
@@ -125,10 +129,10 @@ export const statLabel = style({
 
 export const section = style({
   maxWidth: 800,
-  margin: "0 auto 24px",
+  margin: "0 auto 32px",
   "@media": {
     "screen and (min-width: 768px)": {
-      marginBottom: 32,
+      marginBottom: 40,
     },
   },
 });
@@ -137,23 +141,23 @@ export const sectionHeader = style({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  marginBottom: 16,
+  marginBottom: 20,
   flexWrap: "wrap",
-  gap: 12,
+  gap: 16,
   "@media": {
     "screen and (min-width: 768px)": {
-      marginBottom: 20,
+      marginBottom: 24,
     },
   },
 });
 
 export const sectionTitle = style({
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 600,
   color: "#1a1a1a",
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 20,
+      fontSize: 22,
     },
   },
 });
@@ -180,52 +184,57 @@ export const bookButton = style({
 });
 
 export const emptyState = style({
-  padding: "48px 24px",
+  padding: "56px 24px",
   textAlign: "center",
   backgroundColor: "#ffffff",
   borderRadius: 8,
   border: "1px solid #e2e8f0",
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: "64px 32px",
+      padding: "72px 40px",
     },
   },
 });
 
 export const emptyStateIcon = style({
-  fontSize: 48,
-  marginBottom: 16,
-  opacity: 0.4,
+  width: 56,
+  height: 56,
+  marginBottom: 20,
+  opacity: 0.5,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 56,
+      width: 64,
+      height: 64,
+      marginBottom: 24,
     },
   },
 });
 
 export const emptyStateTitle = style({
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 600,
   color: "#1a1a1a",
-  marginBottom: 8,
+  marginBottom: 12,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 20,
+      fontSize: 22,
+      marginBottom: 14,
     },
   },
 });
 
 export const emptyStateText = style({
-  fontSize: 14,
+  fontSize: 15,
   color: "#64748b",
-  marginBottom: 24,
-  maxWidth: 300,
+  marginBottom: 28,
+  maxWidth: 320,
   marginLeft: "auto",
   marginRight: "auto",
-  lineHeight: 1.5,
+  lineHeight: 1.6,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 15,
+      fontSize: 16,
+      marginBottom: 32,
     },
   },
 });
@@ -233,11 +242,11 @@ export const emptyStateText = style({
 export const bookingsList = style({
   display: "flex",
   flexDirection: "column",
-  gap: 12,
+  gap: 16,
 });
 
 export const bookingCard = style({
-  padding: 16,
+  padding: 20,
   backgroundColor: "#ffffff",
   borderRadius: 8,
   border: "1px solid #e2e8f0",
@@ -247,7 +256,7 @@ export const bookingCard = style({
   },
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: 20,
+      padding: 24,
     },
   },
 });
@@ -256,9 +265,9 @@ export const bookingHeader = style({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "flex-start",
-  marginBottom: 12,
+  marginBottom: 16,
   flexWrap: "wrap",
-  gap: 8,
+  gap: 12,
 });
 
 export const bookingDate = style({
@@ -309,7 +318,7 @@ export const no_show = style({
 export const bookingDetails = style({
   display: "flex",
   flexDirection: "column",
-  gap: 4,
+  gap: 6,
 });
 
 export const bookingTime = style({
@@ -362,15 +371,15 @@ export const rewardsCard = style({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  padding: 20,
+  padding: "24px 20px",
   backgroundColor: "#ffffff",
   borderRadius: 8,
   border: "1px solid #e2e8f0",
-  gap: 16,
+  gap: 20,
   flexWrap: "wrap",
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: 24,
+      padding: "28px 24px",
     },
   },
 });
@@ -378,14 +387,14 @@ export const rewardsCard = style({
 export const rewardsInfo = style({
   display: "flex",
   alignItems: "center",
-  gap: 12,
+  gap: 16,
 });
 
 export const rewardsIcon = style({
-  fontSize: 24,
+  fontSize: 28,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 28,
+      fontSize: 32,
     },
   },
 });
@@ -393,26 +402,26 @@ export const rewardsIcon = style({
 export const rewardsText = style({
   display: "flex",
   flexDirection: "column",
-  gap: 2,
+  gap: 4,
 });
 
 export const rewardsTitle = style({
-  fontSize: 15,
+  fontSize: 16,
   fontWeight: 600,
   color: "#1a1a1a",
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 16,
+      fontSize: 17,
     },
   },
 });
 
 export const rewardsSubtitle = style({
-  fontSize: 13,
+  fontSize: 14,
   color: "#64748b",
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 14,
+      fontSize: 15,
     },
   },
 });

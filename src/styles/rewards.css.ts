@@ -335,3 +335,172 @@ export const link = style({
     opacity: 0.6,
   },
 });
+
+// Redemption Code Modal
+export const codeModal = style({
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0, 0, 0, 0.6)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1000,
+  padding: 16,
+});
+
+export const codeModalContent = style({
+  backgroundColor: "#ffffff",
+  borderRadius: 8,
+  padding: 32,
+  maxWidth: 400,
+  width: "100%",
+  textAlign: "center",
+  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
+});
+
+export const codeModalTitle = style({
+  fontSize: 24,
+  fontWeight: 600,
+  color: "#1a1a1a",
+  marginBottom: 8,
+});
+
+export const codeModalSubtitle = style({
+  fontSize: 14,
+  color: "#666",
+  marginBottom: 24,
+});
+
+export const codeDisplay = style({
+  backgroundColor: "#f0f9ff",
+  border: "2px dashed #0ea5e9",
+  borderRadius: 8,
+  padding: "20px 24px",
+  marginBottom: 16,
+});
+
+export const codeText = style({
+  fontSize: 36,
+  fontWeight: 700,
+  letterSpacing: "0.2em",
+  color: "#0369a1",
+  fontFamily: "monospace",
+});
+
+export const codeModalHint = style({
+  fontSize: 13,
+  color: "#64748b",
+  marginBottom: 24,
+});
+
+export const codeModalButton = style({
+  padding: "12px 32px",
+  fontSize: 16,
+  fontWeight: 500,
+  backgroundColor: "#1a1a1a",
+  color: "#ffffff",
+  border: "none",
+  borderRadius: 6,
+  cursor: "pointer",
+  transition: "all 0.2s ease",
+  ":hover": {
+    backgroundColor: "#333",
+  },
+});
+
+// Pending Redemptions Section
+export const pendingSection = style({
+  maxWidth: 1200,
+  margin: "0 auto 32px",
+  padding: 24,
+  backgroundColor: "#f0f9ff",
+  borderRadius: 8,
+  border: "1px solid #bae6fd",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      marginBottom: 48,
+      padding: 32,
+    },
+  },
+});
+
+export const pendingHint = style({
+  fontSize: 14,
+  color: "#0369a1",
+  textAlign: "center",
+  marginBottom: 20,
+});
+
+export const pendingList = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 12,
+});
+
+export const pendingCard = style({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  flexWrap: "wrap",
+  gap: 12,
+  padding: 16,
+  backgroundColor: "#ffffff",
+  borderRadius: 6,
+  border: "1px solid #e2e8f0",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 20,
+    },
+  },
+});
+
+export const pendingInfo = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 4,
+});
+
+export const pendingReward = style({
+  fontSize: 16,
+  fontWeight: 600,
+  color: "#1a1a1a",
+});
+
+export const pendingPoints = style({
+  fontSize: 13,
+  color: "#64748b",
+});
+
+export const pendingCodeBox = style({
+  backgroundColor: "#f0f9ff",
+  border: "1px solid #0ea5e9",
+  borderRadius: 4,
+  padding: "8px 16px",
+});
+
+export const pendingCode = style({
+  fontSize: 18,
+  fontWeight: 700,
+  letterSpacing: "0.15em",
+  color: "#0369a1",
+  fontFamily: "monospace",
+});
+
+export const cancelButton = style({
+  padding: "8px 16px",
+  fontSize: 13,
+  fontWeight: 500,
+  backgroundColor: "transparent",
+  color: "#64748b",
+  border: "1px solid #e2e8f0",
+  borderRadius: 4,
+  cursor: "pointer",
+  transition: "all 0.2s",
+  ":hover": {
+    borderColor: "#ef4444",
+    color: "#ef4444",
+  },
+});

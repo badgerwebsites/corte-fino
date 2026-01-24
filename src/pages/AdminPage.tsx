@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
-import type { Barber, Service, BarberServicePricing } from '../types/database.types';
+import type { Barber, Service, BarberServicePricing, RewardRedemptionWithDetails } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { BarberScheduleManager } from '../components/BarberScheduleManager';
 import { View } from '../ui/View';
@@ -16,8 +16,10 @@ export default function AdminPage() {
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
+  const [pendingRedemptions, setPendingRedemptions] = useState<RewardRedemptionWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'pricing' | 'services' | 'barbers'>('pricing');
+  const [activeTab, setActiveTab] = useState<'pricing' | 'services' | 'barbers' | 'rewards'>('pricing');
+  const [verifyCode, setVerifyCode] = useState('');
 
   // Barber form state
   const [editingBarber, setEditingBarber] = useState<Barber | null>(null);
@@ -59,19 +61,26 @@ export default function AdminPage() {
 
   const loadData = async () => {
     try {
-      const [barbersRes, servicesRes, pricingRes] = await Promise.all([
+      const [barbersRes, servicesRes, pricingRes, redemptionsRes] = await Promise.all([
         supabase.from('barbers').select('*').order('name'),
         supabase.from('services').select('*').order('name'),
         supabase.from('barber_service_pricing').select('*'),
+        supabase.from('reward_redemptions').select(`
+          *,
+          customer:customers(*),
+          reward:rewards(*)
+        `).eq('fulfilled', false).order('redeemed_at', { ascending: false }),
       ]);
 
       if (barbersRes.error) throw barbersRes.error;
       if (servicesRes.error) throw servicesRes.error;
       if (pricingRes.error) throw pricingRes.error;
+      if (redemptionsRes.error) throw redemptionsRes.error;
 
       setBarbers(barbersRes.data || []);
       setServices(servicesRes.data || []);
       setPricing(pricingRes.data || []);
+      setPendingRedemptions(redemptionsRes.data || []);
     } catch (error) {
       console.error('Error loading admin data:', error);
       alert('Failed to load data');
@@ -287,6 +296,75 @@ export default function AdminPage() {
     }
   };
 
+  // Reward Redemption Management
+  const handleConfirmRedemption = async (redemption: RewardRedemptionWithDetails) => {
+    if (!confirm(`Confirm redemption for ${redemption.reward?.name}? This will deduct ${redemption.points_spent} points from the customer.`)) {
+      return;
+    }
+
+    try {
+      // Mark redemption as fulfilled
+      const { error: redemptionError } = await supabase
+        .from('reward_redemptions')
+        .update({ fulfilled: true, fulfilled_at: new Date().toISOString() })
+        .eq('id', redemption.id);
+
+      if (redemptionError) throw redemptionError;
+
+      // Deduct points from customer
+      const currentPoints = redemption.customer?.reward_points || 0;
+      const { error: customerError } = await supabase
+        .from('customers')
+        .update({ reward_points: Math.max(0, currentPoints - redemption.points_spent) })
+        .eq('id', redemption.customer_id);
+
+      if (customerError) throw customerError;
+
+      alert('Redemption confirmed! Points have been deducted.');
+      loadData();
+    } catch (error) {
+      console.error('Error confirming redemption:', error);
+      alert('Failed to confirm redemption');
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    const code = verifyCode.trim().toUpperCase();
+    if (!code) {
+      alert('Please enter a redemption code');
+      return;
+    }
+
+    const redemption = pendingRedemptions.find(r => r.redemption_code === code);
+    if (!redemption) {
+      alert('Invalid or already used redemption code');
+      return;
+    }
+
+    handleConfirmRedemption(redemption);
+    setVerifyCode('');
+  };
+
+  const handleRejectRedemption = async (redemptionId: string) => {
+    if (!confirm('Reject this redemption? The customer will need to redeem again.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('reward_redemptions')
+        .delete()
+        .eq('id', redemptionId);
+
+      if (error) throw error;
+      alert('Redemption rejected');
+      loadData();
+    } catch (error) {
+      console.error('Error rejecting redemption:', error);
+      alert('Failed to reject redemption');
+    }
+  };
+
   if (loading) {
     return (
       <>
@@ -333,6 +411,15 @@ export default function AdminPage() {
           onClick={() => setActiveTab('barbers')}
         >
           Barbers
+        </button>
+        <button
+          className={`${styles.tab} ${activeTab === 'rewards' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('rewards')}
+        >
+          Rewards
+          {pendingRedemptions.length > 0 && (
+            <span className={styles.tabBadge}>{pendingRedemptions.length}</span>
+          )}
         </button>
       </View>
 
@@ -720,6 +807,90 @@ export default function AdminPage() {
               <BarberScheduleManager barbers={[editingBarber]} onUpdate={loadData} />
             </View>
           )}
+        </View>
+      )}
+
+      {activeTab === 'rewards' && (
+        <View className={styles.section}>
+          <View className={styles.sectionHeader}>
+            <View>
+              <Text className={styles.sectionTitle}>Verify Reward Redemptions</Text>
+              <Text className={styles.sectionDescription}>
+                Enter a customer's redemption code or select from pending redemptions below
+              </Text>
+            </View>
+          </View>
+
+          {/* Code Entry */}
+          <View className={styles.verifyCodeSection}>
+            <View className={styles.verifyCodeForm}>
+              <input
+                type="text"
+                className={styles.verifyCodeInput}
+                placeholder="Enter 6-digit code"
+                value={verifyCode}
+                onChange={(e) => setVerifyCode(e.target.value.toUpperCase())}
+                maxLength={6}
+              />
+              <button
+                className={styles.verifyCodeButton}
+                onClick={handleVerifyCode}
+              >
+                Verify & Confirm
+              </button>
+            </View>
+          </View>
+
+          {/* Pending Redemptions */}
+          <View className={styles.pendingRedemptionsSection}>
+            <Text className={styles.subsectionTitle}>
+              Pending Redemptions ({pendingRedemptions.length})
+            </Text>
+
+            {pendingRedemptions.length === 0 ? (
+              <View className={styles.emptyState}>
+                <Text className={styles.emptyStateText}>No pending redemptions</Text>
+              </View>
+            ) : (
+              <View className={styles.redemptionsList}>
+                {pendingRedemptions.map((redemption) => (
+                  <View key={redemption.id} className={styles.redemptionCard}>
+                    <View className={styles.redemptionInfo}>
+                      <Text className={styles.redemptionCustomer}>
+                        {redemption.customer?.first_name} {redemption.customer?.last_name}
+                      </Text>
+                      <Text className={styles.redemptionReward}>
+                        {redemption.reward?.name}
+                      </Text>
+                      <Text className={styles.redemptionPoints}>
+                        {redemption.points_spent} points
+                      </Text>
+                      <Text className={styles.redemptionDate}>
+                        {new Date(redemption.redeemed_at).toLocaleDateString()}
+                      </Text>
+                    </View>
+                    <View className={styles.redemptionCodeDisplay}>
+                      <Text className={styles.redemptionCode}>{redemption.redemption_code}</Text>
+                    </View>
+                    <View className={styles.redemptionActions}>
+                      <button
+                        className={styles.confirmButton}
+                        onClick={() => handleConfirmRedemption(redemption)}
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        className={styles.rejectButton}
+                        onClick={() => handleRejectRedemption(redemption.id)}
+                      >
+                        Reject
+                      </button>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
         </View>
       )}
     </View>

@@ -97,6 +97,13 @@ export interface RewardRedemption {
   points_spent: number;
   redeemed_at: string;
   fulfilled: boolean;
+  redemption_code: string;
+  fulfilled_at?: string;
+}
+
+export interface RewardRedemptionWithDetails extends RewardRedemption {
+  customer?: Customer;
+  reward?: Reward;
 }
 
 export interface ShopSettings {

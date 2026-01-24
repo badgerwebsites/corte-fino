@@ -771,3 +771,212 @@ export const eveningBadge = style({
   color: '#0369a1',
   borderLeftColor: '#0ea5e9',
 });
+
+// Tab badge for notifications
+export const tabBadge = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginLeft: '0.5rem',
+  minWidth: '1.25rem',
+  height: '1.25rem',
+  padding: '0 0.375rem',
+  fontSize: '0.7rem',
+  fontWeight: '600',
+  backgroundColor: '#0ea5e9',
+  color: '#ffffff',
+  borderRadius: '9999px',
+});
+
+// Rewards tab styles
+export const verifyCodeSection = style({
+  marginBottom: '2rem',
+  padding: '1.5rem',
+  backgroundColor: '#f0f9ff',
+  borderRadius: '0.5rem',
+  border: '1px solid #bae6fd',
+});
+
+export const verifyCodeForm = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+  },
+});
+
+export const verifyCodeInput = style({
+  flex: 1,
+  maxWidth: '200px',
+  padding: '0.75rem 1rem',
+  fontSize: '1.25rem',
+  fontWeight: '600',
+  fontFamily: 'monospace',
+  letterSpacing: '0.2em',
+  textAlign: 'center',
+  textTransform: 'uppercase',
+  border: '2px solid #0ea5e9',
+  borderRadius: '0.5rem',
+  backgroundColor: '#ffffff',
+  ':focus': {
+    outline: 'none',
+    borderColor: '#0369a1',
+  },
+  '::placeholder': {
+    fontSize: '0.875rem',
+    fontWeight: '400',
+    letterSpacing: '0',
+    textTransform: 'none',
+  },
+});
+
+export const verifyCodeButton = style({
+  padding: '0.75rem 1.5rem',
+  fontSize: '0.9375rem',
+  fontWeight: '500',
+  backgroundColor: '#0ea5e9',
+  color: '#ffffff',
+  border: 'none',
+  borderRadius: '0.5rem',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  whiteSpace: 'nowrap',
+  ':hover': {
+    backgroundColor: '#0284c7',
+  },
+});
+
+export const pendingRedemptionsSection = style({
+  marginTop: '1.5rem',
+});
+
+export const subsectionTitle = style({
+  fontSize: '1rem',
+  fontWeight: '600',
+  color: '#1a1a1a',
+  marginBottom: '1rem',
+});
+
+export const emptyState = style({
+  padding: '2rem',
+  textAlign: 'center',
+  backgroundColor: '#f8fafc',
+  borderRadius: '0.5rem',
+  border: '1px solid #e2e8f0',
+});
+
+export const emptyStateText = style({
+  fontSize: '0.9375rem',
+  color: '#64748b',
+});
+
+export const redemptionsList = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.75rem',
+});
+
+export const redemptionCard = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+  padding: '1rem',
+  backgroundColor: '#ffffff',
+  borderRadius: '0.5rem',
+  border: '1px solid #e2e8f0',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '1.25rem',
+    },
+  },
+});
+
+export const redemptionInfo = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
+  flex: 1,
+});
+
+export const redemptionCustomer = style({
+  fontSize: '1rem',
+  fontWeight: '600',
+  color: '#1a1a1a',
+});
+
+export const redemptionReward = style({
+  fontSize: '0.9375rem',
+  fontWeight: '500',
+  color: '#0369a1',
+});
+
+export const redemptionPoints = style({
+  fontSize: '0.8125rem',
+  color: '#64748b',
+});
+
+export const redemptionDate = style({
+  fontSize: '0.75rem',
+  color: '#94a3b8',
+});
+
+export const redemptionCodeDisplay = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0.625rem 1rem',
+  backgroundColor: '#f0f9ff',
+  border: '1px solid #0ea5e9',
+  borderRadius: '0.375rem',
+});
+
+export const redemptionCode = style({
+  fontSize: '1.125rem',
+  fontWeight: '700',
+  letterSpacing: '0.15em',
+  color: '#0369a1',
+  fontFamily: 'monospace',
+});
+
+export const redemptionActions = style({
+  display: 'flex',
+  gap: '0.5rem',
+});
+
+export const confirmButton = style({
+  padding: '0.5rem 1rem',
+  fontSize: '0.875rem',
+  fontWeight: '500',
+  backgroundColor: '#10b981',
+  color: '#ffffff',
+  border: 'none',
+  borderRadius: '0.375rem',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  ':hover': {
+    backgroundColor: '#059669',
+  },
+});
+
+export const rejectButton = style({
+  padding: '0.5rem 1rem',
+  fontSize: '0.875rem',
+  fontWeight: '500',
+  backgroundColor: 'transparent',
+  color: '#64748b',
+  border: '1px solid #e2e8f0',
+  borderRadius: '0.375rem',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  ':hover': {
+    borderColor: '#ef4444',
+    color: '#ef4444',
+  },
+});

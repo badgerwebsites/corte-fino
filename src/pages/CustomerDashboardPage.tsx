@@ -91,8 +91,39 @@ export default function CustomerDashboardPage() {
           <Text className={styles.statLabel}>Reward Points</Text>
         </View>
         <View className={styles.statCard}>
-          <Text className={styles.statValue}>{bookings.length}</Text>
-          <Text className={styles.statLabel}>Total Bookings</Text>
+          {(() => {
+            const today = new Date(new Date().toDateString());
+            const upcoming = bookings
+              .filter(b =>
+                new Date(b.booking_date) >= today &&
+                (b.status === 'pending' || b.status === 'confirmed')
+              )
+              .sort((a, b) => new Date(a.booking_date).getTime() - new Date(b.booking_date).getTime());
+
+            if (upcoming.length === 0) {
+              return (
+                <>
+                  <Text className={styles.statValueSmall}>None scheduled</Text>
+                  <Text className={styles.statLabel}>Next Appointment</Text>
+                </>
+              );
+            }
+
+            const nextDate = new Date(upcoming[0].booking_date);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            let dateText = nextDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            if (nextDate.getTime() === today.getTime()) dateText = 'Today';
+            else if (nextDate.getTime() === tomorrow.getTime()) dateText = 'Tomorrow';
+
+            return (
+              <>
+                <Text className={styles.statValue}>{dateText}</Text>
+                <Text className={styles.statLabel}>Next Appointment</Text>
+              </>
+            );
+          })()}
         </View>
       </View>
 
