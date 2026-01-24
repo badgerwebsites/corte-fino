@@ -16,10 +16,11 @@ import 'react-day-picker/dist/style.css';
 type BookingStep = 1 | 2 | 3 | 4;
 
 export default function BookingPage() {
-  const { user } = useAuth();
+  const { user, customer } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<BookingStep>(1);
   const [loading, setLoading] = useState(true);
+  const [bookingInProgress, setBookingInProgress] = useState(false);
 
   // Data from database
   const [services, setServices] = useState<Service[]>([]);
@@ -118,13 +119,108 @@ export default function BookingPage() {
   };
 
   const handleBooking = async () => {
-    if (!user) {
+    if (!user || !customer) {
       navigate('/login?redirect=/book');
       return;
     }
 
-    // TODO: Integrate with Stripe payment
-    alert('Payment integration coming next! This will require Stripe setup.');
+    if (!selectedService || !selectedDate || !selectedTime) {
+      alert('Please complete all booking selections');
+      return;
+    }
+
+    setBookingInProgress(true);
+
+    try {
+      // If "any barber" was selected, pick the first available barber for this time slot
+      let bookingBarber = selectedBarber;
+      if (anyBarber && !selectedBarber) {
+        const dayOfWeek = getDay(selectedDate);
+        const dateString = format(selectedDate, 'yyyy-MM-dd');
+
+        // Find first available barber for this date/time
+        bookingBarber = barbers.find(barber => {
+          const hasAvailability = availability.some(
+            a => a.barber_id === barber.id &&
+                 a.day_of_week === dayOfWeek &&
+                 a.is_available
+          );
+          const hasTimeOff = timeOff.some(
+            t => t.barber_id === barber.id &&
+                 dateString >= t.start_date &&
+                 dateString <= t.end_date
+          );
+          return hasAvailability && !hasTimeOff;
+        }) || null;
+      }
+
+      if (!bookingBarber) {
+        alert('No barber available for this time slot. Please select a different time.');
+        setBookingInProgress(false);
+        return;
+      }
+
+      // Calculate end time based on service duration
+      const [startHours, startMins] = selectedTime.split(':').map(Number);
+      const totalMinutes = startHours * 60 + startMins + selectedService.duration_minutes;
+      const endHours = Math.floor(totalMinutes / 60);
+      const endMins = totalMinutes % 60;
+      const endTime = `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
+
+      // Calculate price
+      const timePeriod = getTimePeriod(selectedTime, bookingBarber);
+      const priceEntry = pricing.find(
+        p => p.barber_id === bookingBarber!.id &&
+             p.service_id === selectedService.id &&
+             p.time_period === timePeriod
+      );
+      const totalPrice = priceEntry?.price || selectedService.base_price;
+
+      // Create the booking
+      const { error: bookingError } = await supabase
+        .from('bookings')
+        .insert({
+          customer_id: user.id,
+          barber_id: bookingBarber.id,
+          service_id: selectedService.id,
+          booking_date: format(selectedDate, 'yyyy-MM-dd'),
+          start_time: selectedTime,
+          end_time: endTime,
+          total_price: totalPrice,
+          status: 'confirmed',
+          cancellation_fee_charged: false,
+          reminder_sent: false,
+          review_request_sent: false,
+        });
+
+      if (bookingError) throw bookingError;
+
+      // Award reward points to customer
+      const newPoints = (customer.reward_points || 0) + selectedService.reward_points;
+      const { error: pointsError } = await supabase
+        .from('customers')
+        .update({ reward_points: newPoints })
+        .eq('id', user.id);
+
+      if (pointsError) {
+        console.error('Failed to award points:', pointsError);
+        // Don't fail the booking if points update fails
+      }
+
+      // Navigate to dashboard with success message
+      navigate('/dashboard', {
+        state: {
+          bookingSuccess: true,
+          message: `Booking confirmed! You earned ${selectedService.reward_points} reward points.`
+        }
+      });
+
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      alert('Failed to create booking. Please try again.');
+    } finally {
+      setBookingInProgress(false);
+    }
   };
 
 
@@ -510,8 +606,12 @@ export default function BookingPage() {
             </View>
 
             <View className={styles.buttonGroup}>
-              <button className={styles.confirmButton} onClick={handleBooking}>
-                {user ? 'Proceed to Payment' : 'Login to Book'}
+              <button
+                className={styles.confirmButton}
+                onClick={handleBooking}
+                disabled={bookingInProgress}
+              >
+                {bookingInProgress ? 'Booking...' : user ? 'Confirm Booking' : 'Login to Book'}
               </button>
               <button className={styles.backButton} onClick={() => setStep(3)}>
                 ← Back to Date & Time

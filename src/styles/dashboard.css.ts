@@ -113,6 +113,20 @@ export const statValue = style({
   },
 });
 
+export const statValueSmall = style({
+  fontSize: 18,
+  fontWeight: 500,
+  color: "#64748b",
+  marginBottom: 8,
+  lineHeight: 1.2,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 20,
+      marginBottom: 10,
+    },
+  },
+});
+
 export const statLabel = style({
   fontSize: 12,
   color: "#64748b",

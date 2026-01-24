@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import type { Barber, Service, BarberServicePricing, RewardRedemptionWithDetails } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { BarberScheduleManager } from '../components/BarberScheduleManager';
+import { AdminCalendar } from '../components/AdminCalendar';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/admin.css';
@@ -18,7 +19,7 @@ export default function AdminPage() {
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
   const [pendingRedemptions, setPendingRedemptions] = useState<RewardRedemptionWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'pricing' | 'services' | 'barbers' | 'rewards'>('pricing');
+  const [activeTab, setActiveTab] = useState<'calendar' | 'pricing' | 'services' | 'barbers' | 'rewards'>('calendar');
   const [verifyCode, setVerifyCode] = useState('');
 
   // Barber form state
@@ -395,6 +396,12 @@ export default function AdminPage() {
 
       <View className={styles.tabs}>
         <button
+          className={`${styles.tab} ${activeTab === 'calendar' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('calendar')}
+        >
+          Calendar
+        </button>
+        <button
           className={`${styles.tab} ${activeTab === 'pricing' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('pricing')}
         >
@@ -422,6 +429,12 @@ export default function AdminPage() {
           )}
         </button>
       </View>
+
+      {activeTab === 'calendar' && (
+        <View className={styles.section}>
+          <AdminCalendar barbers={barbers} onBookingUpdate={loadData} />
+        </View>
+      )}
 
       {activeTab === 'pricing' && (
         <View className={styles.section}>
