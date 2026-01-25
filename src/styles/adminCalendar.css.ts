@@ -218,8 +218,17 @@ export const weekView = style({
 
 export const weekHeader = style({
   display: 'grid',
-  gridTemplateColumns: 'repeat(7, 1fr)',
+  gridTemplateColumns: '70px repeat(7, 1fr)',
   borderBottom: '1px solid #e2e8f0',
+  position: 'sticky',
+  top: 0,
+  backgroundColor: '#ffffff',
+  zIndex: 10,
+});
+
+export const timeColumnHeader = style({
+  borderRight: '1px solid #f1f5f9',
+  backgroundColor: '#f8fafc',
 });
 
 export const weekDayHeader = style({
@@ -248,6 +257,44 @@ export const weekDayDate = style({
   fontWeight: '600',
   color: '#1a1a1a',
   marginTop: '0.25rem',
+});
+
+export const weekTimeGrid = style({
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+export const weekTimeRow = style({
+  display: 'grid',
+  gridTemplateColumns: '70px repeat(7, 1fr)',
+  minHeight: '60px',
+  borderBottom: '1px solid #f1f5f9',
+});
+
+export const weekTimeLabel = style({
+  padding: '0.5rem',
+  fontSize: '0.75rem',
+  fontWeight: '500',
+  color: '#64748b',
+  textAlign: 'right',
+  paddingRight: '0.75rem',
+  borderRight: '1px solid #f1f5f9',
+  backgroundColor: '#f8fafc',
+});
+
+export const weekTimeCell = style({
+  padding: '0.25rem',
+  borderRight: '1px solid #f1f5f9',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
+  ':last-child': {
+    borderRight: 'none',
+  },
+});
+
+export const todayCell = style({
+  backgroundColor: '#f0f9ff',
 });
 
 export const weekBody = style({

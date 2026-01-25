@@ -1,6 +1,6 @@
 // pages/BookingPage.tsx
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { DayPicker } from 'react-day-picker';
 import { addDays, format, isBefore, startOfDay, getDay } from 'date-fns';
 import { useAuth } from '../auth/useAuth.ts';
@@ -15,9 +15,22 @@ import 'react-day-picker/dist/style.css';
 
 type BookingStep = 1 | 2 | 3 | 4;
 
+interface LocationState {
+  rescheduleFrom?: string;
+  serviceId?: string;
+  barberId?: string;
+}
+
 export default function BookingPage() {
   const { user, customer } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const locationState = location.state as LocationState | null;
+
+  // Check if this is a reschedule
+  const rescheduleFromId = locationState?.rescheduleFrom;
+  const isReschedule = !!rescheduleFromId;
+
   const [step, setStep] = useState<BookingStep>(1);
   const [loading, setLoading] = useState(true);
   const [bookingInProgress, setBookingInProgress] = useState(false);
@@ -39,6 +52,29 @@ export default function BookingPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Pre-select service and barber if rescheduling
+  useEffect(() => {
+    if (!loading && locationState) {
+      if (locationState.serviceId) {
+        const service = services.find(s => s.id === locationState.serviceId);
+        if (service) {
+          setSelectedService(service);
+          setStep(2);
+        }
+      }
+      if (locationState.barberId) {
+        const barber = barbers.find(b => b.id === locationState.barberId);
+        if (barber) {
+          setSelectedBarber(barber);
+          setAnyBarber(false);
+          if (locationState.serviceId) {
+            setStep(3); // Go straight to date/time selection
+          }
+        }
+      }
+    }
+  }, [loading, locationState, services, barbers]);
 
   const loadData = async () => {
     try {
@@ -176,6 +212,19 @@ export default function BookingPage() {
       );
       const totalPrice = priceEntry?.price || selectedService.base_price;
 
+      // If rescheduling, delete the original booking first
+      if (rescheduleFromId) {
+        const { error: deleteError } = await supabase
+          .from('bookings')
+          .delete()
+          .eq('id', rescheduleFromId);
+
+        if (deleteError) {
+          console.error('Error deleting original booking:', deleteError);
+          // Continue with new booking even if delete fails
+        }
+      }
+
       // Create the booking
       const { error: bookingError } = await supabase
         .from('bookings')
@@ -195,23 +244,29 @@ export default function BookingPage() {
 
       if (bookingError) throw bookingError;
 
-      // Award reward points to customer
-      const newPoints = (customer.reward_points || 0) + selectedService.reward_points;
-      const { error: pointsError } = await supabase
-        .from('customers')
-        .update({ reward_points: newPoints })
-        .eq('id', user.id);
+      // Award reward points to customer (only for new bookings, not reschedules)
+      if (!rescheduleFromId) {
+        const newPoints = (customer.reward_points || 0) + selectedService.reward_points;
+        const { error: pointsError } = await supabase
+          .from('customers')
+          .update({ reward_points: newPoints })
+          .eq('id', user.id);
 
-      if (pointsError) {
-        console.error('Failed to award points:', pointsError);
-        // Don't fail the booking if points update fails
+        if (pointsError) {
+          console.error('Failed to award points:', pointsError);
+          // Don't fail the booking if points update fails
+        }
       }
 
       // Navigate to dashboard with success message
+      const message = rescheduleFromId
+        ? 'Appointment rescheduled successfully!'
+        : `Booking confirmed! You earned ${selectedService.reward_points} reward points.`;
+
       navigate('/dashboard', {
         state: {
           bookingSuccess: true,
-          message: `Booking confirmed! You earned ${selectedService.reward_points} reward points.`
+          message
         }
       });
 
@@ -396,9 +451,21 @@ export default function BookingPage() {
       <Navigation />
       <View className={styles.container}>
       <View className={styles.header}>
-        <Text className={styles.title}>Book Your Appointment</Text>
-        <Link to="/" className={styles.backLink}>← Back to Home</Link>
+        <Text className={styles.title}>
+          {isReschedule ? 'Reschedule Appointment' : 'Book Your Appointment'}
+        </Text>
+        <Link to={isReschedule ? '/dashboard' : '/'} className={styles.backLink}>
+          {isReschedule ? '← Back to Dashboard' : '← Back to Home'}
+        </Link>
       </View>
+
+      {isReschedule && (
+        <View className={styles.rescheduleNotice}>
+          <Text className={styles.rescheduleNoticeText}>
+            You are rescheduling an existing appointment. Your original booking will be cancelled when you confirm the new time.
+          </Text>
+        </View>
+      )}
 
       {/* Progress Indicator */}
       <View className={styles.progressBar}>
@@ -611,7 +678,11 @@ export default function BookingPage() {
                 onClick={handleBooking}
                 disabled={bookingInProgress}
               >
-                {bookingInProgress ? 'Booking...' : user ? 'Confirm Booking' : 'Login to Book'}
+                {bookingInProgress
+                  ? (isReschedule ? 'Rescheduling...' : 'Booking...')
+                  : user
+                    ? (isReschedule ? 'Confirm Reschedule' : 'Confirm Booking')
+                    : 'Login to Book'}
               </button>
               <button className={styles.backButton} onClick={() => setStep(3)}>
                 ← Back to Date & Time

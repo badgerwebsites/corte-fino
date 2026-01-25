@@ -669,3 +669,30 @@ export const cancelButton = style({
     color: "#999",
   },
 });
+
+// Reschedule notice
+export const rescheduleNotice = style({
+  maxWidth: 800,
+  margin: "0 auto 24px",
+  padding: "16px 20px",
+  backgroundColor: "#fef3c7",
+  border: "1px solid #fcd34d",
+  borderRadius: 8,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      marginBottom: 32,
+    },
+  },
+});
+
+export const rescheduleNoticeText = style({
+  fontSize: 14,
+  color: "#92400e",
+  lineHeight: 1.5,
+  textAlign: "center",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 15,
+    },
+  },
+});

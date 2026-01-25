@@ -27,6 +27,29 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
     loadBookings();
   }, [currentDate, viewMode]);
 
+  // Subscribe to real-time changes on bookings table
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-calendar-bookings')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'bookings',
+        },
+        () => {
+          // Reload bookings when any change occurs
+          loadBookings();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentDate, viewMode]);
+
   const loadBookings = async () => {
     setLoading(true);
     try {
@@ -53,6 +76,7 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
         `)
         .gte('booking_date', startDate)
         .lte('booking_date', endDate)
+        .neq('status', 'cancelled')
         .order('booking_date', { ascending: true })
         .order('start_time', { ascending: true });
 
@@ -253,7 +277,9 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
           {/* Week View */}
           {viewMode === 'week' && (
             <View className={styles.weekView}>
+              {/* Header with day names */}
               <View className={styles.weekHeader}>
+                <View className={styles.timeColumnHeader}></View>
                 {getWeekDays().map(day => (
                   <View
                     key={day.toISOString()}
@@ -264,37 +290,40 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
                   </View>
                 ))}
               </View>
-              <View className={styles.weekBody}>
-                {getWeekDays().map(day => {
-                  const dayBookings = filteredBookings.filter(b =>
-                    isSameDay(new Date(b.booking_date), day)
-                  );
-                  return (
-                    <View
-                      key={day.toISOString()}
-                      className={`${styles.weekDayColumn} ${isSameDay(day, new Date()) ? styles.todayColumn : ''}`}
-                    >
-                      {dayBookings.length === 0 ? (
-                        <Text className={styles.noAppointments}>-</Text>
-                      ) : (
-                        dayBookings.map(booking => (
-                          <View
-                            key={booking.id}
-                            className={`${styles.weekAppointment} ${getStatusColor(booking.status)}`}
-                            onClick={() => setSelectedBooking(booking)}
-                          >
-                            <Text className={styles.weekAppointmentTime}>
-                              {formatTime(booking.start_time)}
-                            </Text>
-                            <Text className={styles.weekAppointmentCustomer}>
-                              {booking.customer?.first_name}
-                            </Text>
-                          </View>
-                        ))
-                      )}
+
+              {/* Time grid with rows for each hour */}
+              <View className={styles.weekTimeGrid}>
+                {timeSlots.map(timeSlot => (
+                  <View key={timeSlot} className={styles.weekTimeRow}>
+                    <View className={styles.weekTimeLabel}>
+                      <Text>{formatTime(timeSlot)}</Text>
                     </View>
-                  );
-                })}
+                    {getWeekDays().map(day => {
+                      const slotBookings = getBookingsForTimeSlot(day, timeSlot);
+                      return (
+                        <View
+                          key={day.toISOString()}
+                          className={`${styles.weekTimeCell} ${isSameDay(day, new Date()) ? styles.todayCell : ''}`}
+                        >
+                          {slotBookings.map(booking => (
+                            <View
+                              key={booking.id}
+                              className={`${styles.weekAppointment} ${getStatusColor(booking.status)}`}
+                              onClick={() => setSelectedBooking(booking)}
+                            >
+                              <Text className={styles.weekAppointmentTime}>
+                                {formatTime(booking.start_time)}
+                              </Text>
+                              <Text className={styles.weekAppointmentCustomer}>
+                                {booking.customer?.first_name}
+                              </Text>
+                            </View>
+                          ))}
+                        </View>
+                      );
+                    })}
+                  </View>
+                ))}
               </View>
             </View>
           )}
