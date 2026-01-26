@@ -41,13 +41,13 @@ export function Navigation() {
   return (
     <nav className={styles.nav}>
       <View className={styles.navContainer}>
-        <View className={styles.logoLink}>
+        <Link to="/" className={styles.logoLink}>
           <img
             src={logo}
             alt="Corte Fino"
             className={styles.logoImage}
           />
-        </View>
+        </Link>
 
         <View className={styles.navButtons}>
           {isAuthenticated ? (
