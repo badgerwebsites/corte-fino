@@ -97,6 +97,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   };
 
+  const refreshCustomer = async () => {
+    if (user) {
+      await loadCustomerData(user.id);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -107,6 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signIn,
         signOut,
+        refreshCustomer,
       }}
     >
       {children}

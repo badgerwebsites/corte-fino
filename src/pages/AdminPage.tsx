@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
-import type { Barber, Service, BarberServicePricing, RewardRedemptionWithDetails } from '../types/database.types';
+import type { Barber, Service, BarberServicePricing, RewardRedemptionWithDetails, Reward, RewardType } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { BarberScheduleManager } from '../components/BarberScheduleManager';
 import { AdminCalendar } from '../components/AdminCalendar';
@@ -18,6 +18,7 @@ export default function AdminPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
   const [pendingRedemptions, setPendingRedemptions] = useState<RewardRedemptionWithDetails[]>([]);
+  const [rewards, setRewards] = useState<Reward[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'calendar' | 'pricing' | 'services' | 'barbers' | 'rewards'>('calendar');
   const [verifyCode, setVerifyCode] = useState('');
@@ -46,6 +47,18 @@ export default function AdminPage() {
     reward_points: 10,
   });
 
+  // Reward form state
+  const [editingReward, setEditingReward] = useState<Reward | null>(null);
+  const [rewardForm, setRewardForm] = useState({
+    name: '',
+    description: '',
+    points_required: 100,
+    reward_type: 'product' as RewardType,
+    item_name: '',
+    is_active: true,
+    sort_order: 0,
+  });
+
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -62,7 +75,7 @@ export default function AdminPage() {
 
   const loadData = async () => {
     try {
-      const [barbersRes, servicesRes, pricingRes, redemptionsRes] = await Promise.all([
+      const [barbersRes, servicesRes, pricingRes, redemptionsRes, rewardsRes] = await Promise.all([
         supabase.from('barbers').select('*').order('name'),
         supabase.from('services').select('*').order('name'),
         supabase.from('barber_service_pricing').select('*'),
@@ -71,17 +84,20 @@ export default function AdminPage() {
           customer:customers(*),
           reward:rewards(*)
         `).eq('fulfilled', false).order('redeemed_at', { ascending: false }),
+        supabase.from('rewards').select('*').order('sort_order'),
       ]);
 
       if (barbersRes.error) throw barbersRes.error;
       if (servicesRes.error) throw servicesRes.error;
       if (pricingRes.error) throw pricingRes.error;
       if (redemptionsRes.error) throw redemptionsRes.error;
+      if (rewardsRes.error) throw rewardsRes.error;
 
       setBarbers(barbersRes.data || []);
       setServices(servicesRes.data || []);
       setPricing(pricingRes.data || []);
       setPendingRedemptions(redemptionsRes.data || []);
+      setRewards(rewardsRes.data || []);
     } catch (error) {
       console.error('Error loading admin data:', error);
       alert('Failed to load data');
@@ -299,12 +315,12 @@ export default function AdminPage() {
 
   // Reward Redemption Management
   const handleConfirmRedemption = async (redemption: RewardRedemptionWithDetails) => {
-    if (!confirm(`Confirm redemption for ${redemption.reward?.name}? This will deduct ${redemption.points_spent} points from the customer.`)) {
+    if (!confirm(`Confirm redemption for ${redemption.reward?.name}?`)) {
       return;
     }
 
     try {
-      // Mark redemption as fulfilled
+      // Mark redemption as fulfilled (points already deducted when customer redeemed)
       const { error: redemptionError } = await supabase
         .from('reward_redemptions')
         .update({ fulfilled: true, fulfilled_at: new Date().toISOString() })
@@ -312,16 +328,7 @@ export default function AdminPage() {
 
       if (redemptionError) throw redemptionError;
 
-      // Deduct points from customer
-      const currentPoints = redemption.customer?.reward_points || 0;
-      const { error: customerError } = await supabase
-        .from('customers')
-        .update({ reward_points: Math.max(0, currentPoints - redemption.points_spent) })
-        .eq('id', redemption.customer_id);
-
-      if (customerError) throw customerError;
-
-      alert('Redemption confirmed! Points have been deducted.');
+      alert('Redemption confirmed!');
       loadData();
     } catch (error) {
       console.error('Error confirming redemption:', error);
@@ -346,23 +353,128 @@ export default function AdminPage() {
     setVerifyCode('');
   };
 
-  const handleRejectRedemption = async (redemptionId: string) => {
-    if (!confirm('Reject this redemption? The customer will need to redeem again.')) {
+  const handleRejectRedemption = async (redemption: RewardRedemptionWithDetails) => {
+    if (!confirm('Reject this redemption? The customer\'s points will be refunded.')) {
+      return;
+    }
+
+    try {
+      // Refund points to customer
+      const currentPoints = redemption.customer?.reward_points || 0;
+      const { error: refundError } = await supabase
+        .from('customers')
+        .update({ reward_points: currentPoints + redemption.points_spent })
+        .eq('id', redemption.customer_id);
+
+      if (refundError) throw refundError;
+
+      // Delete the redemption
+      const { error } = await supabase
+        .from('reward_redemptions')
+        .delete()
+        .eq('id', redemption.id);
+
+      if (error) throw error;
+      alert('Redemption rejected. Points have been refunded to the customer.');
+      loadData();
+    } catch (error) {
+      console.error('Error rejecting redemption:', error);
+      alert('Failed to reject redemption');
+    }
+  };
+
+  // Reward Management
+  const handleRewardSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      if (editingReward) {
+        const { data, error } = await supabase
+          .from('rewards')
+          .update(rewardForm)
+          .eq('id', editingReward.id)
+          .select();
+
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          throw new Error('Update failed - no rows were modified. Check database permissions.');
+        }
+        alert('Reward updated successfully!');
+      } else {
+        const { error } = await supabase
+          .from('rewards')
+          .insert([rewardForm]);
+
+        if (error) throw error;
+        alert('Reward added successfully!');
+      }
+
+      setRewardForm({
+        name: '',
+        description: '',
+        points_required: 100,
+        reward_type: 'product',
+        item_name: '',
+        is_active: true,
+        sort_order: 0,
+      });
+      setEditingReward(null);
+      loadData();
+    } catch (error) {
+      console.error('Error saving reward:', error);
+      alert('Failed to save reward: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  };
+
+  const handleEditReward = (reward: Reward) => {
+    setEditingReward(reward);
+    setRewardForm({
+      name: reward.name,
+      description: reward.description || '',
+      points_required: reward.points_required,
+      reward_type: reward.reward_type,
+      item_name: reward.item_name,
+      is_active: reward.is_active,
+      sort_order: reward.sort_order,
+    });
+  };
+
+  const handleDeleteReward = async (rewardId: string) => {
+    if (!confirm('Are you sure you want to delete this reward? This action cannot be undone.')) {
       return;
     }
 
     try {
       const { error } = await supabase
-        .from('reward_redemptions')
+        .from('rewards')
         .delete()
-        .eq('id', redemptionId);
+        .eq('id', rewardId);
 
       if (error) throw error;
-      alert('Redemption rejected');
+      alert('Reward deleted successfully!');
       loadData();
     } catch (error) {
-      console.error('Error rejecting redemption:', error);
-      alert('Failed to reject redemption');
+      console.error('Error deleting reward:', error);
+      alert('Failed to delete reward');
+    }
+  };
+
+  const handleToggleRewardActive = async (reward: Reward) => {
+    try {
+      const { data, error } = await supabase
+        .from('rewards')
+        .update({ is_active: !reward.is_active })
+        .eq('id', reward.id)
+        .select();
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new Error('Update failed - no rows were modified. Check database permissions.');
+      }
+      loadData();
+    } catch (error) {
+      console.error('Error toggling reward status:', error);
+      alert('Failed to update reward status: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 
@@ -894,7 +1006,7 @@ export default function AdminPage() {
                       </button>
                       <button
                         className={styles.rejectButton}
-                        onClick={() => handleRejectRedemption(redemption.id)}
+                        onClick={() => handleRejectRedemption(redemption)}
                       >
                         Reject
                       </button>
@@ -903,6 +1015,184 @@ export default function AdminPage() {
                 ))}
               </View>
             )}
+          </View>
+
+          {/* Manage Rewards */}
+          <View className={styles.rewardsManagementSection}>
+            <View className={styles.sectionHeader}>
+              <Text className={styles.sectionTitle}>
+                {editingReward ? 'Edit Reward' : 'Add New Reward'}
+              </Text>
+            </View>
+
+            <form onSubmit={handleRewardSubmit} className={styles.form}>
+              <View className={styles.formGroup}>
+                <label className={styles.label}>Reward Name *</label>
+                <input
+                  type="text"
+                  className={styles.input}
+                  value={rewardForm.name}
+                  onChange={(e) => setRewardForm({ ...rewardForm, name: e.target.value })}
+                  placeholder="e.g., Free Haircut"
+                  required
+                />
+              </View>
+
+              <View className={styles.formGroup}>
+                <label className={styles.label}>Description</label>
+                <textarea
+                  className={styles.textarea}
+                  value={rewardForm.description}
+                  onChange={(e) => setRewardForm({ ...rewardForm, description: e.target.value })}
+                  placeholder="Brief description of the reward"
+                  rows={2}
+                />
+              </View>
+
+              <View className={styles.formRow}>
+                <View className={styles.formGroup}>
+                  <label className={styles.label}>Points Required *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    className={styles.input}
+                    value={rewardForm.points_required}
+                    onChange={(e) => setRewardForm({ ...rewardForm, points_required: parseInt(e.target.value) || 0 })}
+                    required
+                  />
+                </View>
+
+                <View className={styles.formGroup}>
+                  <label className={styles.label}>Reward Type *</label>
+                  <select
+                    className={styles.select}
+                    value={rewardForm.reward_type}
+                    onChange={(e) => setRewardForm({ ...rewardForm, reward_type: e.target.value as RewardType })}
+                    required
+                  >
+                    <option value="product">Product</option>
+                    <option value="service">Service</option>
+                    <option value="merchandise">Merchandise</option>
+                  </select>
+                </View>
+              </View>
+
+              <View className={styles.formRow}>
+                <View className={styles.formGroup}>
+                  <label className={styles.label}>Item Name *</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    value={rewardForm.item_name}
+                    onChange={(e) => setRewardForm({ ...rewardForm, item_name: e.target.value })}
+                    placeholder="e.g., Corte Fino Hoodie"
+                    required
+                  />
+                </View>
+
+                <View className={styles.formGroup}>
+                  <label className={styles.label}>Sort Order</label>
+                  <input
+                    type="number"
+                    min="0"
+                    className={styles.input}
+                    value={rewardForm.sort_order}
+                    onChange={(e) => setRewardForm({ ...rewardForm, sort_order: parseInt(e.target.value) || 0 })}
+                  />
+                </View>
+              </View>
+
+              <View className={styles.formGroup}>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={rewardForm.is_active}
+                    onChange={(e) => setRewardForm({ ...rewardForm, is_active: e.target.checked })}
+                  />
+                  <Text>Active (visible to customers)</Text>
+                </label>
+              </View>
+
+              <View className={styles.formActions}>
+                <button type="submit" className={styles.submitButton}>
+                  {editingReward ? 'Update Reward' : 'Add Reward'}
+                </button>
+                {editingReward && (
+                  <button
+                    type="button"
+                    className={styles.cancelButton}
+                    onClick={() => {
+                      setEditingReward(null);
+                      setRewardForm({
+                        name: '',
+                        description: '',
+                        points_required: 100,
+                        reward_type: 'product',
+                        item_name: '',
+                        is_active: true,
+                        sort_order: 0,
+                      });
+                    }}
+                  >
+                    Cancel
+                  </button>
+                )}
+              </View>
+            </form>
+
+            <View className={styles.barbersList}>
+              <Text className={styles.sectionTitle}>Current Rewards</Text>
+              {rewards.length === 0 ? (
+                <View className={styles.emptyState}>
+                  <Text className={styles.emptyStateText}>No rewards configured yet</Text>
+                </View>
+              ) : (
+                rewards.map((reward) => (
+                  <View key={reward.id} className={styles.barberCard}>
+                    <View className={styles.barberInfo}>
+                      <View className={styles.barberNameRow}>
+                        <Text className={styles.barberName}>{reward.name}</Text>
+                        {reward.is_active ? (
+                          <View className={styles.statusBadge}>
+                            <Text>Active</Text>
+                          </View>
+                        ) : (
+                          <View className={styles.statusBadgeInactive}>
+                            <Text>Inactive</Text>
+                          </View>
+                        )}
+                      </View>
+                      <Text className={styles.barberDetail}>
+                        {reward.points_required} points · {reward.reward_type} · {reward.item_name}
+                      </Text>
+                      {reward.description && (
+                        <Text className={styles.barberDetail}>{reward.description}</Text>
+                      )}
+                    </View>
+                    <View className={styles.barberActions}>
+                      <button
+                        className={styles.editButton}
+                        onClick={() => handleEditReward(reward)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className={styles.toggleButton}
+                        onClick={() => handleToggleRewardActive(reward)}
+                      >
+                        {reward.is_active ? 'Deactivate' : 'Activate'}
+                      </button>
+                      <button
+                        className={styles.deleteButton}
+                        onClick={() => handleDeleteReward(reward.id)}
+                      >
+                        Delete
+                      </button>
+                    </View>
+                  </View>
+                ))
+              )}
+            </View>
           </View>
         </View>
       )}

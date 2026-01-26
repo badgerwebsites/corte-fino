@@ -1,6 +1,6 @@
 // pages/RewardsPage.tsx
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
 import type { Reward, RewardRedemptionWithDetails } from '../types/database.types';
@@ -20,15 +20,17 @@ const generateRedemptionCode = (): string => {
 };
 
 export default function RewardsPage() {
-  const { user, customer } = useAuth();
+  const { user, customer, refreshCustomer } = useAuth();
+  const location = useLocation();
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [pendingRedemptions, setPendingRedemptions] = useState<RewardRedemptionWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCode, setActiveCode] = useState<string | null>(null);
 
+  // Refetch rewards when navigating to this page
   useEffect(() => {
     loadRewards();
-  }, []);
+  }, [location.key]);
 
   useEffect(() => {
     if (user) {
@@ -88,7 +90,16 @@ export default function RewardsPage() {
     const redemptionCode = generateRedemptionCode();
 
     try {
-      // Create pending redemption - points will be deducted when barber confirms
+      // Deduct points immediately
+      const newPoints = customer.reward_points - pointsRequired;
+      const { error: pointsError } = await supabase
+        .from('customers')
+        .update({ reward_points: newPoints })
+        .eq('id', user.id);
+
+      if (pointsError) throw pointsError;
+
+      // Create pending redemption
       const { error } = await supabase.from('reward_redemptions').insert({
         customer_id: user.id,
         reward_id: rewardId,
@@ -97,23 +108,41 @@ export default function RewardsPage() {
         fulfilled: false,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Refund points if redemption creation fails
+        await supabase
+          .from('customers')
+          .update({ reward_points: customer.reward_points })
+          .eq('id', user.id);
+        throw error;
+      }
 
       // Show the code to the customer
       setActiveCode(redemptionCode);
+
+      // Refresh customer data to update points in UI
+      await refreshCustomer();
 
       // Reload pending redemptions
       loadPendingRedemptions();
     } catch (error) {
       console.error('Error redeeming reward:', error);
-      alert('Failed to redeem reward');
+      alert('Failed to redeem reward: ' + (error instanceof Error ? error.message : 'Check database permissions'));
     }
   };
 
   const handleCancelRedemption = async (redemptionId: string) => {
-    if (!confirm('Cancel this redemption request?')) return;
+    if (!confirm('Cancel this redemption request? Your points will be refunded.')) return;
 
     try {
+      // Find the redemption to get points_spent
+      const redemption = pendingRedemptions.find(r => r.id === redemptionId);
+      if (!redemption) {
+        alert('Redemption not found');
+        return;
+      }
+
+      // Delete the redemption
       const { error } = await supabase
         .from('reward_redemptions')
         .delete()
@@ -121,6 +150,19 @@ export default function RewardsPage() {
         .eq('fulfilled', false);
 
       if (error) throw error;
+
+      // Refund points to customer
+      if (user && customer) {
+        const newPoints = customer.reward_points + redemption.points_spent;
+        await supabase
+          .from('customers')
+          .update({ reward_points: newPoints })
+          .eq('id', user.id);
+
+        // Refresh customer data to update points in UI
+        await refreshCustomer();
+      }
+
       loadPendingRedemptions();
     } catch (error) {
       console.error('Error cancelling redemption:', error);

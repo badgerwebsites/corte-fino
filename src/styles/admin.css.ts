@@ -980,3 +980,31 @@ export const rejectButton = style({
     color: '#ef4444',
   },
 });
+
+// Rewards Management styles
+export const rewardsManagementSection = style({
+  marginTop: '2.5rem',
+  paddingTop: '2rem',
+  borderTop: '2px solid #e2e8f0',
+});
+
+export const select = style({
+  width: '100%',
+  padding: '0.625rem',
+  border: '2px solid #e2e8f0',
+  borderRadius: '0.25rem',
+  fontSize: '0.875rem',
+  backgroundColor: '#ffffff',
+  cursor: 'pointer',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.75rem',
+      borderRadius: '0.5rem',
+      fontSize: '1rem',
+    },
+  },
+  ':focus': {
+    outline: 'none',
+    borderColor: '#1a1a1a',
+  },
+});
