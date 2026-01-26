@@ -57,9 +57,9 @@ export const logo = style({
     },
   },
 
-  ':hover': {
-    opacity: 0.85,
-  },
+  // ':hover': {
+  //   opacity: 0.85,
+  // },
 });
 
 export const form = style({
@@ -112,6 +112,12 @@ export const input = style({
     borderColor: '#a8dce8',
     boxShadow: '0 0 0 2px rgba(168,220,232,0.35)',
   },
+  '@media': {
+    'screen and (min-width: 768px)': {
+        padding: '12px 12px',
+        fontSize: 16,
+    },
+  },
 });
 
 export const submitButton = style({
@@ -122,7 +128,7 @@ export const submitButton = style({
   fontSize: 20,
   fontWeight: 700,
 
-  letterSpacing: '0.1em',
+  letterSpacing: '0.05em',
   textTransform: 'uppercase',
 
   backgroundColor: '#96cfe0',
@@ -133,6 +139,12 @@ export const submitButton = style({
 
   cursor: 'pointer',
   transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+
+  '@media': {
+    'screen and (min-width: 768px)': {
+        fontSize: 24,
+    },
+  },
 
   ':hover': {
     transform: 'translateY(-1px)',
@@ -175,13 +187,13 @@ export const footerText = style({
 
   '@media': {
     'screen and (min-width: 768px)': {
-        fontSize: 24,
+        fontSize: 28,
     },
   },
 });
 
 export const link = style({
-  fontSize: 24,
+  fontSize: 22,
   fontWeight: 700,
 
   color: '#96cfe0',
@@ -191,7 +203,7 @@ export const link = style({
 
   '@media': {
     'screen and (min-width: 768px)': {
-        fontSize: 24,
+        fontSize: 28,
     },
   },
 

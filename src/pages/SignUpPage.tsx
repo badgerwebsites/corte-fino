@@ -52,20 +52,13 @@ export default function SignUpPage() {
 
       <View className={styles.container}>
         <View className={styles.formCard}>
-          <Link to="/" className={styles.logoWrapper}>
+          <View className={styles.logoWrapper}>
           <img
             src={logo}
             alt="Corte Fino"
             className={styles.logo}
           />
-        </Link>
-          {/* <View className={styles.logoWrapper}>
-            <img
-              src={logo}
-              alt="Corte Fino"
-              className={styles.logo}
-            />
-          </View> */}
+        </View>
 
           <form onSubmit={handleSubmit} className={styles.form}>
             {error && (

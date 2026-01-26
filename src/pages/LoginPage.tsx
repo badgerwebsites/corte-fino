@@ -42,13 +42,13 @@ export default function LoginPage() {
 
       <View className={styles.container}>
         <View className={styles.formCard}>
-        <Link to="/" className={styles.logoWrapper}>
+        <View className={styles.logoWrapper}>
           <img
             src={logo}
             alt="Corte Fino"
             className={styles.logo}
           />
-        </Link>
+        </View>
 
           <form onSubmit={handleSubmit} className={styles.form}>
             {error && (
