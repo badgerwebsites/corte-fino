@@ -40,7 +40,6 @@ export default function HomePage() {
     <>
       <Navigation />
 
-      {/* Full-Screen Hero */}
       <View className={styles.heroFullScreen}>
         <View className={styles.heroOverlay} />
         <View className={styles.heroContent}>

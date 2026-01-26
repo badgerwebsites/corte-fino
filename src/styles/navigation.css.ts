@@ -1,3 +1,4 @@
+// styles/navigation.css.ts
 import { style } from '@vanilla-extract/css';
 
 export const nav = style({
@@ -6,17 +7,14 @@ export const nav = style({
   left: 0,
   right: 0,
   zIndex: 1000,
-
-  backgroundColor: '#ffffff',
-  borderBottom: '1px solid #e5e5e5',
-
-  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-
-  padding: '12px 12px',
+  backgroundColor: '#222222',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+  padding: '12px 8px',
+  borderBottom: '1px solid #ffffff',
 
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '16px 24px',
+      padding: '12px 18px',
     },
   },
 });
@@ -27,7 +25,6 @@ export const navContainer = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: 12,
 });
 
 export const logoLink = style({
@@ -37,34 +34,19 @@ export const logoLink = style({
 });
 
 export const logoImage = style({
-  height: 14,
+  height: 40,
   width: 'auto',
-  transition: 'opacity 0.2s ease',
 
   '@media': {
     'screen and (min-width: 768px)': {
-      height: 32,
+      height: 50,
     },
-  },
-
-  ':hover': {
-    opacity: 0.7,
   },
 });
 
 export const navButtons = style({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'flex-end',
-  gap: 8,
-  flexWrap: 'wrap',
-
-  '@media': {
-    'screen and (min-width: 768px)': {
-      flexWrap: 'nowrap',
-      gap: 12,
-    },
-  },
 });
 
 const baseButton = {
@@ -72,100 +54,71 @@ const baseButton = {
   alignItems: 'center',
   justifyContent: 'center',
   whiteSpace: 'nowrap',
-  fontWeight: 500,
-  // borderRadius: 4,
-  textDecoration: 'none',
+
+  padding: '4px 8px',
+  fontSize: 15,
+  fontWeight: 700,
+  letterSpacing: '0.05em',
+
+  borderRadius: 6,
   cursor: 'pointer',
+  textDecoration: 'none',
+
   transition: 'all 0.2s ease',
 };
 
 export const loginButton = style({
   ...baseButton,
-  padding: '4px 8px',
-  fontSize: 13,
-  fontWeight: 500,
-  color: '#1a1a1a',
 
+  color: '#ffffff',
   backgroundColor: 'transparent',
-
-  // ✅ BLACK OUTLINE ALWAYS
-  border: '1px solid #1a1a1a',
-  borderWidth: 2,
-  borderRadius: 6,
+  border: '3px solid #ffffff',
 
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '6px 12px',
-      fontSize: 16,
-      letterSpacing: '0.05em',
+      fontSize: 18,
     },
   },
 
   ':hover': {
-    backgroundColor: '#fafafa',
-  },
-
-  ':focus-visible': {
-    outline: 'none',
-    boxShadow: '0 0 0 2px rgba(46,120,183,0.4)',
-  },
-});
-
-export const dashboardButton = style({
-  ...baseButton,
-  padding: '4px 8px',
-  fontSize: 12,
-  fontWeight: 500,
-  color: '#1a1a1a',
-
-  backgroundColor: 'transparent',
-
-  // ✅ BLACK OUTLINE ALWAYS
-  border: '1px solid #1a1a1a',
-  borderWidth: 2,
-  borderRadius: 6,
-
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '6px 12px',
-      fontSize: 16,
-      letterSpacing: '0.05em',
-    },
-  },
-
-  ':hover': {
-    backgroundColor: '#fafafa',
-  },
-
-  ':focus-visible': {
-    outline: 'none',
-    boxShadow: '0 0 0 2px rgba(46,120,183,0.35)',
-  },
-});
-
-export const bookNowButton = style({
-  ...baseButton,
-  padding: '6px 8px',
-  fontSize: 12,
-  backgroundColor: '#c6ecf4',
-  color: '#1a1a1a',
-  border: 'none',
-  borderRadius: 6,
-
-
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '8px 12px',
-      fontSize: 16,
-      letterSpacing: '0.05em',
-    },
-  },
-
-  ':hover': {
-    backgroundColor: '#a8dce8',
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
 
   ':active': {
     transform: 'scale(0.97)',
+  },
+
+  ':focus-visible': {
+    outline: 'none',
+    boxShadow: '0 0 0 3px rgba(168,220,232,0.5)',
+  },
+});
+
+export const logoutButton = style({
+  ...baseButton,
+
+  color: '#c24141',
+  backgroundColor: 'transparent',
+  border: '3px solid #c24141',
+
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '6px 12px',
+      fontSize: 18,
+    },
+  },
+
+  ':hover': {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+
+  ':active': {
+    transform: 'scale(0.97)',
+  },
+
+  ':focus-visible': {
+    outline: 'none',
+    boxShadow: '0 0 0 3px rgba(168,220,232,0.5)',
   },
 });

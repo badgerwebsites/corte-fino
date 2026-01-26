@@ -1,16 +1,17 @@
 // components/Navigation.tsx
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { View } from '../ui/View';
 import * as styles from '../styles/navigation.css';
-import logo from '../assets/WhiteLogo.svg';
+import logo from '../assets/BlackLogo.svg';
 
 export function Navigation() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
   const location = useLocation();
-  const hideLoginButton =
+  const navigate = useNavigate();
+
+  const hideNav =
     location.pathname === '/login' ||
     location.pathname === '/signup';
 
@@ -28,39 +29,42 @@ export function Navigation() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login', { replace: true });
+  };
+
+  if (hideNav) {
+    return null;
+  }
+
   return (
     <nav className={styles.nav}>
       <View className={styles.navContainer}>
-        <Link to="/" className={styles.logoLink}>
+        <View className={styles.logoLink}>
           <img
             src={logo}
             alt="Corte Fino"
             className={styles.logoImage}
           />
-        </Link>
+        </View>
 
         <View className={styles.navButtons}>
           {isAuthenticated ? (
-            <Link
-              to="/dashboard"
-              className={styles.dashboardButton}
+            <button
+              onClick={handleLogout}
+              className={styles.logoutButton}
             >
-              Dashboard
-            </Link>
+              Logout
+            </button>
           ) : (
-            !hideLoginButton && (
-              <Link
-                to="/login"
-                className={styles.loginButton}
-              >
-                Login
-              </Link>
-            )
+            <Link
+              to="/login"
+              className={styles.loginButton}
+            >
+              Login
+            </Link>
           )}
-
-          <Link to="/book" className={styles.bookNowButton}>
-            Book Now
-          </Link>
         </View>
       </View>
     </nav>

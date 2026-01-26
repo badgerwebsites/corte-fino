@@ -6,7 +6,7 @@ import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/auth.css';
-import logo from '../assets/WhiteLogoExtra.svg';
+import logo from '../assets/BlackLogo.svg';
 
 export default function SignUpPage() {
   const [firstName, setFirstName] = useState('');
@@ -52,13 +52,20 @@ export default function SignUpPage() {
 
       <View className={styles.container}>
         <View className={styles.formCard}>
-          <View className={styles.logoWrapper}>
+          <Link to="/" className={styles.logoWrapper}>
+          <img
+            src={logo}
+            alt="Corte Fino"
+            className={styles.logo}
+          />
+        </Link>
+          {/* <View className={styles.logoWrapper}>
             <img
               src={logo}
               alt="Corte Fino"
               className={styles.logo}
             />
-          </View>
+          </View> */}
 
           <form onSubmit={handleSubmit} className={styles.form}>
             {error && (

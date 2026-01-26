@@ -1,34 +1,35 @@
 import { style } from '@vanilla-extract/css';
 
 export const container = style({
-  minHeight: '100vh',
+  height: '100dvh',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: '#fafafa',
-  padding: 8,
-  // paddingTop: 80,
+  background:
+    'linear-gradient(180deg, #cfeef4 0%, #96cfe0 100%)',
+  boxSizing: 'border-box',
+  padding: 24,
 
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: 24,
-      // paddingTop: 96,
+      padding: 32,
     },
   },
 });
 
 export const formCard = style({
   width: '100%',
-  maxWidth: 400,
-  padding: 16,
-  backgroundColor: '#ffffff',
-  borderRadius: 8,
-  border: '1px solid #e5e5e5',
-  boxShadow: '0 10px 40px rgba(72, 34, 34, 0.04)',
+  maxWidth: 420,
+
+  padding: 20,
+  backgroundColor: '#222222',
+  borderRadius: 12,
+
+  boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
 
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: 28,
+      padding: 32,
     },
   },
 });
@@ -36,21 +37,28 @@ export const formCard = style({
 export const logoWrapper = style({
   display: 'flex',
   justifyContent: 'center',
-  marginBottom: 12,
+  marginBottom: 16,
+
   '@media': {
     'screen and (min-width: 768px)': {
-      marginBottom: 24,
+      marginBottom: 28,
     },
   },
 });
 
 export const logo = style({
-  height: 60,
+  height: 50,
   width: 'auto',
+  transition: 'opacity 0.2s ease',
+
   '@media': {
     'screen and (min-width: 768px)': {
-      height: 80,
+      height: 72,
     },
+  },
+
+  ':hover': {
+    opacity: 0.85,
   },
 });
 
@@ -61,7 +69,7 @@ export const form = style({
 
   '@media': {
     'screen and (min-width: 768px)': {
-      gap: 16,
+      gap: 18,
     },
   },
 });
@@ -74,6 +82,7 @@ export const inputRow = style({
   '@media': {
     'screen and (min-width: 768px)': {
       gridTemplateColumns: '1fr 1fr',
+      gap: 18,
     },
   },
 });
@@ -81,57 +90,57 @@ export const inputRow = style({
 export const inputGroup = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: 8,
-});
-
-export const label = style({
-  fontSize: 13,
-  fontWeight: 500,
-  color: '#222',
 });
 
 export const input = style({
-  padding: '8px 12px',
-  fontSize: 14,
-  borderRadius: 6,
-  border: '1px solid #ddd',
+  padding: '10px 12px',
+  fontSize: 15,
+
+  borderRadius: 8,
+  backgroundColor: '#f9f9f9',
+  border: '1px solid #e5e5e5',
+
   outline: 'none',
-  transition: 'all 0.2s ease',
+  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
 
   '::placeholder': {
-    color: '#aaa',
-    fontWeight: 300,
+    color: '#9ca3af',
+    fontWeight: 400,
   },
 
   ':focus': {
-    borderColor: '#111',
-    boxShadow: '0 0 0 1px #111',
-  },
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '12px 12px',
-    },
+    borderColor: '#a8dce8',
+    boxShadow: '0 0 0 2px rgba(168,220,232,0.35)',
   },
 });
 
 export const submitButton = style({
   marginTop: 4,
-  minHeight: 48,
-  padding: '14px 24px',
-  fontSize: 14,
-  fontWeight: 600,
-  letterSpacing: '0.15em',
+  minHeight: 52,
+
+  // padding: '14px 24px',
+  fontSize: 20,
+  fontWeight: 700,
+
+  letterSpacing: '0.1em',
   textTransform: 'uppercase',
-  backgroundColor: '#111',
-  color: '#fff',
+
+  backgroundColor: '#96cfe0',
+  color: '#1f1f1f',
+
   border: 'none',
-  borderRadius: 6,
+  borderRadius: 10,
+
   cursor: 'pointer',
-  transition: 'all 0.25s ease',
+  transition: 'transform 0.15s ease, box-shadow 0.15s ease',
 
   ':hover': {
-    backgroundColor: '#000',
     transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
+  },
+
+  ':active': {
+    transform: 'translateY(0)',
   },
 
   ':disabled': {
@@ -142,9 +151,11 @@ export const submitButton = style({
 
 export const error = style({
   padding: 12,
+  borderRadius: 8,
+
   backgroundColor: '#fef2f2',
   color: '#991b1b',
-  borderRadius: 6,
+
   fontSize: 14,
   border: '1px solid #fecaca',
 });
@@ -154,40 +165,37 @@ export const footer = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      marginTop: 16,
-      gap: 4,
-    },
-  },
+  gap: 4,
 });
 
 export const footerText = style({
   fontSize: 20,
-  color: '#666',
+  color: '#9ca3af',
   textAlign: 'center',
 
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: 24,
+        fontSize: 24,
     },
   },
 });
 
 export const link = style({
-  color: '#2e78b7',
+  fontSize: 24,
   fontWeight: 700,
-  fontSize: 20,
-  textDecoration: 'none',
-  transition: 'color 0.2s ease',
 
-  ':hover': {
-    color: '#245f93',
-  },
+  color: '#96cfe0',
+  textDecoration: 'none',
+
+  transition: 'color 0.2s ease',
 
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: 24,
+        fontSize: 24,
     },
+  },
+
+  ':hover': {
+    color: '#6faec6',
   },
 });
