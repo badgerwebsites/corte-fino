@@ -220,52 +220,53 @@ export default function CustomerDashboardPage() {
           {/* Header */}
           <View className={styles.header}>
             <View className={styles.headerTop}>
-              <View>
-                <Text className={styles.greeting}>Welcome back, {customer?.first_name}</Text>
-                <Text className={styles.title}>Dashboard</Text>
-              </View>
+              <Text className={styles.greeting}>Hi, {customer?.first_name}</Text>
               <button onClick={handleSignOut} className={styles.signOutButton}>
                 Sign out
               </button>
             </View>
-
-            {/* Primary CTA */}
-            <Link to="/book" className={styles.primaryCta}>
-              Book Appointment
-            </Link>
           </View>
 
           {/* Stats */}
           <View className={styles.statsRow}>
             <View className={styles.stat}>
               <Text className={styles.statValue}>{customer?.reward_points || 0}</Text>
-              <Text className={styles.statLabel}>Points</Text>
+              <Text className={styles.statLabel}>Reward Points</Text>
             </View>
             <View className={styles.stat}>
               {nextAppointment ? (
                 <Text className={styles.statValue}>{nextAppointment}</Text>
               ) : (
-                <Text className={styles.statValueMuted}>None</Text>
+                <Text className={styles.statValueMuted}>None scheduled</Text>
               )}
-              <Text className={styles.statLabel}>Next appointment</Text>
+              <Text className={styles.statLabel}>Next Visit</Text>
             </View>
           </View>
+
+          {/* Book Appointment CTA - only show when there are bookings */}
+          {bookings.length > 0 && (
+            <View className={styles.section}>
+              <Link to="/book" className={styles.primaryCta}>
+                Book New Appointment
+              </Link>
+            </View>
+          )}
 
           {/* Upcoming Appointments */}
           <View className={styles.section}>
             <View className={styles.sectionHeader}>
-              <Text className={styles.sectionTitle}>Upcoming</Text>
+              <Text className={styles.sectionTitle}>Upcoming Appointments</Text>
             </View>
 
             {bookings.length === 0 ? (
               <View className={styles.emptyState}>
                 <img src={calendarCheckIcon} alt="" className={styles.emptyStateIcon} />
-                <Text className={styles.emptyStateTitle}>No appointments</Text>
+                <Text className={styles.emptyStateTitle}>No upcoming appointments</Text>
                 <Text className={styles.emptyStateText}>
-                  Book your first appointment and start earning rewards.
+                  Book your first appointment and start earning reward points.
                 </Text>
                 <Link to="/book" className={styles.emptyStateButton}>
-                  Book now
+                  Book Appointment
                 </Link>
               </View>
             ) : (
@@ -277,12 +278,13 @@ export default function CustomerDashboardPage() {
                         <Text className={styles.bookingDate}>
                           {formatDateShort(booking.booking_date)}
                         </Text>
-                        <Text className={styles.bookingMeta}>
-                          <span className={styles.bookingTime}>{formatTime(booking.start_time)}</span>
-                          {' · '}
-                          {booking.service?.name}
-                          {booking.barber && ` with ${booking.barber.name}`}
-                        </Text>
+                        <View className={styles.bookingMeta}>
+                          <Text>
+                            <span className={styles.bookingTime}>{formatTime(booking.start_time)}</span>
+                          </Text>
+                          <Text>{booking.service?.name}</Text>
+                          {booking.barber && <Text>with {booking.barber.name}</Text>}
+                        </View>
                       </View>
                       <View className={styles.bookingRight}>
                         <Text className={styles.bookingPrice}>
@@ -315,7 +317,7 @@ export default function CustomerDashboardPage() {
             )}
           </View>
 
-          {/* Rewards - subtle secondary section */}
+          {/* Rewards Card */}
           <View className={styles.section}>
             <View className={styles.rewardsCard}>
               <View className={styles.rewardsInfo}>
@@ -325,7 +327,7 @@ export default function CustomerDashboardPage() {
                 </Text>
               </View>
               <Link to="/rewards" className={styles.rewardsLink}>
-                View rewards
+                View Rewards
               </Link>
             </View>
           </View>
@@ -333,7 +335,7 @@ export default function CustomerDashboardPage() {
           {customer?.is_admin && (
             <View className={styles.section}>
               <Link to="/admin" className={styles.adminLink}>
-                Admin Dashboard →
+                Admin Dashboard
               </Link>
             </View>
           )}
