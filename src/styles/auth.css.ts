@@ -123,23 +123,17 @@ export const input = style({
 export const submitButton = style({
   marginTop: 4,
   minHeight: 52,
-
   // padding: '14px 24px',
   fontSize: 20,
   fontWeight: 700,
-
   letterSpacing: '0.05em',
   textTransform: 'uppercase',
-
   backgroundColor: '#96cfe0',
   color: '#1f1f1f',
-
   border: 'none',
   borderRadius: 10,
-
   cursor: 'pointer',
   transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-
   '@media': {
     'screen and (min-width: 768px)': {
         fontSize: 24,

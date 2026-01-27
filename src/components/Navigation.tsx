@@ -8,6 +8,10 @@ import logo from '../assets/BlackLogo.svg';
 
 export function Navigation() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(
+    window.matchMedia('(min-width: 768px)').matches
+  );
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -27,6 +31,14 @@ export function Navigation() {
     });
 
     return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 768px)');
+    const handler = () => setIsDesktop(media.matches);
+
+    media.addEventListener('change', handler);
+    return () => media.removeEventListener('change', handler);
   }, []);
 
   const handleLogout = async () => {
@@ -57,6 +69,15 @@ export function Navigation() {
             >
               Logout
             </button>
+          ) : isDesktop ? (
+            <a
+              href="/login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.loginButton}
+            >
+              Login
+            </a>
           ) : (
             <Link
               to="/login"
