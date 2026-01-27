@@ -60,6 +60,23 @@ export const todayButton = style({
   },
 });
 
+export const backButton = style({
+  padding: '0.5rem 0.75rem',
+  fontSize: '0.875rem',
+  fontWeight: '500',
+  backgroundColor: '#f1f5f9',
+  color: '#475569',
+  border: '1px solid #e2e8f0',
+  borderRadius: '0.375rem',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  marginRight: '0.5rem',
+  ':hover': {
+    backgroundColor: '#e2e8f0',
+    color: '#1a1a1a',
+  },
+});
+
 export const dateTitle = style({
   fontSize: '1.125rem',
   fontWeight: '600',
@@ -218,12 +235,17 @@ export const weekView = style({
 
 export const weekHeader = style({
   display: 'grid',
-  gridTemplateColumns: '70px repeat(7, 1fr)',
+  gridTemplateColumns: '50px repeat(7, 1fr)',
   borderBottom: '1px solid #e2e8f0',
   position: 'sticky',
   top: 0,
   backgroundColor: '#ffffff',
   zIndex: 10,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      gridTemplateColumns: '70px repeat(7, 1fr)',
+    },
+  },
 });
 
 export const timeColumnHeader = style({
@@ -232,11 +254,20 @@ export const timeColumnHeader = style({
 });
 
 export const weekDayHeader = style({
-  padding: '0.75rem 0.5rem',
+  padding: '0.5rem 0.25rem',
   textAlign: 'center',
   borderRight: '1px solid #f1f5f9',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
   ':last-child': {
     borderRight: 'none',
+  },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.75rem 0.5rem',
+    },
   },
 });
 
@@ -252,11 +283,46 @@ export const weekDayName = style({
   letterSpacing: '0.05em',
 });
 
+// Short day name (S, M, T, W...) - shown on mobile
+export const weekDayNameShort = style({
+  display: 'block',
+  fontSize: '0.875rem',
+  fontWeight: '600',
+  color: '#64748b',
+  textTransform: 'uppercase',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      display: 'none',
+    },
+  },
+});
+
+// Full day name (Sun, Mon, Tue...) - shown on desktop
+export const weekDayNameFull = style({
+  display: 'none',
+  fontSize: '0.75rem',
+  fontWeight: '500',
+  color: '#64748b',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      display: 'block',
+    },
+  },
+});
+
 export const weekDayDate = style({
-  fontSize: '1.25rem',
+  fontSize: '1rem',
   fontWeight: '600',
   color: '#1a1a1a',
-  marginTop: '0.25rem',
+  marginTop: '0.125rem',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: '1.25rem',
+      marginTop: '0.25rem',
+    },
+  },
 });
 
 export const weekTimeGrid = style({
@@ -266,20 +332,33 @@ export const weekTimeGrid = style({
 
 export const weekTimeRow = style({
   display: 'grid',
-  gridTemplateColumns: '70px repeat(7, 1fr)',
-  minHeight: '60px',
+  gridTemplateColumns: '50px repeat(7, 1fr)',
+  minHeight: '50px',
   borderBottom: '1px solid #f1f5f9',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      gridTemplateColumns: '70px repeat(7, 1fr)',
+      minHeight: '60px',
+    },
+  },
 });
 
 export const weekTimeLabel = style({
-  padding: '0.5rem',
-  fontSize: '0.75rem',
+  padding: '0.25rem',
+  fontSize: '0.625rem',
   fontWeight: '500',
   color: '#64748b',
   textAlign: 'right',
-  paddingRight: '0.75rem',
+  paddingRight: '0.375rem',
   borderRight: '1px solid #f1f5f9',
   backgroundColor: '#f8fafc',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.5rem',
+      fontSize: '0.75rem',
+      paddingRight: '0.75rem',
+    },
+  },
 });
 
 export const weekTimeCell = style({
@@ -326,12 +405,35 @@ export const noAppointments = style({
 });
 
 export const weekAppointment = style({
-  padding: '0.5rem',
-  borderRadius: '0.25rem',
+  padding: '0.125rem 0.25rem',
+  borderRadius: '0.125rem',
   cursor: 'pointer',
   transition: 'all 0.2s',
+  overflow: 'hidden',
   ':hover': {
     transform: 'scale(1.02)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+  },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.25rem 0.375rem',
+      borderRadius: '0.25rem',
+    },
+  },
+});
+
+export const weekAppointmentName = style({
+  fontSize: '0.625rem',
+  fontWeight: '600',
+  color: '#1a1a1a',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  lineHeight: '1.2',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: '0.75rem',
+    },
   },
 });
 
@@ -530,5 +632,159 @@ export const actionCancel = style({
   color: '#ffffff',
   ':hover': {
     backgroundColor: '#dc2626',
+  },
+});
+
+// Month View Styles
+export const monthView = style({
+  padding: '0.5rem',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '1rem',
+    },
+  },
+});
+
+export const monthHeader = style({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(7, 1fr)',
+  borderBottom: '1px solid #e2e8f0',
+  marginBottom: '0.5rem',
+});
+
+export const monthDayHeader = style({
+  padding: '0.5rem 0.25rem',
+  textAlign: 'center',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.75rem 0.5rem',
+    },
+  },
+});
+
+export const monthDayNameShort = style({
+  display: 'block',
+  fontSize: '0.75rem',
+  fontWeight: '600',
+  color: '#64748b',
+  textTransform: 'uppercase',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      display: 'none',
+    },
+  },
+});
+
+export const monthDayNameFull = style({
+  display: 'none',
+  fontSize: '0.75rem',
+  fontWeight: '500',
+  color: '#64748b',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      display: 'block',
+    },
+  },
+});
+
+export const monthGrid = style({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(7, 1fr)',
+  gap: '1px',
+  backgroundColor: '#e2e8f0',
+  border: '1px solid #e2e8f0',
+  borderRadius: '0.375rem',
+  overflow: 'hidden',
+});
+
+export const monthCell = style({
+  backgroundColor: '#ffffff',
+  minHeight: '60px',
+  padding: '0.25rem',
+  cursor: 'pointer',
+  transition: 'background-color 0.2s',
+  ':hover': {
+    backgroundColor: '#f8fafc',
+  },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      minHeight: '100px',
+      padding: '0.5rem',
+    },
+  },
+});
+
+export const monthCellOther = style({
+  backgroundColor: '#f8fafc',
+  ':hover': {
+    backgroundColor: '#f1f5f9',
+  },
+});
+
+export const monthCellToday = style({
+  backgroundColor: '#f0f9ff',
+  ':hover': {
+    backgroundColor: '#e0f2fe',
+  },
+});
+
+export const monthCellDate = style({
+  fontSize: '0.75rem',
+  fontWeight: '600',
+  color: '#1a1a1a',
+  marginBottom: '0.25rem',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: '0.875rem',
+    },
+  },
+});
+
+export const monthCellBookings = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.125rem',
+});
+
+export const monthBookingDot = style({
+  padding: '0.125rem 0.25rem',
+  borderRadius: '0.125rem',
+  cursor: 'pointer',
+  transition: 'transform 0.2s',
+  ':hover': {
+    transform: 'scale(1.02)',
+  },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.25rem 0.375rem',
+      borderRadius: '0.25rem',
+    },
+  },
+});
+
+export const monthBookingText = style({
+  fontSize: '0.625rem',
+  fontWeight: '500',
+  color: '#1a1a1a',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: '0.75rem',
+    },
+  },
+});
+
+export const monthMoreBookings = style({
+  fontSize: '0.625rem',
+  color: '#64748b',
+  fontWeight: '500',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: '0.75rem',
+    },
   },
 });

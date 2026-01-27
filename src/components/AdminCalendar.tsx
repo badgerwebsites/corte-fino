@@ -1,6 +1,6 @@
 // components/AdminCalendar.tsx
 import { useState, useEffect } from 'react';
-import { format, addDays, subDays, startOfWeek, endOfWeek, isSameDay } from 'date-fns';
+import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isSameDay, isSameMonth, addMonths, subMonths, parseISO } from 'date-fns';
 import { supabase } from '../lib/supabase';
 import type { Barber, BookingWithDetails } from '../types/database.types';
 import { View } from '../ui/View';
@@ -12,11 +12,12 @@ interface AdminCalendarProps {
   onBookingUpdate?: () => void;
 }
 
-type ViewMode = 'day' | 'week';
+type ViewMode = 'day' | 'week' | 'month';
 type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
 
 export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('week');
+  const [previousView, setPreviousView] = useState<'week' | 'month' | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedBarberId, setSelectedBarberId] = useState<string>('all');
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
@@ -59,11 +60,19 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
       if (viewMode === 'day') {
         startDate = format(currentDate, 'yyyy-MM-dd');
         endDate = startDate;
-      } else {
+      } else if (viewMode === 'week') {
         const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
         const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
         startDate = format(weekStart, 'yyyy-MM-dd');
         endDate = format(weekEnd, 'yyyy-MM-dd');
+      } else {
+        // Month view - get all days visible in the calendar grid
+        const monthStart = startOfMonth(currentDate);
+        const monthEnd = endOfMonth(currentDate);
+        const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+        const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+        startDate = format(calendarStart, 'yyyy-MM-dd');
+        endDate = format(calendarEnd, 'yyyy-MM-dd');
       }
 
       const { data, error } = await supabase
@@ -116,8 +125,10 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
   const navigateDate = (direction: 'prev' | 'next') => {
     if (viewMode === 'day') {
       setCurrentDate(direction === 'prev' ? subDays(currentDate, 1) : addDays(currentDate, 1));
-    } else {
+    } else if (viewMode === 'week') {
       setCurrentDate(direction === 'prev' ? subDays(currentDate, 7) : addDays(currentDate, 7));
+    } else {
+      setCurrentDate(direction === 'prev' ? subMonths(currentDate, 1) : addMonths(currentDate, 1));
     }
   };
 
@@ -156,7 +167,8 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
   // Get bookings for a specific time slot
   const getBookingsForTimeSlot = (date: Date, timeSlot: string) => {
     return filteredBookings.filter(booking => {
-      const bookingDate = new Date(booking.booking_date);
+      // Parse date string as local date to avoid timezone issues
+      const bookingDate = parseISO(booking.booking_date);
       if (!isSameDay(bookingDate, date)) return false;
 
       const bookingHour = parseInt(booking.start_time.split(':')[0]);
@@ -171,11 +183,51 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
     return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   };
 
+  // Get all days for month view calendar grid
+  const getMonthDays = () => {
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+
+    const days: Date[] = [];
+    let day = calendarStart;
+    while (day <= calendarEnd) {
+      days.push(day);
+      day = addDays(day, 1);
+    }
+    return days;
+  };
+
+  // Get bookings for a specific day (for month view)
+  const getBookingsForDay = (date: Date) => {
+    return filteredBookings.filter(booking => {
+      // Parse date string as local date to avoid timezone issues
+      const bookingDate = parseISO(booking.booking_date);
+      return isSameDay(bookingDate, date);
+    });
+  };
+
+  // Day names for header
+  const dayNamesShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const dayNamesFull = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
   return (
     <View className={styles.container}>
       {/* Calendar Header */}
       <View className={styles.header}>
         <View className={styles.navigation}>
+          {viewMode === 'day' && previousView && (
+            <button
+              className={styles.backButton}
+              onClick={() => {
+                setViewMode(previousView);
+                setPreviousView(null);
+              }}
+            >
+              &larr; Back
+            </button>
+          )}
           <button className={styles.navButton} onClick={() => navigateDate('prev')}>
             &larr;
           </button>
@@ -190,7 +242,9 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
         <Text className={styles.dateTitle}>
           {viewMode === 'day'
             ? format(currentDate, 'EEEE, MMMM d, yyyy')
-            : `${format(startOfWeek(currentDate, { weekStartsOn: 0 }), 'MMM d')} - ${format(endOfWeek(currentDate, { weekStartsOn: 0 }), 'MMM d, yyyy')}`}
+            : viewMode === 'week'
+            ? `${format(startOfWeek(currentDate, { weekStartsOn: 0 }), 'MMM d')} - ${format(endOfWeek(currentDate, { weekStartsOn: 0 }), 'MMM d, yyyy')}`
+            : format(currentDate, 'MMMM yyyy')}
         </Text>
 
         <View className={styles.controls}>
@@ -208,15 +262,21 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
           <View className={styles.viewToggle}>
             <button
               className={`${styles.viewButton} ${viewMode === 'day' ? styles.viewButtonActive : ''}`}
-              onClick={() => setViewMode('day')}
+              onClick={() => { setPreviousView(null); setViewMode('day'); }}
             >
               Day
             </button>
             <button
               className={`${styles.viewButton} ${viewMode === 'week' ? styles.viewButtonActive : ''}`}
-              onClick={() => setViewMode('week')}
+              onClick={() => { setPreviousView(null); setViewMode('week'); }}
             >
               Week
+            </button>
+            <button
+              className={`${styles.viewButton} ${viewMode === 'month' ? styles.viewButtonActive : ''}`}
+              onClick={() => { setPreviousView(null); setViewMode('month'); }}
+            >
+              Month
             </button>
           </View>
         </View>
@@ -280,12 +340,13 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
               {/* Header with day names */}
               <View className={styles.weekHeader}>
                 <View className={styles.timeColumnHeader}></View>
-                {getWeekDays().map(day => (
+                {getWeekDays().map((day, index) => (
                   <View
                     key={day.toISOString()}
                     className={`${styles.weekDayHeader} ${isSameDay(day, new Date()) ? styles.todayHeader : ''}`}
                   >
-                    <Text className={styles.weekDayName}>{format(day, 'EEE')}</Text>
+                    <Text className={styles.weekDayNameShort}>{dayNamesShort[index]}</Text>
+                    <Text className={styles.weekDayNameFull}>{dayNamesFull[index]}</Text>
                     <Text className={styles.weekDayDate}>{format(day, 'd')}</Text>
                   </View>
                 ))}
@@ -311,10 +372,7 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
                               className={`${styles.weekAppointment} ${getStatusColor(booking.status)}`}
                               onClick={() => setSelectedBooking(booking)}
                             >
-                              <Text className={styles.weekAppointmentTime}>
-                                {formatTime(booking.start_time)}
-                              </Text>
-                              <Text className={styles.weekAppointmentCustomer}>
+                              <Text className={styles.weekAppointmentName}>
                                 {booking.customer?.first_name}
                               </Text>
                             </View>
@@ -324,6 +382,67 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
                     })}
                   </View>
                 ))}
+              </View>
+            </View>
+          )}
+
+          {/* Month View */}
+          {viewMode === 'month' && (
+            <View className={styles.monthView}>
+              {/* Header with day names */}
+              <View className={styles.monthHeader}>
+                {dayNamesShort.map((dayName, index) => (
+                  <View key={index} className={styles.monthDayHeader}>
+                    <Text className={styles.monthDayNameShort}>{dayName}</Text>
+                    <Text className={styles.monthDayNameFull}>{dayNamesFull[index]}</Text>
+                  </View>
+                ))}
+              </View>
+
+              {/* Calendar grid */}
+              <View className={styles.monthGrid}>
+                {getMonthDays().map(day => {
+                  const dayBookings = getBookingsForDay(day);
+                  const isCurrentMonth = isSameMonth(day, currentDate);
+                  const isToday = isSameDay(day, new Date());
+
+                  return (
+                    <View
+                      key={day.toISOString()}
+                      className={`${styles.monthCell} ${!isCurrentMonth ? styles.monthCellOther : ''} ${isToday ? styles.monthCellToday : ''}`}
+                      onClick={() => {
+                        setPreviousView('month');
+                        setCurrentDate(day);
+                        setViewMode('day');
+                      }}
+                    >
+                      <Text className={styles.monthCellDate}>{format(day, 'd')}</Text>
+                      {dayBookings.length > 0 && (
+                        <View className={styles.monthCellBookings}>
+                          {dayBookings.slice(0, 3).map(booking => (
+                            <div
+                              key={booking.id}
+                              className={`${styles.monthBookingDot} ${getStatusColor(booking.status)}`}
+                              onClick={(e: React.MouseEvent) => {
+                                e.stopPropagation();
+                                setSelectedBooking(booking);
+                              }}
+                            >
+                              <Text className={styles.monthBookingText}>
+                                {booking.customer?.first_name}
+                              </Text>
+                            </div>
+                          ))}
+                          {dayBookings.length > 3 && (
+                            <Text className={styles.monthMoreBookings}>
+                              +{dayBookings.length - 3} more
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                    </View>
+                  );
+                })}
               </View>
             </View>
           )}

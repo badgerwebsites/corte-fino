@@ -106,6 +106,7 @@ export const section = style({
   borderRadius: '4px',
   padding: '1rem',
   border: '1px solid #e5e5e5',
+  overflow: 'hidden',
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '2rem',
@@ -193,6 +194,7 @@ export const label = style({
 
 export const input = style({
   width: '100%',
+  boxSizing: 'border-box',
   padding: '0.625rem',
   border: '2px solid #e2e8f0',
   borderRadius: '0.25rem',
@@ -212,6 +214,7 @@ export const input = style({
 
 export const textarea = style({
   width: '100%',
+  boxSizing: 'border-box',
   padding: '0.625rem',
   border: '2px solid #e2e8f0',
   borderRadius: '0.25rem',
@@ -688,6 +691,7 @@ export const pricingPeriodsCard = style({
   borderRadius: '0.5rem',
   padding: '1rem',
   marginTop: '0.5rem',
+  overflow: 'hidden',
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '1.25rem',
@@ -696,6 +700,7 @@ export const pricingPeriodsCard = style({
 });
 
 export const pricingPeriodsTitle = style({
+  display: 'block',
   fontSize: '0.9rem',
   fontWeight: '600',
   color: '#1a1a1a',
@@ -990,6 +995,7 @@ export const rewardsManagementSection = style({
 
 export const select = style({
   width: '100%',
+  boxSizing: 'border-box',
   padding: '0.625rem',
   border: '2px solid #e2e8f0',
   borderRadius: '0.25rem',
