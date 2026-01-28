@@ -696,3 +696,179 @@ export const rescheduleNoticeText = style({
     },
   },
 });
+
+// Booking Confirmation Screen Styles
+export const confirmationOverlay = style({
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1000,
+  padding: 20,
+  animation: `${fadeIn} 0.3s ease-out`,
+});
+
+export const confirmationModal = style({
+  backgroundColor: "#ffffff",
+  borderRadius: 16,
+  padding: 32,
+  maxWidth: 440,
+  width: "100%",
+  boxShadow: "0 24px 48px rgba(0, 0, 0, 0.16)",
+  textAlign: "center",
+  animation: `${slideInUp} 0.4s ease-out`,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 40,
+    },
+  },
+});
+
+export const confirmationIcon = style({
+  width: 72,
+  height: 72,
+  margin: "0 auto 24px",
+  backgroundColor: "#dcfce7",
+  borderRadius: "50%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      width: 80,
+      height: 80,
+    },
+  },
+});
+
+export const confirmationCheckmark = style({
+  width: 36,
+  height: 36,
+  color: "#166534",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      width: 40,
+      height: 40,
+    },
+  },
+});
+
+export const confirmationTitle = style({
+  fontSize: 24,
+  fontWeight: 600,
+  color: "#0a0a0a",
+  marginBottom: 12,
+  letterSpacing: "-0.02em",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 28,
+    },
+  },
+});
+
+export const confirmationMessage = style({
+  fontSize: 15,
+  color: "#525252",
+  marginBottom: 24,
+  lineHeight: 1.6,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
+});
+
+export const confirmationDetails = style({
+  backgroundColor: "#fafafa",
+  borderRadius: 12,
+  padding: 20,
+  marginBottom: 28,
+  textAlign: "left",
+});
+
+export const confirmationDetailRow = style({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingTop: 12,
+  paddingBottom: 12,
+  borderBottom: "1px solid #f0f0f0",
+  selectors: {
+    "&:first-child": {
+      paddingTop: 0,
+    },
+    "&:last-child": {
+      borderBottom: "none",
+      paddingBottom: 0,
+    },
+  },
+});
+
+export const confirmationDetailLabel = style({
+  fontSize: 13,
+  color: "#737373",
+  fontWeight: 400,
+});
+
+export const confirmationDetailValue = style({
+  fontSize: 14,
+  color: "#0a0a0a",
+  fontWeight: 500,
+  textAlign: "right",
+});
+
+export const confirmationButtons = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 12,
+});
+
+export const confirmationPrimaryButton = style({
+  padding: "14px 24px",
+  fontSize: 15,
+  fontWeight: 600,
+  backgroundColor: "#0a0a0a",
+  color: "#ffffff",
+  border: "none",
+  borderRadius: 10,
+  cursor: "pointer",
+  textDecoration: "none",
+  textAlign: "center",
+  transition: "all 0.15s",
+  ":hover": {
+    backgroundColor: "#262626",
+  },
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
+});
+
+export const confirmationSecondaryButton = style({
+  padding: "14px 24px",
+  fontSize: 15,
+  fontWeight: 500,
+  backgroundColor: "#f5f5f5",
+  color: "#525252",
+  border: "none",
+  borderRadius: 10,
+  cursor: "pointer",
+  textDecoration: "none",
+  textAlign: "center",
+  transition: "all 0.15s",
+  ":hover": {
+    backgroundColor: "#e5e5e5",
+    color: "#0a0a0a",
+  },
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
+});

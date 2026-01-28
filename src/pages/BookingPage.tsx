@@ -34,6 +34,15 @@ export default function BookingPage() {
   const [step, setStep] = useState<BookingStep>(1);
   const [loading, setLoading] = useState(true);
   const [bookingInProgress, setBookingInProgress] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmedBookingDetails, setConfirmedBookingDetails] = useState<{
+    serviceName: string;
+    barberName: string;
+    date: string;
+    time: string;
+    price: number;
+    rewardPoints: number;
+  } | null>(null);
 
   // Data from database
   const [services, setServices] = useState<Service[]>([]);
@@ -258,17 +267,18 @@ export default function BookingPage() {
         }
       }
 
-      // Navigate to dashboard with success message
-      const message = rescheduleFromId
-        ? 'Appointment rescheduled successfully!'
-        : `Booking confirmed! You earned ${selectedService.reward_points} reward points.`;
-
-      navigate('/dashboard', {
-        state: {
-          bookingSuccess: true,
-          message
-        }
+      // Store booking details for confirmation screen
+      setConfirmedBookingDetails({
+        serviceName: selectedService.name,
+        barberName: anyBarber ? 'Any Available Barber' : bookingBarber.name,
+        date: formatDate(selectedDate),
+        time: formatTimeTo12Hour(selectedTime),
+        price: totalPrice,
+        rewardPoints: rescheduleFromId ? 0 : selectedService.reward_points,
       });
+
+      // Show confirmation screen
+      setShowConfirmation(true);
 
     } catch (error) {
       console.error('Error creating booking:', error);
@@ -695,6 +705,82 @@ export default function BookingPage() {
         </View>
       )}
     </View>
+
+      {/* Booking Confirmation Modal */}
+      {showConfirmation && confirmedBookingDetails && (
+        <div className={styles.confirmationOverlay}>
+          <div className={styles.confirmationModal}>
+            <View className={styles.confirmationIcon}>
+              <svg
+                className={styles.confirmationCheckmark}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </View>
+
+            <Text className={styles.confirmationTitle}>
+              {isReschedule ? 'Appointment Rescheduled!' : 'Booking Confirmed!'}
+            </Text>
+
+            <Text className={styles.confirmationMessage}>
+              {isReschedule
+                ? 'Your appointment has been successfully rescheduled.'
+                : `Your appointment is confirmed. You earned ${confirmedBookingDetails.rewardPoints} reward points!`}
+            </Text>
+
+            <View className={styles.confirmationDetails}>
+              <View className={styles.confirmationDetailRow}>
+                <Text className={styles.confirmationDetailLabel}>Service</Text>
+                <Text className={styles.confirmationDetailValue}>
+                  {confirmedBookingDetails.serviceName}
+                </Text>
+              </View>
+              <View className={styles.confirmationDetailRow}>
+                <Text className={styles.confirmationDetailLabel}>Barber</Text>
+                <Text className={styles.confirmationDetailValue}>
+                  {confirmedBookingDetails.barberName}
+                </Text>
+              </View>
+              <View className={styles.confirmationDetailRow}>
+                <Text className={styles.confirmationDetailLabel}>Date</Text>
+                <Text className={styles.confirmationDetailValue}>
+                  {confirmedBookingDetails.date}
+                </Text>
+              </View>
+              <View className={styles.confirmationDetailRow}>
+                <Text className={styles.confirmationDetailLabel}>Time</Text>
+                <Text className={styles.confirmationDetailValue}>
+                  {confirmedBookingDetails.time}
+                </Text>
+              </View>
+              <View className={styles.confirmationDetailRow}>
+                <Text className={styles.confirmationDetailLabel}>Total</Text>
+                <Text className={styles.confirmationDetailValue}>
+                  ${confirmedBookingDetails.price.toFixed(2)}
+                </Text>
+              </View>
+            </View>
+
+            <View className={styles.confirmationButtons}>
+              <Link to="/dashboard" className={styles.confirmationPrimaryButton}>
+                Back to Dashboard
+              </Link>
+              <Link to="/" className={styles.confirmationSecondaryButton}>
+                Back to Home
+              </Link>
+            </View>
+          </div>
+        </div>
+      )}
     </>
   );
 }
