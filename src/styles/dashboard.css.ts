@@ -1,34 +1,47 @@
 import { style } from "@vanilla-extract/css";
 
-// Layout
 export const container = style({
   minHeight: "100vh",
   backgroundColor: "#fafafa",
-  paddingTop: 80,
-  paddingBottom: 40,
-});
+  paddingTop: 72,
+  paddingBottom: 32,
 
-export const content = style({
-  maxWidth: 560,
-  margin: "0 auto",
-  padding: "0 16px",
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: "0 24px",
+      paddingTop: 88,
     },
   },
 });
 
-// Header
-export const header = style({
-  marginBottom: 32,
+export const content = style({
+  margin: "0 auto",
+  padding: "0 16px",
+
+  "@media": {
+    "screen and (min-width: 768px)": {
+      maxWidth: 960,
+      padding: "0 24px",
+    },
+    "screen and (min-width: 1200px)": {
+      maxWidth: 1000,
+    },
+  },
 });
 
-export const headerTop = style({
+export const header = style({
   display: "flex",
-  justifyContent: "space-between",
+  flexDirection: "column",
   alignItems: "center",
-  marginBottom: 8,
+  gap: 12,
+  // marginBottom: 16,
+
+  "@media": {
+    "screen and (min-width: 768px)": {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      // alignItems: "center",
+    },
+  },
 });
 
 export const greeting = style({
@@ -43,52 +56,48 @@ export const greeting = style({
   },
 });
 
-export const title = style({
-  display: "none",
-});
+// export const signOutButton = style({
+//   padding: "8px 16px",
+//   fontSize: 13,
+//   fontWeight: 500,
+//   backgroundColor: "transparent",
+//   color: "#737373",
+//   border: "1px solid #e5e5e5",
+//   borderRadius: 6,
+//   cursor: "pointer",
+//   transition: "all 0.15s",
+//   ":hover": {
+//     backgroundColor: "#ffffff",
+//     borderColor: "#d4d4d4",
+//     color: "#525252",
+//   },
+// });
 
-export const signOutButton = style({
-  padding: "8px 16px",
-  fontSize: 13,
-  fontWeight: 500,
-  backgroundColor: "transparent",
-  color: "#737373",
-  border: "1px solid #e5e5e5",
-  borderRadius: 6,
-  cursor: "pointer",
-  transition: "all 0.15s",
-  ":hover": {
-    backgroundColor: "#ffffff",
-    borderColor: "#d4d4d4",
-    color: "#525252",
-  },
-});
-
-// Primary CTA - now more subtle when bookings exist
 export const primaryCta = style({
   display: "block",
-  width: "100%",
-  padding: "14px 24px",
-  fontSize: 15,
-  fontWeight: 500,
-  backgroundColor: "#0a0a0a",
-  color: "#ffffff",
+  maxWidth: 300,
+  padding: "12px 16px",
+  fontSize: 16,
+  fontWeight: 700,
+  letterSpacing: '0.05em',
+  textTransform: 'uppercase',
+  backgroundColor: '#222222',
+  color: '#f5f5f5',
   border: "none",
   borderRadius: 10,
   cursor: "pointer",
   textDecoration: "none",
   textAlign: "center",
   transition: "all 0.15s",
-  letterSpacing: "-0.01em",
-  ":hover": {
-    backgroundColor: "#262626",
+  ':hover': {
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
   },
-  ":active": {
-    transform: "scale(0.99)",
+  ':active': {
+    transform: 'translateY(0)',
   },
 });
 
-// Stats row - now a card
 export const statsRow = style({
   display: "grid",
   gridTemplateColumns: "1fr 1fr",
@@ -133,7 +142,6 @@ export const statLabel = style({
   marginTop: 4,
 });
 
-// Section
 export const section = style({
   marginBottom: 24,
 });
@@ -152,7 +160,6 @@ export const sectionTitle = style({
   letterSpacing: "-0.01em",
 });
 
-// Empty state
 export const emptyState = style({
   padding: "48px 24px",
   textAlign: "center",
@@ -203,7 +210,6 @@ export const emptyStateButton = style({
   },
 });
 
-// Bookings list
 export const bookingsList = style({
   display: "flex",
   flexDirection: "column",
@@ -341,7 +347,6 @@ export const actionLinkDanger = style({
   },
 });
 
-// Rewards card - clean card style
 export const rewardsCard = style({
   display: "flex",
   alignItems: "center",
@@ -390,7 +395,6 @@ export const rewardsLink = style({
   },
 });
 
-// Admin link
 export const adminLink = style({
   display: "inline-flex",
   alignItems: "center",
@@ -411,7 +415,6 @@ export const adminLink = style({
   },
 });
 
-// Modal styles
 export const modalOverlay = style({
   position: "fixed",
   top: 0,
@@ -534,25 +537,9 @@ export const modalConfirmButton = style({
   },
 });
 
-// Loading state
 export const loadingText = style({
   color: "#737373",
   fontSize: 14,
   textAlign: "center",
   padding: "40px 0",
 });
-
-// Legacy exports for compatibility
-export const subtitle = style({ display: "none" });
-export const statsGrid = style({ display: "none" });
-export const statCard = style({ display: "none" });
-export const statValueSmall = style({ display: "none" });
-export const bookButton = style({ display: "none" });
-export const bookingHeader = style({ display: "none" });
-export const bookingService = style({ display: "none" });
-export const bookingBarber = style({ display: "none" });
-export const bookingDetails = style({ display: "none" });
-export const rewardsTitle = style({ display: "none" });
-export const rewardsSubtitle = style({ display: "none" });
-export const rescheduleButton = style({ display: "none" });
-export const cancelButton = style({ display: "none" });

@@ -189,7 +189,6 @@ export const footerText = style({
 export const link = style({
   fontSize: 22,
   fontWeight: 700,
-
   color: '#96cfe0',
   textDecoration: 'none',
 

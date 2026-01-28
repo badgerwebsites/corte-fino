@@ -12,7 +12,7 @@ import calendarCheckIcon from '../assets/calendar-check.svg';
 import giftIcon from '../assets/gift.svg';
 
 export default function CustomerDashboardPage() {
-  const { user, customer, signOut } = useAuth();
+  const { user, customer } = useAuth();
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancellingBooking, setCancellingBooking] = useState<BookingWithDetails | null>(null);
@@ -68,12 +68,6 @@ export default function CustomerDashboardPage() {
 
     loadBookings();
   }, [user, navigate]);
-
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
 
   const loadBookings = async () => {
     if (!user) return;
@@ -174,61 +168,62 @@ export default function CustomerDashboardPage() {
   };
 
   // Get next appointment info
-  const getNextAppointment = () => {
-    const today = new Date(new Date().toDateString());
-    const upcoming = bookings
-      .filter(b =>
-        new Date(b.booking_date) >= today &&
-        (b.status === 'pending' || b.status === 'confirmed')
-      )
-      .sort((a, b) => new Date(a.booking_date).getTime() - new Date(b.booking_date).getTime());
+  // const getNextAppointment = () => {
+  //   const today = new Date(new Date().toDateString());
+  //   const upcoming = bookings
+  //     .filter(b =>
+  //       new Date(b.booking_date) >= today &&
+  //       (b.status === 'pending' || b.status === 'confirmed')
+  //     )
+  //     .sort((a, b) => new Date(a.booking_date).getTime() - new Date(b.booking_date).getTime());
 
-    if (upcoming.length === 0) return null;
+  //   if (upcoming.length === 0) return null;
 
-    const next = upcoming[0];
-    const nextDate = new Date(next.booking_date);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+  //   const next = upcoming[0];
+  //   const nextDate = new Date(next.booking_date);
+  //   const tomorrow = new Date(today);
+  //   tomorrow.setDate(tomorrow.getDate() + 1);
 
-    let dateText = nextDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    if (nextDate.getTime() === today.getTime()) dateText = 'Today';
-    else if (nextDate.getTime() === tomorrow.getTime()) dateText = 'Tomorrow';
+  //   let dateText = nextDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  //   if (nextDate.getTime() === today.getTime()) dateText = 'Today';
+  //   else if (nextDate.getTime() === tomorrow.getTime()) dateText = 'Tomorrow';
 
-    return dateText;
-  };
+  //   return dateText;
+  // };
 
-  if (loading) {
-    return (
-      <>
-        <Navigation />
-        <View className={styles.container}>
-          <View className={styles.content}>
-            <Text className={styles.loadingText}>Loading...</Text>
-          </View>
-        </View>
-      </>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <>
+  //       <Navigation />
+  //       <View className={styles.container}>
+  //         <View className={styles.content}>
+  //           <Text className={styles.loadingText}>Loading...</Text>
+  //         </View>
+  //       </View>
+  //     </>
+  //   );
+  // }
 
-  const nextAppointment = getNextAppointment();
+  // const nextAppointment = getNextAppointment();
 
   return (
     <>
       <Navigation />
       <View className={styles.container}>
         <View className={styles.content}>
-          {/* Header */}
-          <View className={styles.header}>
-            <View className={styles.headerTop}>
-              <Text className={styles.greeting}>Hi, {customer?.first_name}</Text>
-              <button onClick={handleSignOut} className={styles.signOutButton}>
-                Sign out
-              </button>
+            <View className={styles.header}>
+              <Text className={styles.greeting}>Welcome back, {customer?.first_name}</Text>
+              {bookings.length > 0 && (
+                <View className={styles.section}>
+                  <Link to="/book" className={styles.primaryCta}>
+                    Book Appointment
+                  </Link>
+                </View>
+              )}
             </View>
-          </View>
 
           {/* Stats */}
-          <View className={styles.statsRow}>
+          {/* <View className={styles.statsRow}>
             <View className={styles.stat}>
               <Text className={styles.statValue}>{customer?.reward_points || 0}</Text>
               <Text className={styles.statLabel}>Reward Points</Text>
@@ -241,16 +236,16 @@ export default function CustomerDashboardPage() {
               )}
               <Text className={styles.statLabel}>Next Visit</Text>
             </View>
-          </View>
+          </View> */}
 
           {/* Book Appointment CTA - only show when there are bookings */}
-          {bookings.length > 0 && (
+          {/* {bookings.length > 0 && (
             <View className={styles.section}>
               <Link to="/book" className={styles.primaryCta}>
                 Book New Appointment
               </Link>
             </View>
-          )}
+          )} */}
 
           {/* Upcoming Appointments */}
           <View className={styles.section}>
@@ -332,13 +327,13 @@ export default function CustomerDashboardPage() {
             </View>
           </View>
 
-          {customer?.is_admin && (
+          {/* {customer?.is_admin && (
             <View className={styles.section}>
               <Link to="/admin" className={styles.adminLink}>
                 Admin Dashboard
               </Link>
             </View>
-          )}
+          )} */}
         </View>
       </View>
 

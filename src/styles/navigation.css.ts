@@ -7,7 +7,7 @@ export const nav = style({
   left: 0,
   right: 0,
   zIndex: 1000,
-  backgroundColor: '#222222',
+  backgroundColor: '#101214',
   boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
   padding: '12px 8px',
   borderBottom: '1px solid #ffffff',
