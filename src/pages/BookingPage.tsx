@@ -372,11 +372,22 @@ export default function BookingPage() {
     });
   };
 
-  // Check if a time slot is already booked for a specific barber
+  // Check if a time slot overlaps with any existing booking for a specific barber
   const isSlotBooked = (time: string, barberId: string): boolean => {
-    return existingBookings.some(
-      booking => booking.barber_id === barberId && booking.start_time === time
-    );
+    const [slotHours, slotMins] = time.split(':').map(Number);
+    const slotMinutes = slotHours * 60 + slotMins;
+
+    return existingBookings.some(booking => {
+      if (booking.barber_id !== barberId) return false;
+
+      const [startHours, startMins] = booking.start_time.split(':').map(Number);
+      const [endHours, endMins] = booking.end_time.split(':').map(Number);
+      const bookingStart = startHours * 60 + startMins;
+      const bookingEnd = endHours * 60 + endMins;
+
+      // Check if the slot falls within an existing booking's time range
+      return slotMinutes >= bookingStart && slotMinutes < bookingEnd;
+    });
   };
 
   // Get available time slots for selected date and barber
@@ -419,8 +430,8 @@ export default function BookingPage() {
             const startMinutes = startHour * 60 + startMin;
             const endMinutes = endHour * 60 + endMin;
 
-            // Generate 30-minute slots
-            for (let minutes = startMinutes; minutes < endMinutes; minutes += 30) {
+            // Generate 15-minute slots
+            for (let minutes = startMinutes; minutes < endMinutes; minutes += 15) {
               const hours = Math.floor(minutes / 60);
               const mins = minutes % 60;
               const timeSlot = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
@@ -457,8 +468,8 @@ export default function BookingPage() {
       const startMinutes = startHour * 60 + startMin;
       const endMinutes = endHour * 60 + endMin;
 
-      // Generate 30-minute slots
-      for (let minutes = startMinutes; minutes < endMinutes; minutes += 30) {
+      // Generate 15-minute slots
+      for (let minutes = startMinutes; minutes < endMinutes; minutes += 15) {
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
         const timeSlot = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
