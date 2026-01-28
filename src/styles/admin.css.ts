@@ -324,6 +324,9 @@ export const barberCard = style({
 
 export const barberInfo = style({
   flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
 });
 
 export const barberName = style({

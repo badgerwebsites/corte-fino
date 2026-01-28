@@ -156,40 +156,110 @@ export const emptyStateText = style({
   color: '#64748b',
 });
 
-// Day View Styles
+// Day View Styles - Google Calendar style with grey time panel
 export const dayView = style({
-  padding: '1rem',
+  overflow: 'auto',
+});
+
+export const dayHeader = style({
+  display: 'grid',
+  gridTemplateColumns: '50px 1fr',
+  borderBottom: '1px solid #e2e8f0',
+  position: 'sticky',
+  top: 0,
+  backgroundColor: '#ffffff',
+  zIndex: 10,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      gridTemplateColumns: '70px 1fr',
+    },
+  },
+});
+
+export const dayTimeColumnHeader = style({
+  borderRight: '1px solid #f1f5f9',
+  backgroundColor: '#f8fafc',
+});
+
+export const dayColumnHeader = style({
+  padding: '0.5rem 0.25rem',
+  textAlign: 'center',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.75rem 0.5rem',
+    },
+  },
+});
+
+export const dayColumnHeaderToday = style({
+  backgroundColor: '#f0f9ff',
+});
+
+export const dayColumnDayName = style({
+  fontSize: '0.75rem',
+  fontWeight: '500',
+  color: '#64748b',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+});
+
+export const dayColumnDate = style({
+  fontSize: '1.25rem',
+  fontWeight: '600',
+  color: '#1a1a1a',
+  marginTop: '0.25rem',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: '1.5rem',
+    },
+  },
 });
 
 export const timeGrid = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.25rem',
 });
 
 export const timeRow = style({
-  display: 'flex',
-  minHeight: '60px',
+  display: 'grid',
+  gridTemplateColumns: '50px 1fr',
+  minHeight: '50px',
   borderBottom: '1px solid #f1f5f9',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      gridTemplateColumns: '70px 1fr',
+      minHeight: '60px',
+    },
+  },
 });
 
 export const timeLabel = style({
-  width: '80px',
-  flexShrink: 0,
-  padding: '0.5rem',
-  fontSize: '0.75rem',
+  padding: '0.25rem',
+  fontSize: '0.625rem',
   fontWeight: '500',
   color: '#64748b',
   textAlign: 'right',
-  paddingRight: '1rem',
+  paddingRight: '0.375rem',
+  borderRight: '1px solid #f1f5f9',
+  backgroundColor: '#f8fafc',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.5rem',
+      fontSize: '0.75rem',
+      paddingRight: '0.75rem',
+    },
+  },
 });
 
 export const appointmentsColumn = style({
-  flex: 1,
+  padding: '0.25rem',
   display: 'flex',
   flexDirection: 'column',
   gap: '0.25rem',
-  padding: '0.25rem 0',
 });
 
 export const appointmentCard = style({

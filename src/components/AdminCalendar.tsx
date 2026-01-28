@@ -346,46 +346,50 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
           {/* Day View */}
           {viewMode === 'day' && (
             <View className={styles.dayView}>
-              {filteredBookings.length === 0 ? (
-                <View className={styles.emptyState}>
-                  <Text className={styles.emptyStateText}>No appointments scheduled for this day</Text>
+              {/* Header with day column */}
+              <View className={styles.dayHeader}>
+                <View className={styles.dayTimeColumnHeader}></View>
+                <View className={`${styles.dayColumnHeader} ${isSameDay(currentDate, new Date()) ? styles.dayColumnHeaderToday : ''}`}>
+                  <Text className={styles.dayColumnDayName}>{format(currentDate, 'EEE')}</Text>
+                  <Text className={styles.dayColumnDate}>{format(currentDate, 'd')}</Text>
                 </View>
-              ) : (
-                <View className={styles.timeGrid}>
-                  {timeSlots.map(timeSlot => {
-                    const slotBookings = getBookingsForTimeSlot(currentDate, timeSlot);
-                    return (
-                      <View key={timeSlot} className={styles.timeRow}>
-                        <View className={styles.timeLabel}>
-                          <Text>{formatTime(timeSlot)}</Text>
-                        </View>
-                        <View className={styles.appointmentsColumn}>
-                          {slotBookings.map(booking => (
-                            <View
-                              key={booking.id}
-                              className={`${styles.appointmentCard} ${getStatusColor(booking.status)}`}
-                              onClick={() => setSelectedBooking(booking)}
-                            >
-                              <Text className={styles.appointmentTime}>
-                                {formatTime(booking.start_time)} - {formatTime(booking.end_time)}
-                              </Text>
-                              <Text className={styles.appointmentCustomer}>
-                                {booking.customer?.first_name} {booking.customer?.last_name}
-                              </Text>
-                              <Text className={styles.appointmentService}>
-                                {booking.service?.name}
-                              </Text>
-                              <Text className={styles.appointmentBarber}>
-                                with {booking.barber?.name}
-                              </Text>
-                            </View>
-                          ))}
-                        </View>
+              </View>
+
+              {/* Time grid with rows for each hour */}
+              <View className={styles.timeGrid}>
+                {timeSlots.map(timeSlot => {
+                  const slotBookings = getBookingsForTimeSlot(currentDate, timeSlot);
+                  return (
+                    <View key={timeSlot} className={styles.timeRow}>
+                      <View className={styles.timeLabel}>
+                        <Text>{formatTime(timeSlot)}</Text>
                       </View>
-                    );
-                  })}
-                </View>
-              )}
+                      <View className={styles.appointmentsColumn}>
+                        {slotBookings.map(booking => (
+                          <View
+                            key={booking.id}
+                            className={`${styles.appointmentCard} ${getStatusColor(booking.status)}`}
+                            onClick={() => setSelectedBooking(booking)}
+                          >
+                            <Text className={styles.appointmentTime}>
+                              {formatTime(booking.start_time)} - {formatTime(booking.end_time)}
+                            </Text>
+                            <Text className={styles.appointmentCustomer}>
+                              {booking.customer?.first_name} {booking.customer?.last_name}
+                            </Text>
+                            <Text className={styles.appointmentService}>
+                              {booking.service?.name}
+                            </Text>
+                            <Text className={styles.appointmentBarber}>
+                              with {booking.barber?.name}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
             </View>
           )}
 
