@@ -27,10 +27,11 @@ export default function RewardsPage() {
   const [loading, setLoading] = useState(true);
   const [activeCode, setActiveCode] = useState<string | null>(null);
 
-  // Refetch rewards when navigating to this page
+  // Refetch rewards and customer data when navigating to this page
   useEffect(() => {
     loadRewards();
-  }, [location.key]);
+    refreshCustomer();
+  }, [location.key, refreshCustomer]);
 
   useEffect(() => {
     if (user) {

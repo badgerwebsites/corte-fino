@@ -5,7 +5,7 @@ import { DayPicker } from 'react-day-picker';
 import { addDays, format, isBefore, startOfDay, getDay } from 'date-fns';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
-import type { Barber, Service, BarberServicePricing, BarberAvailability, BarberTimeOff } from '../types/database.types';
+import type { Barber, Service, BarberServicePricing, BarberAvailability, BarberTimeOff, Booking } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
@@ -50,6 +50,7 @@ export default function BookingPage() {
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
   const [availability, setAvailability] = useState<BarberAvailability[]>([]);
   const [timeOff, setTimeOff] = useState<BarberTimeOff[]>([]);
+  const [existingBookings, setExistingBookings] = useState<Booking[]>([]);
 
   // Booking selections
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -61,6 +62,32 @@ export default function BookingPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Fetch existing bookings when date changes
+  useEffect(() => {
+    if (!selectedDate) {
+      setExistingBookings([]);
+      return;
+    }
+
+    const fetchExistingBookings = async () => {
+      const dateString = format(selectedDate, 'yyyy-MM-dd');
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('booking_date', dateString)
+        .neq('status', 'cancelled');
+
+      if (error) {
+        console.error('Error fetching existing bookings:', error);
+        return;
+      }
+
+      setExistingBookings(data || []);
+    };
+
+    fetchExistingBookings();
+  }, [selectedDate]);
 
   // Pre-select service and barber if rescheduling
   useEffect(() => {
@@ -253,20 +280,6 @@ export default function BookingPage() {
 
       if (bookingError) throw bookingError;
 
-      // Award reward points to customer (only for new bookings, not reschedules)
-      if (!rescheduleFromId) {
-        const newPoints = (customer.reward_points || 0) + selectedService.reward_points;
-        const { error: pointsError } = await supabase
-          .from('customers')
-          .update({ reward_points: newPoints })
-          .eq('id', user.id);
-
-        if (pointsError) {
-          console.error('Failed to award points:', pointsError);
-          // Don't fail the booking if points update fails
-        }
-      }
-
       // Store booking details for confirmation screen
       setConfirmedBookingDetails({
         serviceName: selectedService.name,
@@ -337,6 +350,35 @@ export default function BookingPage() {
     return !hasTimeOff;
   };
 
+  // Filter out past time slots if the selected date is today
+  const filterPastTimeSlots = (slots: string[]): string[] => {
+    if (!selectedDate) return slots;
+
+    const now = new Date();
+    const isToday = startOfDay(selectedDate).getTime() === startOfDay(now).getTime();
+
+    if (!isToday) return slots;
+
+    // Get current time in minutes
+    const currentHour = now.getHours();
+    const currentMinutes = now.getMinutes();
+    const currentTimeInMinutes = currentHour * 60 + currentMinutes;
+
+    // Filter out slots that are in the past (add a small buffer of 30 min)
+    return slots.filter(slot => {
+      const [hours, mins] = slot.split(':').map(Number);
+      const slotTimeInMinutes = hours * 60 + mins;
+      return slotTimeInMinutes > currentTimeInMinutes;
+    });
+  };
+
+  // Check if a time slot is already booked for a specific barber
+  const isSlotBooked = (time: string, barberId: string): boolean => {
+    return existingBookings.some(
+      booking => booking.barber_id === barberId && booking.start_time === time
+    );
+  };
+
   // Get available time slots for selected date and barber
   const getAvailableTimeSlots = (): string[] => {
     if (!selectedDate) return [];
@@ -344,9 +386,9 @@ export default function BookingPage() {
     const dayOfWeek = getDay(selectedDate);
     const dateString = format(selectedDate, 'yyyy-MM-dd');
 
-    // If "any barber" selected, collect all time slots from all available barbers
+    // If "any barber" selected, collect time slots where at least one barber is available
     if (!selectedBarber && anyBarber) {
-      const allSlots = new Set<string>();
+      const slotAvailability = new Map<string, boolean>();
 
       barbers.forEach(barber => {
         // Check if this barber is available on this date
@@ -381,13 +423,18 @@ export default function BookingPage() {
             for (let minutes = startMinutes; minutes < endMinutes; minutes += 30) {
               const hours = Math.floor(minutes / 60);
               const mins = minutes % 60;
-              allSlots.add(`${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`);
+              const timeSlot = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+
+              // Check if this barber is available for this slot (not already booked)
+              if (!isSlotBooked(timeSlot, barber.id)) {
+                slotAvailability.set(timeSlot, true);
+              }
             }
           });
         }
       });
 
-      return Array.from(allSlots).sort();
+      return filterPastTimeSlots(Array.from(slotAvailability.keys()).sort());
     }
 
     // Specific barber selected
@@ -414,11 +461,16 @@ export default function BookingPage() {
       for (let minutes = startMinutes; minutes < endMinutes; minutes += 30) {
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
-        slots.push(`${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`);
+        const timeSlot = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+
+        // Only add if not already booked
+        if (!isSlotBooked(timeSlot, selectedBarber.id)) {
+          slots.push(timeSlot);
+        }
       }
     });
 
-    return slots.sort();
+    return filterPastTimeSlots(slots.sort());
   };
 
   const formatDate = (date: Date | string): string => {
@@ -734,7 +786,7 @@ export default function BookingPage() {
             <Text className={styles.confirmationMessage}>
               {isReschedule
                 ? 'Your appointment has been successfully rescheduled.'
-                : `Your appointment is confirmed. You earned ${confirmedBookingDetails.rewardPoints} reward points!`}
+                : `Your appointment is confirmed. You'll earn ${confirmedBookingDetails.rewardPoints} reward points when your appointment is completed!`}
             </Text>
 
             <View className={styles.confirmationDetails}>

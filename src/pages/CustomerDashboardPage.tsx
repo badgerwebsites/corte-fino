@@ -12,12 +12,17 @@ import calendarCheckIcon from '../assets/calendar-check.svg';
 import giftIcon from '../assets/gift.svg';
 
 export default function CustomerDashboardPage() {
-  const { user, customer } = useAuth();
+  const { user, customer, refreshCustomer } = useAuth();
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancellingBooking, setCancellingBooking] = useState<BookingWithDetails | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const navigate = useNavigate();
+
+  // Refresh customer data (including reward points) when dashboard loads
+  useEffect(() => {
+    refreshCustomer();
+  }, [refreshCustomer]);
 
   useEffect(() => {
     if (loading) return;

@@ -79,9 +79,9 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
         .from('bookings')
         .select(`
           *,
-          customer:customers(first_name, last_name, phone, email),
+          customer:customers(first_name, last_name, phone, email, reward_points),
           barber:barbers(id, name),
-          service:services(name, duration_minutes)
+          service:services(name, duration_minutes, reward_points)
         `)
         .gte('booking_date', startDate)
         .lte('booking_date', endDate)
@@ -112,6 +112,61 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
         .eq('id', bookingId);
 
       if (error) throw error;
+
+      // Award reward points when marking as completed
+      if (newStatus === 'completed' && selectedBooking) {
+        // Fetch the service's reward points directly from the database
+        const { data: serviceData, error: serviceError } = await supabase
+          .from('services')
+          .select('reward_points')
+          .eq('id', selectedBooking.service_id)
+          .single();
+
+        if (serviceError) {
+          console.error('Failed to fetch service:', serviceError);
+          alert('Appointment marked as complete, but failed to fetch service for reward points.');
+        } else {
+          const serviceRewardPoints = serviceData?.reward_points || 0;
+
+          if (serviceRewardPoints > 0) {
+            // Fetch the customer's current points fresh from the database
+            const { data: customerData, error: fetchError } = await supabase
+              .from('customers')
+              .select('reward_points')
+              .eq('id', selectedBooking.customer_id)
+              .single();
+
+            if (fetchError) {
+              console.error('Failed to fetch customer points:', fetchError);
+              alert('Appointment marked as complete, but failed to fetch customer for reward points.');
+            } else {
+              const currentPoints = customerData?.reward_points || 0;
+              const newPoints = currentPoints + serviceRewardPoints;
+
+              const { data: updateResult, error: pointsError } = await supabase
+                .from('customers')
+                .update({ reward_points: newPoints })
+                .eq('id', selectedBooking.customer_id)
+                .select('reward_points');
+
+              if (pointsError) {
+                console.error('Failed to award points:', pointsError);
+                alert('Appointment marked as complete, but failed to award reward points.');
+              } else if (!updateResult || updateResult.length === 0) {
+                console.error('No rows updated - RLS policy may be blocking the update');
+                console.log('Customer ID:', selectedBooking.customer_id);
+                console.log('New points value:', newPoints);
+                alert('Appointment marked as complete, but could not update reward points (permission issue). Check RLS policies.');
+              } else {
+                console.log('Points updated successfully:', updateResult);
+                alert(`Appointment completed! ${serviceRewardPoints} reward points awarded to customer. New total: ${updateResult[0].reward_points}`);
+              }
+            }
+          } else {
+            alert('Appointment marked as complete. (No reward points for this service)');
+          }
+        }
+      }
 
       loadBookings();
       setSelectedBooking(null);
