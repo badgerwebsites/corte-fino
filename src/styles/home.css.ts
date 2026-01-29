@@ -158,15 +158,6 @@ export const scrollArrow = style({
   },
 });
 
-// export const container = style({
-//   display: "flex",
-//   flexDirection: "column",
-//   height: "100vh",
-//   backgroundColor: "#1f1f1f",
-//   color: "#1a1a1a",
-//   paddingTop: 60,
-// });
-
 export const sectionDark = style({
   backgroundColor: dark_bg,
   padding: '40px 20px',
@@ -189,41 +180,14 @@ export const sectionDarker = style({
   },
 });
 
-export const sectionInner = style({
-  maxWidth: 1200,
-  margin: '0 auto',
-  width: '100%',
-
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-});
-
-
-export const sectionTitle = style({
-  fontSize: 28,
-  fontWeight: 300,
-  textAlign: "center",
-  marginBottom: 24,
-  color: text_primary,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 36,
-      marginBottom: 40,
-    },
-  },
-});
-
 export const barbersGrid = style({
   display: "grid",
   gridTemplateColumns: "1fr",
   gap: 24,
-  // marginTop: 32,
   "@media": {
     "screen and (min-width: 768px)": {
       gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
       gap: 32,
-      // marginTop: 48,
     },
   },
 });
@@ -299,6 +263,11 @@ export const barberBio = style({
 export const barberSocial = style({
   fontSize: 14,
   color: text_secondary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
 });
 
 export const barberSocialLink = style({
@@ -320,6 +289,12 @@ export const barberSocialIcon = style({
   width: 16,
   height: 16,
   color: text_secondary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      width: 20,
+      height: 20,
+    },
+  },
 });
 
 export const barberPhoneLink = style({
@@ -342,11 +317,22 @@ export const barberPhoneIcon = style({
   width: 16,
   height: 16,
   color: text_secondary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      width: 20,
+      height: 20,
+    },
+  },
 });
 
 export const barberPhone = style({
   fontSize: 14,
   color: text_secondary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
 });
 
 export const features = style({
@@ -356,7 +342,6 @@ export const features = style({
   "@media": {
     "screen and (min-width: 768px)": {
       gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-      // gap: 32,
     },
   },
 });
@@ -421,7 +406,6 @@ export const featureIconImg = style({
 export const featureTitle = style({
   fontSize: 22,
   fontWeight: 500,
-  // marginTop: 16,
   marginBottom: 12,
   color: text_primary,
 });
@@ -433,34 +417,12 @@ export const featureText = style({
   fontWeight: 300,
 });
 
-export const barbersSection = style({
-  padding: "48px 16px",
-  maxWidth: 1200,
-  margin: "0 auto",
-  width: "100%",
-  backgroundColor: "transparent",
-
-  "@media": {
-    "screen and (min-width: 768px)": {
-      padding: "80px 24px",
-    },
-  },
-});
-
-export const contactSection = style({
-  padding: "48px 16px",
-  maxWidth: 1200,
-  margin: "0 auto",
-  width: "100%",
-  backgroundColor: "transparent",
-  borderTop: `1px solid ${border_subtle}`,
-});
-
 export const contactInfo = style({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   gap: 16,
+  marginBottom: 24,
   "@media": {
     "screen and (min-width: 768px)": {
       gap: 20,
@@ -471,10 +433,9 @@ export const contactInfo = style({
 export const contactText = style({
   fontSize: 13,
   color: '#7fb8ff',
-  // color: text_secondary,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 18,
+      fontSize: 20,
     },
   },
 });
@@ -515,6 +476,11 @@ export const footer = style({
 });
 
 export const footerText = style({
-  fontSize: 15,
+  fontSize: 14,
   color: text_muted,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 18,
+    },
+  },
 });

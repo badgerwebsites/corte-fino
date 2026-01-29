@@ -1,8 +1,20 @@
 import { style } from "@vanilla-extract/css";
 
+const darker_bg = "#101214";
+const dark_bg = "#222222";
+const button =  "#96cfe0";
+
+
+const text_primary = "#f5f5f5";
+const text_secondary = "#b0b0b0";
+const text_muted = "#8a8a8a";
+
+const border_subtle = "rgba(255,255,255,0.08)";
+// const border_hover = "rgba(255,255,255,0.18)";
+
 export const container = style({
   minHeight: "100vh",
-  backgroundColor: "#fafafa",
+  backgroundColor: dark_bg,
   paddingTop: 72,
   paddingBottom: 32,
 
@@ -20,7 +32,7 @@ export const content = style({
   "@media": {
     "screen and (min-width: 768px)": {
       maxWidth: 960,
-      padding: "0 24px",
+      // padding: "0 24px",
     },
     "screen and (min-width: 1200px)": {
       maxWidth: 1000,
@@ -32,7 +44,7 @@ export const header = style({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  gap: 12,
+  // gap: 12,
   // marginBottom: 16,
 
   "@media": {
@@ -47,31 +59,15 @@ export const header = style({
 export const greeting = style({
   fontSize: 24,
   fontWeight: 600,
-  color: "#0a0a0a",
+  color: text_primary,
   letterSpacing: "-0.02em",
+  marginBottom: 12,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 28,
     },
   },
 });
-
-// export const signOutButton = style({
-//   padding: "8px 16px",
-//   fontSize: 13,
-//   fontWeight: 500,
-//   backgroundColor: "transparent",
-//   color: "#737373",
-//   border: "1px solid #e5e5e5",
-//   borderRadius: 6,
-//   cursor: "pointer",
-//   transition: "all 0.15s",
-//   ":hover": {
-//     backgroundColor: "#ffffff",
-//     borderColor: "#d4d4d4",
-//     color: "#525252",
-//   },
-// });
 
 export const primaryCta = style({
   display: "block",
@@ -81,7 +77,7 @@ export const primaryCta = style({
   fontWeight: 700,
   letterSpacing: '0.05em',
   textTransform: 'uppercase',
-  backgroundColor: '#222222',
+  backgroundColor: button,
   color: '#f5f5f5',
   border: "none",
   borderRadius: 10,
@@ -160,53 +156,131 @@ export const sectionTitle = style({
   letterSpacing: "-0.01em",
 });
 
+// export const emptyState = style({
+//   padding: "48px 24px",
+//   textAlign: "center",
+//   backgroundColor: "#ffffff",
+//   borderRadius: 16,
+//   border: "1px solid #f0f0f0",
+// });
+
 export const emptyState = style({
-  padding: "48px 24px",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
   textAlign: "center",
-  backgroundColor: "#ffffff",
+
+  padding: "40px 20px",
+  gap: 16,
+  backgroundColor: darker_bg,
   borderRadius: 16,
-  border: "1px solid #f0f0f0",
+  border: `1px solid ${border_subtle}`,
+  boxShadow: "0 12px 32px rgba(0,0,0,0.6)",
+  margin: "0 auto",
+  // maxWidth: 420,
+
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: "56px 32px",
+      gap: 20,
+      // maxWidth: 520,
+    },
+  },
 });
+
+// export const emptyStateIcon = style({
+//   width: 56,
+//   height: 56,
+//   marginBottom: 20,
+//   opacity: 0.3,
+// });
 
 export const emptyStateIcon = style({
-  width: 56,
-  height: 56,
-  marginBottom: 20,
-  opacity: 0.3,
+  width: 48,
+  height: 48,
+  color: text_primary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      width: 80,
+      height: 80,
+    },
+  },
 });
 
+// export const emptyStateTitle = style({
+//   fontSize: 17,
+//   fontWeight: 600,
+//   color: "#0a0a0a",
+//   marginBottom: 8,
+//   letterSpacing: "-0.01em",
+// });
+
 export const emptyStateTitle = style({
-  fontSize: 17,
+  fontSize: 20,
   fontWeight: 600,
-  color: "#0a0a0a",
-  marginBottom: 8,
+  color: text_secondary,
   letterSpacing: "-0.01em",
 });
 
+// export const emptyStateText = style({
+//   fontSize: 14,
+//   color: "#737373",
+//   marginBottom: 24,
+//   maxWidth: 260,
+//   marginLeft: "auto",
+//   marginRight: "auto",
+//   lineHeight: 1.5,
+// });
+
 export const emptyStateText = style({
   fontSize: 14,
-  color: "#737373",
-  marginBottom: 24,
-  maxWidth: 260,
-  marginLeft: "auto",
-  marginRight: "auto",
+  color: text_muted,
   lineHeight: 1.5,
+  maxWidth: 280,
+
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 15,
+      maxWidth: 340,
+    },
+  },
 });
 
+// export const emptyStateButton = style({
+//   display: "inline-block",
+//   padding: "12px 28px",
+//   fontSize: 14,
+//   fontWeight: 500,
+//   backgroundColor: "#0a0a0a",
+//   color: "#ffffff",
+//   border: "none",
+//   borderRadius: 8,
+//   cursor: "pointer",
+//   textDecoration: "none",
+//   transition: "all 0.15s",
+//   ":hover": {
+//     backgroundColor: "#262626",
+//   },
+// });
+
 export const emptyStateButton = style({
-  display: "inline-block",
+  marginTop: 8,
   padding: "12px 28px",
-  fontSize: 14,
-  fontWeight: 500,
-  backgroundColor: "#0a0a0a",
-  color: "#ffffff",
-  border: "none",
-  borderRadius: 8,
-  cursor: "pointer",
+  fontSize: 18,
+  fontWeight: 700,  
+  letterSpacing: '0.05em',
+  textTransform: 'uppercase',
+  backgroundColor: button,
+  color: '#1f1f1f',
+  borderRadius: 10,
   textDecoration: "none",
   transition: "all 0.15s",
-  ":hover": {
-    backgroundColor: "#262626",
+  ':hover': {
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
+  },
+  ":active": {
+    transform: "translateY(0)",
   },
 });
 
@@ -351,11 +425,17 @@ export const rewardsCard = style({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  padding: "16px 20px",
-  backgroundColor: "#ffffff",
-  borderRadius: 12,
-  border: "1px solid #f0f0f0",
+  padding: "16px 12px",
+  backgroundColor: darker_bg,
+  borderRadius: 16,
+  border: `1px solid ${border_subtle}`,
+  boxShadow: "0 12px 32px rgba(0,0,0,0.6)",  
   gap: 16,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: "16px 20px",
+    },
+  },
 });
 
 export const rewardsInfo = style({
@@ -365,33 +445,40 @@ export const rewardsInfo = style({
 });
 
 export const rewardsIcon = style({
-  width: 24,
-  height: 24,
+  width: 30,
+  height: 30,
   opacity: 0.6,
+  color: text_primary,
 });
 
 export const rewardsText = style({
-  fontSize: 14,
-  color: "#525252",
+  fontSize: 18,
+  color: text_secondary,
   fontWeight: 400,
 });
 
 export const rewardsPoints = style({
   fontWeight: 600,
-  color: "#0a0a0a",
+  color: text_secondary,
 });
 
 export const rewardsLink = style({
-  fontSize: 13,
-  color: "#0a0a0a",
-  textDecoration: "none",
-  fontWeight: 500,
   padding: "8px 16px",
-  backgroundColor: "#f5f5f5",
-  borderRadius: 6,
+  fontSize: 14,
+  fontWeight: 600,  
+  letterSpacing: '0.05em',
+  textTransform: 'uppercase',
+  backgroundColor: button,
+  color: '#1f1f1f',
+  borderRadius: 10,
+  textDecoration: "none",
   transition: "all 0.15s",
-  ":hover": {
-    backgroundColor: "#e5e5e5",
+  ':hover': {
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
+  },
+  ":active": {
+    transform: "translateY(0)",
   },
 });
 

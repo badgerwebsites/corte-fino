@@ -11,7 +11,7 @@ import logo from '../assets/BigLogo.svg';
 import scissorsIcon from '../assets/scissors.svg';
 import calendarCheckIcon from '../assets/calendar-check.svg';
 import crownIcon from '../assets/crown.svg';
-// import instagramIcon from '../assets/instagram.svg';
+import { formatPhone } from "../../utils/formatPhone";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -68,9 +68,6 @@ export default function HomePage() {
 
       {barbers.length > 0 && (
         <View className={styles.sectionDark}>
-          {/* <View className={styles.sectionInner}> */}
-            {/* <Text className={styles.sectionTitle}>Our Barbers</Text> */}
-
             <View className={styles.barbersGrid}>
               {barbers.map((barber) => (
                 <View key={barber.id} className={styles.barberCard}>
@@ -135,7 +132,9 @@ export default function HomePage() {
                           >
                             <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
                           </svg>
-                          <Text className={styles.barberPhone}>{barber.phone}</Text>
+                          <Text className={styles.barberPhone}>
+                            {formatPhone(barber.phone)}
+                          </Text>
                         </View>
                       </a>
                     )}
@@ -143,14 +142,10 @@ export default function HomePage() {
                 </View>
               ))}
             </View>
-          {/* </View> */}
         </View>
       )}
 
       <View className={styles.sectionDarker}>
-        {/* <View className={styles.sectionInner}> */}
-          {/* <Text className={styles.sectionTitle}>Why Choose Us</Text> */}
-
           <View className={styles.features}>
             <View className={styles.feature}>
               <View className={styles.featureIcon}>
@@ -194,14 +189,10 @@ export default function HomePage() {
               </Text>
             </View>
           </View>
-        {/* </View> */}
       </View>
 
-      <View className={styles.sectionDark}>
-        <View className={styles.sectionInner}>
-          <Text className={styles.sectionTitle}>Contact Us</Text>
-
-          <View className={styles.contactInfo}>
+      <View className={styles.footer}>
+        <View className={styles.contactInfo}>
             <a
               href="https://maps.apple.com/?address=966%20W%20400%20N%20ste%20100,%20Logan,%20UT%2084321,%20USA"
               target="_blank"
@@ -241,10 +232,6 @@ export default function HomePage() {
               </View>
             </a>
           </View>
-        </View>
-      </View>
-
-      <View className={styles.footer}>
         <Text className={styles.footerText}>
           © 2026 Corte Fino. All rights reserved.
         </Text>

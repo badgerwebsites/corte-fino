@@ -20,7 +20,6 @@ export const container = style({
 export const formCard = style({
   width: '100%',
   maxWidth: 420,
-
   padding: 20,
   backgroundColor: '#222222',
   borderRadius: 12,
@@ -56,10 +55,6 @@ export const logo = style({
       height: 72,
     },
   },
-
-  // ':hover': {
-  //   opacity: 0.85,
-  // },
 });
 
 export const form = style({

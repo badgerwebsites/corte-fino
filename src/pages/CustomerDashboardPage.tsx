@@ -8,8 +8,8 @@ import { Navigation } from '../components/Navigation.tsx';
 import { View } from '../ui/View.tsx';
 import { Text } from '../ui/Text.tsx';
 import * as styles from '../styles/dashboard.css.ts';
-import calendarCheckIcon from '../assets/calendar-check.svg';
-import giftIcon from '../assets/gift.svg';
+// import calendarCheckIcon from '../assets/calendar-check.svg';
+// import giftIcon from '../assets/gift.svg';
 
 export default function CustomerDashboardPage() {
   const { user, customer, refreshCustomer } = useAuth();
@@ -254,13 +254,28 @@ export default function CustomerDashboardPage() {
 
           {/* Upcoming Appointments */}
           <View className={styles.section}>
-            <View className={styles.sectionHeader}>
+            {/* <View className={styles.sectionHeader}>
               <Text className={styles.sectionTitle}>Upcoming Appointments</Text>
-            </View>
+            </View> */}
 
             {bookings.length === 0 ? (
               <View className={styles.emptyState}>
-                <img src={calendarCheckIcon} alt="" className={styles.emptyStateIcon} />
+                <svg
+                  className={styles.emptyStateIcon}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                  <polyline points="9 16 11 18 15 14" />
+                </svg>
                 <Text className={styles.emptyStateTitle}>No upcoming appointments</Text>
                 <Text className={styles.emptyStateText}>
                   Book your first appointment and start earning reward points.
@@ -321,13 +336,29 @@ export default function CustomerDashboardPage() {
           <View className={styles.section}>
             <View className={styles.rewardsCard}>
               <View className={styles.rewardsInfo}>
-                <img src={giftIcon} alt="" className={styles.rewardsIcon} />
+                <svg
+                  className={styles.rewardsIcon}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <rect x="3" y="8" width="18" height="13" rx="2" />
+                  <line x1="12" y1="8" x2="12" y2="21" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <path d="M12 8c0-2-1.5-4-3-4-1.5 0-2.5 1-2.5 2.5C6.5 8 9 8 12 8z" />
+                  <path d="M12 8c0-2 1.5-4 3-4 1.5 0 2.5 1 2.5 2.5C17.5 8 15 8 12 8z" />
+                </svg>
+                {/* <img src={giftIcon} alt="" className={styles.rewardsIcon} /> */}
                 <Text className={styles.rewardsText}>
-                  <span className={styles.rewardsPoints}>{customer?.reward_points || 0}</span> points available
+                  <span className={styles.rewardsPoints}>{customer?.reward_points || 0}</span> points
                 </Text>
               </View>
               <Link to="/rewards" className={styles.rewardsLink}>
-                View Rewards
+                Rewards
               </Link>
             </View>
           </View>
