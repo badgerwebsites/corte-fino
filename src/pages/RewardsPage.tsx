@@ -1,5 +1,5 @@
 // pages/RewardsPage.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
@@ -33,11 +33,11 @@ export default function RewardsPage() {
     refreshCustomer();
   }, [location.key, refreshCustomer]);
 
-  useEffect(() => {
-    if (user) {
-      loadPendingRedemptions();
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     loadPendingRedemptions();
+  //   }
+  // }, [user]);
 
   const loadRewards = async () => {
     try {
@@ -56,26 +56,48 @@ export default function RewardsPage() {
     }
   };
 
-  const loadPendingRedemptions = async () => {
-    if (!user) return;
+  // const loadPendingRedemptions = async () => {
+  //   if (!user) return;
 
-    try {
-      const { data, error } = await supabase
-        .from('reward_redemptions')
-        .select(`
-          *,
-          reward:rewards(*)
-        `)
-        .eq('customer_id', user.id)
-        .eq('fulfilled', false)
-        .order('redeemed_at', { ascending: false });
+  //   try {
+  //     const { data, error } = await supabase
+  //       .from('reward_redemptions')
+  //       .select(`
+  //         *,
+  //         reward:rewards(*)
+  //       `)
+  //       .eq('customer_id', user.id)
+  //       .eq('fulfilled', false)
+  //       .order('redeemed_at', { ascending: false });
 
-      if (error) throw error;
-      setPendingRedemptions(data || []);
-    } catch (error) {
-      console.error('Error loading pending redemptions:', error);
-    }
-  };
+  //     if (error) throw error;
+  //     setPendingRedemptions(data || []);
+  //   } catch (error) {
+  //     console.error('Error loading pending redemptions:', error);
+  //   }
+  // };
+
+  const loadPendingRedemptions = useCallback(async () => {
+  if (!user) return;
+
+  try {
+    const { data, error } = await supabase
+      .from('reward_redemptions')
+      .select(`
+        *,
+        reward:rewards(*)
+      `)
+      .eq('customer_id', user.id)
+      .eq('fulfilled', false)
+      .order('redeemed_at', { ascending: false });
+
+    if (error) throw error;
+    setPendingRedemptions(data || []);
+  } catch (error) {
+    console.error('Error loading pending redemptions:', error);
+  }
+}, [user]);
+
 
   const handleRedeem = async (rewardId: string, pointsRequired: number) => {
     if (!user || !customer) {

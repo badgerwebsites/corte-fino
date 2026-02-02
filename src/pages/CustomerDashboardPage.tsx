@@ -8,8 +8,6 @@ import { Navigation } from '../components/Navigation.tsx';
 import { View } from '../ui/View.tsx';
 import { Text } from '../ui/Text.tsx';
 import * as styles from '../styles/dashboard.css.ts';
-// import calendarCheckIcon from '../assets/calendar-check.svg';
-// import giftIcon from '../assets/gift.svg';
 
 export default function CustomerDashboardPage() {
   const { user, customer, refreshCustomer } = useAuth();
@@ -172,45 +170,6 @@ export default function CustomerDashboardPage() {
     return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   };
 
-  // Get next appointment info
-  // const getNextAppointment = () => {
-  //   const today = new Date(new Date().toDateString());
-  //   const upcoming = bookings
-  //     .filter(b =>
-  //       new Date(b.booking_date) >= today &&
-  //       (b.status === 'pending' || b.status === 'confirmed')
-  //     )
-  //     .sort((a, b) => new Date(a.booking_date).getTime() - new Date(b.booking_date).getTime());
-
-  //   if (upcoming.length === 0) return null;
-
-  //   const next = upcoming[0];
-  //   const nextDate = new Date(next.booking_date);
-  //   const tomorrow = new Date(today);
-  //   tomorrow.setDate(tomorrow.getDate() + 1);
-
-  //   let dateText = nextDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  //   if (nextDate.getTime() === today.getTime()) dateText = 'Today';
-  //   else if (nextDate.getTime() === tomorrow.getTime()) dateText = 'Tomorrow';
-
-  //   return dateText;
-  // };
-
-  // if (loading) {
-  //   return (
-  //     <>
-  //       <Navigation />
-  //       <View className={styles.container}>
-  //         <View className={styles.content}>
-  //           <Text className={styles.loadingText}>Loading...</Text>
-  //         </View>
-  //       </View>
-  //     </>
-  //   );
-  // }
-
-  // const nextAppointment = getNextAppointment();
-
   return (
     <>
       <Navigation />
@@ -227,36 +186,8 @@ export default function CustomerDashboardPage() {
               )}
             </View>
 
-          {/* Stats */}
-          {/* <View className={styles.statsRow}>
-            <View className={styles.stat}>
-              <Text className={styles.statValue}>{customer?.reward_points || 0}</Text>
-              <Text className={styles.statLabel}>Reward Points</Text>
-            </View>
-            <View className={styles.stat}>
-              {nextAppointment ? (
-                <Text className={styles.statValue}>{nextAppointment}</Text>
-              ) : (
-                <Text className={styles.statValueMuted}>None scheduled</Text>
-              )}
-              <Text className={styles.statLabel}>Next Visit</Text>
-            </View>
-          </View> */}
-
-          {/* Book Appointment CTA - only show when there are bookings */}
-          {/* {bookings.length > 0 && (
-            <View className={styles.section}>
-              <Link to="/book" className={styles.primaryCta}>
-                Book New Appointment
-              </Link>
-            </View>
-          )} */}
-
           {/* Upcoming Appointments */}
           <View className={styles.section}>
-            {/* <View className={styles.sectionHeader}>
-              <Text className={styles.sectionTitle}>Upcoming Appointments</Text>
-            </View> */}
 
             {bookings.length === 0 ? (
               <View className={styles.emptyState}>
@@ -362,14 +293,6 @@ export default function CustomerDashboardPage() {
               </Link>
             </View>
           </View>
-
-          {/* {customer?.is_admin && (
-            <View className={styles.section}>
-              <Link to="/admin" className={styles.adminLink}>
-                Admin Dashboard
-              </Link>
-            </View>
-          )} */}
         </View>
       </View>
 
@@ -377,8 +300,9 @@ export default function CustomerDashboardPage() {
       {cancellingBooking && (
         <div className={styles.modalOverlay} onClick={() => setCancellingBooking(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <Text className={styles.modalTitle}>Cancel appointment?</Text>
-
+            <div className={styles.modalTitleRow}>
+              <Text className={styles.modalTitle}>Cancel appointment?</Text>
+            </div>
             <View className={styles.modalBookingInfo}>
               <Text className={styles.modalBookingDate}>
                 {new Date(cancellingBooking.booking_date).toLocaleDateString('en-US', {
@@ -396,25 +320,27 @@ export default function CustomerDashboardPage() {
               <View className={styles.feeWarning}>
                 <Text className={styles.feeWarningTitle}>Cancellation fee applies</Text>
                 <Text className={styles.feeWarningText}>
-                  A 50% fee (${(cancellingBooking.total_price * 0.5).toFixed(2)}) applies for appointments within 12 hours.
+                  A 50% fee (${(cancellingBooking.total_price * 0.5).toFixed(2)}) applies for cancellations within 12 hours.
                 </Text>
               </View>
             ) : (
-              <Text className={styles.nofeeText}>
-                No cancellation fee for appointments more than 12 hours away.
-              </Text>
+              <View className={styles.nofeeWarning}>
+                <Text className={styles.nofeeText}>
+                  No fee if canceled at least 12 hours in advance.
+                </Text>
+              </View>
             )}
 
             <View className={styles.modalActions}>
               <button
-                className={styles.modalCancelButton}
+                className={styles.modalKeepButton}
                 onClick={() => setCancellingBooking(null)}
                 disabled={cancelling}
               >
                 Keep
               </button>
               <button
-                className={styles.modalConfirmButton}
+                className={styles.modalCancelButton}
                 onClick={handleCancelBooking}
                 disabled={cancelling}
               >
