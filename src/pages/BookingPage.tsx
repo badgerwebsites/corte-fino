@@ -574,12 +574,23 @@ export default function BookingPage() {
                 className={styles.serviceCard}
                 onClick={() => handleServiceSelect(service)}
               >
-                <Text className={styles.serviceName}>{service.name}</Text>
-                {service.description && (
-                  <Text className={styles.serviceDescription}>{service.description}</Text>
+                {service.image_url && (
+                  <View className={styles.serviceImageWrapper}>
+                    <img
+                      src={service.image_url}
+                      alt={service.name}
+                      className={styles.serviceImage}
+                    />
+                  </View>
                 )}
-                <Text className={styles.serviceDuration}>{service.duration_minutes} minutes</Text>
-                <Text className={styles.servicePoints}>+{service.reward_points} reward points</Text>
+                <View className={styles.serviceCardContent}>
+                  <Text className={styles.serviceName}>{service.name}</Text>
+                  {service.description && (
+                    <Text className={styles.serviceDescription}>{service.description}</Text>
+                  )}
+                  <Text className={styles.serviceDuration}>{service.duration_minutes} minutes</Text>
+                  <Text className={styles.servicePoints}>+{service.reward_points} reward points</Text>
+                </View>
               </View>
             ))}
           </View>

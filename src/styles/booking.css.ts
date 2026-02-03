@@ -264,19 +264,16 @@ export const serviceGrid = style({
 });
 
 export const serviceCard = style({
-  padding: 24,
+  padding: 0,
   backgroundColor: "#ffffff",
-  borderRadius: 4,
+  borderRadius: 8,
   border: "1px solid #e5e5e5",
   cursor: "pointer",
   transition: "all 0.3s ease",
   position: "relative",
   overflow: "hidden",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      padding: 32,
-    },
-  },
+  display: "flex",
+  flexDirection: "column",
   ":hover": {
     borderColor: "#1a1a1a",
     transform: "translateY(-2px)",
@@ -284,6 +281,38 @@ export const serviceCard = style({
   },
   ":active": {
     transform: "scale(0.98)",
+  },
+});
+
+export const serviceImageWrapper = style({
+  width: "100%",
+  height: 180,
+  overflow: "hidden",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      height: 200,
+    },
+  },
+});
+
+export const serviceImage = style({
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
+  transition: "transform 0.3s ease",
+  selectors: {
+    [`${serviceCard}:hover &`]: {
+      transform: "scale(1.05)",
+    },
+  },
+});
+
+export const serviceCardContent = style({
+  padding: 20,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 24,
+    },
   },
 });
 

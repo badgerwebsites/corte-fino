@@ -7,6 +7,7 @@ import type { Barber, Service, BarberServicePricing, RewardRedemptionWithDetails
 import { Navigation } from '../components/Navigation';
 import { BarberScheduleManager } from '../components/BarberScheduleManager';
 import { AdminCalendar } from '../components/AdminCalendar';
+import { ImageUpload } from '../components/ImageUpload';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/admin.css';
@@ -28,9 +29,11 @@ export default function AdminPage() {
   const [barberForm, setBarberForm] = useState({
     name: '',
     bio: '',
+    phone: '',
     instagram_handle: '',
     facebook_url: '',
     tiktok_handle: '',
+    image_url: '',
     is_active: true,
     regular_hours_start: '09:00',
     regular_hours_end: '17:00',
@@ -45,6 +48,7 @@ export default function AdminPage() {
     description: '',
     duration_minutes: 45,
     reward_points: 10,
+    image_url: '',
   });
 
   // Reward form state
@@ -181,6 +185,7 @@ export default function AdminPage() {
         description: '',
         duration_minutes: 45,
         reward_points: 10,
+        image_url: '',
       });
       setEditingService(null);
       loadData();
@@ -197,6 +202,7 @@ export default function AdminPage() {
       description: service.description || '',
       duration_minutes: service.duration_minutes,
       reward_points: service.reward_points,
+      image_url: service.image_url || '',
     });
   };
 
@@ -245,9 +251,11 @@ export default function AdminPage() {
       setBarberForm({
         name: '',
         bio: '',
+        phone: '',
         instagram_handle: '',
         facebook_url: '',
         tiktok_handle: '',
+        image_url: '',
         is_active: true,
         regular_hours_start: '09:00',
         regular_hours_end: '17:00',
@@ -267,9 +275,11 @@ export default function AdminPage() {
     setBarberForm({
       name: barber.name,
       bio: barber.bio || '',
+      phone: barber.phone || '',
       instagram_handle: barber.instagram_handle || '',
       facebook_url: barber.facebook_url || '',
       tiktok_handle: barber.tiktok_handle || '',
+      image_url: barber.image_url || '',
       is_active: barber.is_active,
       regular_hours_start: barber.regular_hours_start,
       regular_hours_end: barber.regular_hours_end,
@@ -642,6 +652,13 @@ export default function AdminPage() {
               />
             </View>
 
+            <ImageUpload
+              currentImageUrl={serviceForm.image_url || undefined}
+              onImageChange={(url) => setServiceForm({ ...serviceForm, image_url: url || '' })}
+              bucket="service-images"
+              label="Service Image"
+            />
+
             <View className={styles.formRow}>
               <View className={styles.formGroup}>
                 <label className={styles.label}>Duration (minutes) *</label>
@@ -684,6 +701,7 @@ export default function AdminPage() {
                       description: '',
                       duration_minutes: 45,
                       reward_points: 10,
+                      image_url: '',
                     });
                   }}
                 >
@@ -780,6 +798,13 @@ export default function AdminPage() {
           </View>
 
           <form onSubmit={handleBarberSubmit} className={styles.form}>
+            <ImageUpload
+              currentImageUrl={barberForm.image_url || undefined}
+              onImageChange={(url) => setBarberForm({ ...barberForm, image_url: url || '' })}
+              bucket="barber-images"
+              label="Profile Photo"
+            />
+
             <View className={styles.formGroup}>
               <label className={styles.label}>Name *</label>
               <input
@@ -788,6 +813,17 @@ export default function AdminPage() {
                 value={barberForm.name}
                 onChange={(e) => setBarberForm({ ...barberForm, name: e.target.value })}
                 required
+              />
+            </View>
+
+            <View className={styles.formGroup}>
+              <label className={styles.label}>Phone</label>
+              <input
+                type="tel"
+                className={styles.input}
+                placeholder="(555) 123-4567"
+                value={barberForm.phone}
+                onChange={(e) => setBarberForm({ ...barberForm, phone: e.target.value })}
               />
             </View>
 
@@ -909,9 +945,11 @@ export default function AdminPage() {
                     setBarberForm({
                       name: '',
                       bio: '',
+                      phone: '',
                       instagram_handle: '',
                       facebook_url: '',
                       tiktok_handle: '',
+                      image_url: '',
                       is_active: true,
                       regular_hours_start: '09:00',
                       regular_hours_end: '17:00',

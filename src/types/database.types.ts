@@ -37,6 +37,7 @@ export interface Service {
   base_price: number;
   duration_minutes: number;
   reward_points: number;
+  image_url?: string;
   created_at: string;
   updated_at: string;
 }
