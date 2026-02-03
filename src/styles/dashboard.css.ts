@@ -3,17 +3,14 @@ import { style } from "@vanilla-extract/css";
 const darker_bg = "#101214";
 const dark_bg = "#222222";
 const button =  "#96cfe0";
-
-
 const text_primary = "#f5f5f5";
 const text_secondary = "#b0b0b0";
 const text_muted = "#8a8a8a";
-
 const border_subtle = "rgba(255,255,255,0.08)";
 
 export const container = style({
   minHeight: "100vh",
-  backgroundColor: dark_bg,
+  backgroundColor: darker_bg,
   paddingTop: 72,
   gap: 20,
 
@@ -56,11 +53,12 @@ export const greeting = style({
   fontWeight: 600,
   color: text_primary,
   letterSpacing: "-0.02em",
-  marginBottom: 8,
-  marginTop: 4,
+  marginBottom: 4,
+  // marginTop: 4,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 28,
+      marginTop: 8,
     },
   },
 });
@@ -154,14 +152,14 @@ export const emptyState = style({
   textAlign: "center",
   padding: "20px",
   gap: 16,
-  backgroundColor: darker_bg,
+  backgroundColor: dark_bg,
   borderRadius: 16,
   border: `1px solid ${border_subtle}`,
   boxShadow: "0 12px 32px rgba(0,0,0,0.6)",
   margin: "0 auto",
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: "56px 32px",
+      padding: "32px",
       gap: 20,
     },
   },
@@ -182,19 +180,24 @@ export const emptyStateIcon = style({
 export const emptyStateTitle = style({
   fontSize: 20,
   fontWeight: 600,
-  color: text_secondary,
+  color: text_primary,
   letterSpacing: "-0.01em",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 24,
+    },
+  },
 });
 
 export const emptyStateText = style({
   fontSize: 14,
-  color: text_muted,
+  color: text_secondary,
   lineHeight: 1.5,
   maxWidth: 280,
 
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 15,
+      fontSize: 16,
       maxWidth: 340,
     },
   },
@@ -222,7 +225,7 @@ export const emptyStateButton = style({
   "@media": {
     "screen and (min-width: 768px)": {
       padding: "16px",
-        fontSize: 20,
+      fontSize: 20,
     },
   },
 });
@@ -235,7 +238,7 @@ export const bookingsList = style({
 
 export const bookingCard = style({
   padding: "20px",
-  backgroundColor: darker_bg,
+  backgroundColor: dark_bg,
   borderRadius: 16,
   border: `1px solid ${border_subtle}`,
   boxShadow: "0 12px 32px rgba(0,0,0,0.6)",  
@@ -264,6 +267,11 @@ export const bookingDate = style({
   color: text_primary,
   marginBottom: 6,
   letterSpacing: "-0.01em",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 22,
+    },
+  },
 });
 
 export const bookingMeta = style({
@@ -273,11 +281,22 @@ export const bookingMeta = style({
   display: "flex",
   flexDirection: "column",
   gap: 2,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 18,
+    },
+  },
 });
 
 export const bookingTime = style({
   color: text_primary,
   fontWeight: 500,
+  fontSize: 18,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 22,
+    },
+  },
 });
 
 export const bookingRight = style({
@@ -293,6 +312,11 @@ export const bookingPrice = style({
   fontWeight: 600,
   color: text_primary,
   letterSpacing: "-0.01em",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 22,
+    },
+  },
 });
 
 export const statusBadge = style({
@@ -302,6 +326,11 @@ export const statusBadge = style({
   borderRadius: 6,
   textTransform: "uppercase",
   letterSpacing: "0.03em",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
 });
 
 export const pending = style({
@@ -370,7 +399,7 @@ export const rewardsCard = style({
   alignItems: "center",
   justifyContent: "space-between",
   padding: "16px 12px",
-  backgroundColor: darker_bg,
+  backgroundColor: dark_bg,
   borderRadius: 16,
   border: `1px solid ${border_subtle}`,
   boxShadow: "0 12px 32px rgba(0,0,0,0.6)",  
@@ -465,6 +494,7 @@ export const modal = style({
   maxWidth: 380,
   width: "100%",
   boxShadow: "0 24px 48px rgba(0, 0, 0, 0.16)",
+  border: `1px solid ${border_subtle}`,
 });
 
 export const modalTitleRow = style({

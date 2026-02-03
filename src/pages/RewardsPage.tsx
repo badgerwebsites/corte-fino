@@ -11,7 +11,7 @@ import * as styles from '../styles/rewards.css';
 
 // Generate a random 6-character alphanumeric code
 const generateRedemptionCode = (): string => {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed confusing chars: I, O, 0, 1
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
   for (let i = 0; i < 6; i++) {
     code += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -24,7 +24,6 @@ export default function RewardsPage() {
   const location = useLocation();
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [pendingRedemptions, setPendingRedemptions] = useState<RewardRedemptionWithDetails[]>([]);
-  const [loading, setLoading] = useState(true);
   const [activeCode, setActiveCode] = useState<string | null>(null);
 
   // Refetch rewards and customer data when navigating to this page
@@ -32,12 +31,6 @@ export default function RewardsPage() {
     loadRewards();
     refreshCustomer();
   }, [location.key, refreshCustomer]);
-
-  // useEffect(() => {
-  //   if (user) {
-  //     loadPendingRedemptions();
-  //   }
-  // }, [user]);
 
   const loadRewards = async () => {
     try {
@@ -51,31 +44,8 @@ export default function RewardsPage() {
       setRewards(data || []);
     } catch (error) {
       console.error('Error loading rewards:', error);
-    } finally {
-      setLoading(false);
     }
   };
-
-  // const loadPendingRedemptions = async () => {
-  //   if (!user) return;
-
-  //   try {
-  //     const { data, error } = await supabase
-  //       .from('reward_redemptions')
-  //       .select(`
-  //         *,
-  //         reward:rewards(*)
-  //       `)
-  //       .eq('customer_id', user.id)
-  //       .eq('fulfilled', false)
-  //       .order('redeemed_at', { ascending: false });
-
-  //     if (error) throw error;
-  //     setPendingRedemptions(data || []);
-  //   } catch (error) {
-  //     console.error('Error loading pending redemptions:', error);
-  //   }
-  // };
 
   const loadPendingRedemptions = useCallback(async () => {
   if (!user) return;
@@ -193,47 +163,40 @@ export default function RewardsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <>
-        <Navigation />
-        <View className={styles.container}>
-          <Text>Loading rewards...</Text>
-        </View>
-      </>
-    );
-  }
-
   return (
     <>
       <Navigation />
       <View className={styles.container}>
-      <View className={styles.header}>
-        <Text className={styles.title}>Rewards Program</Text>
-        <Text className={styles.subtitle}>
-          Earn points with every booking and redeem amazing rewards
-        </Text>
-        {customer && (
-          <View className={styles.pointsDisplay}>
-            <Text className={styles.pointsValue}>{customer.reward_points}</Text>
-            <Text className={styles.pointsLabel}>Your Points</Text>
+        <View className={styles.howItWorks}>
+          <View className={styles.stepsList}>
+            <View className={styles.step}>
+              <Text className={styles.stepNumber}>1</Text>
+              <Text className={styles.stepText}>Book through our website</Text>
+            </View>
+            <View className={styles.step}>
+              <Text className={styles.stepNumber}>2</Text>
+              <Text className={styles.stepText}>Earn points with each visit</Text>
+            </View>
+            <View className={styles.step}>
+              <Text className={styles.stepNumber}>3</Text>
+              <Text className={styles.stepText}>Redeem points for rewards</Text>
+            </View>
           </View>
-        )}
-      </View>
+        </View>
 
       {/* Redemption Code Modal */}
       {activeCode && (
         <View className={styles.codeModal}>
           <View className={styles.codeModalContent}>
-            <Text className={styles.codeModalTitle}>Your Redemption Code</Text>
-            <Text className={styles.codeModalSubtitle}>
+            <Text className={styles.codeModalTitle}>Redemption Code</Text>
+            {/* <Text className={styles.codeModalTitle}>
               Show this code to your barber to claim your reward
-            </Text>
+            </Text> */}
             <View className={styles.codeDisplay}>
               <Text className={styles.codeText}>{activeCode}</Text>
             </View>
             <Text className={styles.codeModalHint}>
-              Points will be deducted when the barber confirms your redemption
+              Show this code to your barber to claim your reward
             </Text>
             <button
               className={styles.codeModalButton}
@@ -248,10 +211,7 @@ export default function RewardsPage() {
       {/* Pending Redemptions */}
       {pendingRedemptions.length > 0 && (
         <View className={styles.pendingSection}>
-          <Text className={styles.sectionTitle}>Pending Redemptions</Text>
-          <Text className={styles.pendingHint}>
-            Show these codes to your barber to claim your rewards
-          </Text>
+          <Text className={styles.pendingTitle}>Pending Redemptions</Text>
           <View className={styles.pendingList}>
             {pendingRedemptions.map((redemption) => (
               <View key={redemption.id} className={styles.pendingCard}>
@@ -277,24 +237,6 @@ export default function RewardsPage() {
           </View>
         </View>
       )}
-
-      <View className={styles.howItWorks}>
-        <Text className={styles.sectionTitle}>How It Works</Text>
-        <View className={styles.stepsList}>
-          <View className={styles.step}>
-            <Text className={styles.stepNumber}>1</Text>
-            <Text className={styles.stepText}>Book through our website</Text>
-          </View>
-          <View className={styles.step}>
-            <Text className={styles.stepNumber}>2</Text>
-            <Text className={styles.stepText}>Earn points with each visit</Text>
-          </View>
-          <View className={styles.step}>
-            <Text className={styles.stepNumber}>3</Text>
-            <Text className={styles.stepText}>Redeem points for rewards</Text>
-          </View>
-        </View>
-      </View>
 
       <View className={styles.rewardsGrid}>
         {rewards.map((reward) => {

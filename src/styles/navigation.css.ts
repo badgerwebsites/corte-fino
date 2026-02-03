@@ -9,7 +9,7 @@ export const nav = style({
   zIndex: 1000,
   backgroundColor: '#101214',
   boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-  padding: '12px 8px',
+  padding: '12px 4px',
   borderBottom: '1px solid #ffffff',
 
   '@media': {
@@ -34,7 +34,7 @@ export const logoLink = style({
 });
 
 export const logoImage = style({
-  height: 40,
+  height: 36,
   width: 'auto',
 
   '@media': {

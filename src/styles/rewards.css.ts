@@ -1,134 +1,36 @@
 import { style } from "@vanilla-extract/css";
 
+const darker_bg = "#101214";
+const dark_bg = "#222222";
+const button =  "#96cfe0";
+const text_primary = "#f5f5f5";
+const text_secondary = "#b0b0b0";
+const text_muted = "#8a8a8a";
+const border_subtle = "rgba(255,255,255,0.08)";
+
 export const container = style({
   minHeight: "100vh",
-  backgroundColor: "#fafafa",
-  color: "#1a1a1a",
+  backgroundColor: darker_bg,
   padding: 16,
-  paddingTop: 72,
+  paddingTop: 68,
   "@media": {
     "screen and (min-width: 768px)": {
       padding: 24,
-      paddingTop: 84,
-    },
-  },
-});
-
-export const header = style({
-  maxWidth: 1200,
-  margin: "0 auto 32px",
-  textAlign: "center",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      marginBottom: 48,
-    },
-  },
-});
-
-export const title = style({
-  fontSize: 32,
-  fontWeight: 300,
-  marginBottom: 12,
-  color: "#1a1a1a",
-  letterSpacing: "-0.01em",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 48,
-      marginBottom: 16,
-    },
-  },
-});
-
-export const subtitle = style({
-  fontSize: 16,
-  color: "#666",
-  marginBottom: 24,
-  fontWeight: 300,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 18,
-      marginBottom: 32,
-    },
-  },
-});
-
-export const pointsDisplay = style({
-  display: "inline-block",
-  padding: "20px 32px",
-  backgroundColor: "#ffffff",
-  borderRadius: 4,
-  border: "2px solid #1a1a1a",
-  marginTop: 20,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      padding: "24px 48px",
-      marginTop: 24,
-    },
-  },
-});
-
-export const pointsValue = style({
-  fontSize: 48,
-  fontWeight: 300,
-  color: "#1a1a1a",
-  textAlign: "center",
-  marginBottom: 6,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 64,
-      marginBottom: 8,
-    },
-  },
-});
-
-export const pointsLabel = style({
-  fontSize: 12,
-  color: "#666",
-  textTransform: "uppercase",
-  letterSpacing: "0.1em",
-  textAlign: "center",
-  fontWeight: 500,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 14,
+      paddingTop: 88,
     },
   },
 });
 
 export const howItWorks = style({
-  maxWidth: 1200,
-  margin: "0 auto 48px",
-  padding: 24,
-  backgroundColor: "#ffffff",
-  borderRadius: 4,
-  border: "1px solid #e5e5e5",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      marginBottom: 64,
-      padding: 32,
-    },
-  },
-});
-
-export const sectionTitle = style({
-  fontSize: 20,
-  fontWeight: 300,
-  marginBottom: 20,
-  textAlign: "center",
-  color: "#1a1a1a",
-  letterSpacing: "-0.01em",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 24,
-      marginBottom: 24,
-    },
-  },
+  flex: 1,
+  padding: 16,
+  marginBottom: 12,
 });
 
 export const stepsList = style({
   display: "grid",
   gridTemplateColumns: "1fr",
-  gap: 20,
+  gap: 24,
   "@media": {
     "screen and (min-width: 768px)": {
       gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
@@ -151,8 +53,8 @@ export const stepNumber = style({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: "#1a1a1a",
-  color: "#ffffff",
+  backgroundColor: text_primary,
+  color: "#1a1a1a",
   fontSize: 24,
   fontWeight: 500,
   borderRadius: "50%",
@@ -160,30 +62,221 @@ export const stepNumber = style({
 
 export const stepText = style({
   fontSize: 16,
-  color: "#666",
+  color: text_primary,
   fontWeight: 300,
 });
 
+// Redemption Code Modal
+export const codeModal = style({
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1000,
+  padding: 16,
+});
+
+export const codeModalContent = style({
+  backgroundColor: dark_bg,
+  borderRadius: 16,
+  padding: 20,
+  maxWidth: 400,
+  width: "100%",
+  textAlign: "center",
+  boxShadow: "0 24px 48px rgba(0, 0, 0, 0.2)",
+  border: `1px solid ${border_subtle}`,
+});
+
+export const codeModalTitle = style({
+  fontSize: 24,
+  fontWeight: 600,
+  color: text_primary,
+});
+
+export const codeDisplay = style({
+  backgroundColor: "#f0f9ff",
+  border: "3px dashed #0ea5e9",
+  borderRadius: 8,
+  padding: "16px 20px",
+  marginTop: 16,
+  marginBottom: 12,
+});
+
+export const codeText = style({
+  fontSize: 36,
+  fontWeight: 700,
+  letterSpacing: "0.2em",
+  color: "#0369a1",
+  fontFamily: "monospace",
+});
+
+export const codeModalHint = style({
+  fontSize: 16,
+  color: text_secondary,
+});
+
+export const codeModalButton = style({
+  padding: "12px 24px",
+  fontSize: 18,
+  fontWeight: 500,
+  backgroundColor: button,
+  color: "#1a1a1a",
+  borderRadius: 8,
+  border: `1px solid ${text_muted}`,
+  cursor: "pointer",
+  transition: "all 0.3s ease",
+  marginTop: 12,
+  letterSpacing: "0.05em",
+  ':hover': {
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
+  },
+  ":active": {
+    transform: "translateY(0)",
+  },
+});
+
+// Pending Redemptions
+export const pendingSection = style({
+  maxWidth: 1200,
+  margin: "0 auto 16px",
+  padding: 20,
+  backgroundColor: dark_bg,
+  borderRadius: 8,
+  border: `1px solid ${border_subtle}`,
+  boxShadow: "0 12px 32px rgba(0,0,0,0.6)",  
+  textAlign: 'center',
+  ":hover": {
+    transform: "translateY(-2px)",
+    boxShadow: "0 8px 16px rgba(0,0,0,0.08)",
+    borderColor: text_muted,
+  },
+  "@media": {
+    "screen and (min-width: 768px)": {
+      marginBottom: 24,
+      padding: 20,
+      textAlign: 'left',
+    },
+  },
+});
+
+export const pendingTitle = style({
+  fontSize: 22,
+  fontWeight: 500,
+  color: button,
+  flex: 1,
+  letterSpacing: "-0.01em",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 28,
+    },
+  },
+});
+
+export const pendingList = style({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 12,
+});
+
+export const pendingCard = style({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  textAlign: "center",
+  gap: 12,
+  marginTop: 12,
+  width: "100%",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      flexDirection: "row",
+      textAlign: "left",
+      gap: 40,
+      marginTop: 16,
+    },
+  },
+});
+
+export const pendingInfo = style({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+
+  "@media": {
+    "screen and (min-width: 768px)": {
+      alignItems: "flex-start",
+    },
+  },
+});
+
+export const pendingReward = style({
+  fontSize: 20,
+  fontWeight: 600,
+  color: text_primary,
+});
+
+export const pendingPoints = style({
+  fontSize: 18,
+  color: text_secondary,
+});
+
+export const pendingCodeBox = style({
+  backgroundColor: "#f0f9ff",
+  border: "3px dashed #0ea5e9",
+  borderRadius: 8,
+  padding: "8px 16px",
+});
+
+export const pendingCode = style({
+  fontSize: 20,
+  fontWeight: 700,
+  letterSpacing: "0.15em",
+  color: "#0369a1",
+});
+
+export const cancelButton = style({
+  padding: "8px 16px",
+  fontSize: 20,
+  fontWeight: 700,
+  backgroundColor: "transparent",
+  color: "#dc2626",
+  border: "3px solid #dc2626",
+  borderRadius: 8,
+  cursor: "pointer",
+  ":hover": {
+    borderColor: "#b91c1c",
+    color: "#b91c1c",
+  },
+});
+
+// Rewards Card
 export const rewardsGrid = style({
   display: "grid",
   gridTemplateColumns: "1fr",
   gap: 16,
   maxWidth: 1200,
-  margin: "0 auto 32px",
+  margin: "0 auto 12px",
   "@media": {
     "screen and (min-width: 768px)": {
       gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
       gap: 24,
-      marginBottom: 48,
+      marginBottom: 24,
     },
   },
 });
 
 export const rewardCard = style({
   padding: 20,
-  backgroundColor: "#ffffff",
-  borderRadius: 4,
-  border: "1px solid #e5e5e5",
+  backgroundColor: dark_bg,
+  borderRadius: 8,
+  border: `1px solid ${border_subtle}`,
+  boxShadow: "0 12px 32px rgba(0,0,0,0.6)",  
   display: "flex",
   flexDirection: "column",
   gap: 14,
@@ -197,7 +290,7 @@ export const rewardCard = style({
   ":hover": {
     transform: "translateY(-2px)",
     boxShadow: "0 8px 16px rgba(0,0,0,0.08)",
-    borderColor: "#1a1a1a",
+    borderColor: text_muted,
   },
 });
 
@@ -211,7 +304,7 @@ export const rewardHeader = style({
 export const rewardName = style({
   fontSize: 20,
   fontWeight: 500,
-  color: "#1a1a1a",
+  color: text_primary,
   flex: 1,
 });
 
@@ -221,54 +314,53 @@ export const pointsBadge = style({
   color: "#ffffff",
   fontSize: 14,
   fontWeight: 500,
-  borderRadius: 2,
+  borderRadius: 4,
+  border: `1px solid ${text_muted}`,
   whiteSpace: "nowrap",
 });
 
 export const rewardDescription = style({
-  fontSize: 14,
-  color: "#666",
-  lineHeight: 1.5,
+  fontSize: 16,
+  color: text_secondary,
   fontWeight: 300,
 });
 
 export const progressBar = style({
   width: "100%",
   height: 8,
-  backgroundColor: "#f0f0f0",
+  backgroundColor: "#000",
   borderRadius: 4,
   overflow: "hidden",
 });
 
 export const progressFill = style({
   height: "100%",
-  backgroundColor: "#1a1a1a",
+  backgroundColor: "#f1f1f1",
   transition: "width 0.3s ease",
 });
 
 export const progressText = style({
-  fontSize: 12,
-  color: "#666",
+  fontSize: 14,
+  color: text_secondary,
   textAlign: "center",
   fontWeight: 400,
 });
 
 export const redeemButton = style({
   padding: "12px 24px",
-  fontSize: 14,
+  fontSize: 16,
   fontWeight: 500,
-  backgroundColor: "#1a1a1a",
-  color: "#ffffff",
-  border: "none",
-  borderRadius: 2,
+  backgroundColor: button,
+  color: "#1a1a1a",
+  borderRadius: 8,
+  border: `1px solid ${text_muted}`,
   cursor: "pointer",
   transition: "all 0.3s ease",
   marginTop: "auto",
   letterSpacing: "0.05em",
-  ":hover": {
-    backgroundColor: "#333",
-    transform: "translateY(-2px)",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+  ':hover': {
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
   },
   ":active": {
     transform: "translateY(0)",
@@ -276,10 +368,11 @@ export const redeemButton = style({
 });
 
 export const disabled = style({
-  opacity: 0.5,
+  opacity: 0.75,
   cursor: "not-allowed",
+  backgroundColor: darker_bg,
+  color: text_primary,
   ":hover": {
-    backgroundColor: "#1a1a1a",
     transform: "none",
     boxShadow: "none",
   },
@@ -326,181 +419,12 @@ export const backLink = style({
 });
 
 export const link = style({
-  color: "#1a1a1a",
+  color: text_primary,
   textDecoration: "none",
-  fontSize: 16,
+  fontSize: 20,
   fontWeight: 400,
   transition: "opacity 0.2s",
   ":hover": {
     opacity: 0.6,
-  },
-});
-
-// Redemption Code Modal
-export const codeModal = style({
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0, 0, 0, 0.6)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 1000,
-  padding: 16,
-});
-
-export const codeModalContent = style({
-  backgroundColor: "#ffffff",
-  borderRadius: 8,
-  padding: 32,
-  maxWidth: 400,
-  width: "100%",
-  textAlign: "center",
-  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
-});
-
-export const codeModalTitle = style({
-  fontSize: 24,
-  fontWeight: 600,
-  color: "#1a1a1a",
-  marginBottom: 8,
-});
-
-export const codeModalSubtitle = style({
-  fontSize: 14,
-  color: "#666",
-  marginBottom: 24,
-});
-
-export const codeDisplay = style({
-  backgroundColor: "#f0f9ff",
-  border: "2px dashed #0ea5e9",
-  borderRadius: 8,
-  padding: "20px 24px",
-  marginBottom: 16,
-});
-
-export const codeText = style({
-  fontSize: 36,
-  fontWeight: 700,
-  letterSpacing: "0.2em",
-  color: "#0369a1",
-  fontFamily: "monospace",
-});
-
-export const codeModalHint = style({
-  fontSize: 13,
-  color: "#64748b",
-  marginBottom: 24,
-});
-
-export const codeModalButton = style({
-  padding: "12px 32px",
-  fontSize: 16,
-  fontWeight: 500,
-  backgroundColor: "#1a1a1a",
-  color: "#ffffff",
-  border: "none",
-  borderRadius: 6,
-  cursor: "pointer",
-  transition: "all 0.2s ease",
-  ":hover": {
-    backgroundColor: "#333",
-  },
-});
-
-// Pending Redemptions Section
-export const pendingSection = style({
-  maxWidth: 1200,
-  margin: "0 auto 32px",
-  padding: 24,
-  backgroundColor: "#f0f9ff",
-  borderRadius: 8,
-  border: "1px solid #bae6fd",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      marginBottom: 48,
-      padding: 32,
-    },
-  },
-});
-
-export const pendingHint = style({
-  fontSize: 14,
-  color: "#0369a1",
-  textAlign: "center",
-  marginBottom: 20,
-});
-
-export const pendingList = style({
-  display: "flex",
-  flexDirection: "column",
-  gap: 12,
-});
-
-export const pendingCard = style({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  flexWrap: "wrap",
-  gap: 12,
-  padding: 16,
-  backgroundColor: "#ffffff",
-  borderRadius: 6,
-  border: "1px solid #e2e8f0",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      padding: 20,
-    },
-  },
-});
-
-export const pendingInfo = style({
-  display: "flex",
-  flexDirection: "column",
-  gap: 4,
-});
-
-export const pendingReward = style({
-  fontSize: 16,
-  fontWeight: 600,
-  color: "#1a1a1a",
-});
-
-export const pendingPoints = style({
-  fontSize: 13,
-  color: "#64748b",
-});
-
-export const pendingCodeBox = style({
-  backgroundColor: "#f0f9ff",
-  border: "1px solid #0ea5e9",
-  borderRadius: 4,
-  padding: "8px 16px",
-});
-
-export const pendingCode = style({
-  fontSize: 18,
-  fontWeight: 700,
-  letterSpacing: "0.15em",
-  color: "#0369a1",
-  fontFamily: "monospace",
-});
-
-export const cancelButton = style({
-  padding: "8px 16px",
-  fontSize: 13,
-  fontWeight: 500,
-  backgroundColor: "transparent",
-  color: "#64748b",
-  border: "1px solid #e2e8f0",
-  borderRadius: 4,
-  cursor: "pointer",
-  transition: "all 0.2s",
-  ":hover": {
-    borderColor: "#ef4444",
-    color: "#ef4444",
   },
 });

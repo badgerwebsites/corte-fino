@@ -283,7 +283,6 @@ export default function CustomerDashboardPage() {
                   <path d="M12 8c0-2-1.5-4-3-4-1.5 0-2.5 1-2.5 2.5C6.5 8 9 8 12 8z" />
                   <path d="M12 8c0-2 1.5-4 3-4 1.5 0 2.5 1 2.5 2.5C17.5 8 15 8 12 8z" />
                 </svg>
-                {/* <img src={giftIcon} alt="" className={styles.rewardsIcon} /> */}
                 <Text className={styles.rewardsText}>
                   <span className={styles.rewardsPoints}>{customer?.reward_points || 0}</span> points
                 </Text>
