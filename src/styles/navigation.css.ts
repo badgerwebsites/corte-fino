@@ -33,13 +33,63 @@ export const logoLink = style({
   textDecoration: 'none',
 });
 
+export const carouselContainer = style({
+  width: 100,
+  height: 36,
+  overflow: 'hidden',
+  position: 'relative',
+
+  '@media': {
+    'screen and (min-width: 768px)': {
+      width: 140,
+      height: 50,
+    },
+  },
+});
+
+export const carouselTrack = style({
+  display: 'flex',
+  height: '100%',
+  transition: 'transform 0.5s ease-in-out',
+});
+
+export const carouselSlide = style({
+  flex: '0 0 100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+});
+
 export const logoImage = style({
   height: 36,
   width: 'auto',
+  maxWidth: '100%',
+  objectFit: 'contain',
 
   '@media': {
     'screen and (min-width: 768px)': {
       height: 50,
+    },
+  },
+});
+
+export const logoPlaceholder = style({
+  height: 36,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0 8px',
+  fontSize: 12,
+  fontWeight: 600,
+  color: '#666',
+  backgroundColor: '#333',
+  border: '2px dashed #555',
+  borderRadius: 4,
+
+  '@media': {
+    'screen and (min-width: 768px)': {
+      height: 50,
+      fontSize: 14,
     },
   },
 });

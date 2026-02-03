@@ -7,7 +7,10 @@ import * as styles from '../styles/navigation.css';
 import logo from '../assets/BlackLogo.svg';
 import logo2 from '../assets/jstudios.svg';
 
-const logos = [logo, logo2];
+// Third logo placeholder - replace with actual import when ready
+const logo3Placeholder = null;
+
+const logos = [logo, logo2, logo3Placeholder];
 
 export function Navigation() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -68,11 +71,28 @@ export function Navigation() {
     <nav className={styles.nav}>
       <View className={styles.navContainer}>
         <Link to="/" className={styles.logoLink}>
-          <img
-            src={logos[logoIndex]}
-            alt="Corte Fino"
-            className={styles.logoImage}
-          />
+          <View className={styles.carouselContainer}>
+            <View
+              className={styles.carouselTrack}
+              style={{ transform: `translateX(-${logoIndex * 100}%)` }}
+            >
+              {logos.map((logoSrc, index) => (
+                <View key={index} className={styles.carouselSlide}>
+                  {logoSrc ? (
+                    <img
+                      src={logoSrc}
+                      alt={index === 0 ? "Corte Fino" : index === 1 ? "J Studios" : "Logo 3"}
+                      className={styles.logoImage}
+                    />
+                  ) : (
+                    <View className={styles.logoPlaceholder}>
+                      Logo 3
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
         </Link>
 
         {/* <View className={styles.navButtons}>
