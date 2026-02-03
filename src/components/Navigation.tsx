@@ -102,41 +102,40 @@ export function Navigation() {
           )}
         </View> */}
         <View className={styles.navButtons}>
-  {isAuthenticated ? (
-    location.pathname === '/' ? (
-      <Link
-        to="/dashboard"
-        className={styles.loginButton}
-      >
-        Dashboard
-      </Link>
-    ) : (
-      <button
-        onClick={handleLogout}
-        className={styles.logoutButton}
-      >
-        Logout
-      </button>
-    )
-  ) : isDesktop ? (
-    <a
-      href="/login"
-      target="_blank"
-      rel="noopener noreferrer"
-      className={styles.loginButton}
-    >
-      Login
-    </a>
-  ) : (
-    <Link
-      to="/login"
-      className={styles.loginButton}
-    >
-      Login
-    </Link>
-  )}
-</View>
-
+          {isAuthenticated ? (
+            location.pathname === '/' ? (
+              <Link
+                to="/dashboard"
+                className={styles.loginButton}
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className={styles.logoutButton}
+              >
+                Logout
+              </button>
+            )
+          ) : isDesktop ? (
+            <a
+              href="/login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.loginButton}
+            >
+              Login
+            </a>
+          ) : (
+            <Link
+              to="/login"
+              className={styles.loginButton}
+            >
+              Login
+            </Link>
+          )}
+        </View>
       </View>
     </nav>
   );
