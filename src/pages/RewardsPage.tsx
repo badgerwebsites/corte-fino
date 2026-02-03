@@ -284,15 +284,6 @@ export default function RewardsPage() {
         })}
       </View>
 
-      {!user && (
-        <View className={styles.signInPrompt}>
-          <Text>Sign in to view your points and redeem rewards</Text>
-          <Link to="/login" className={styles.signInButton}>
-            Sign In
-          </Link>
-        </View>
-      )}
-
       <View className={styles.backLink}>
         <Link to={user ? '/dashboard' : '/'} className={styles.link}>
           ← Back
