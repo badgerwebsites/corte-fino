@@ -4,13 +4,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { View } from '../ui/View';
 import * as styles from '../styles/navigation.css';
-import logo from '../assets/BlackLogo.svg';
-import logo2 from '../assets/jstudios.svg';
-
-// Third logo placeholder - replace with actual import when ready
-const logo3Placeholder = null;
-
-const logos = [logo, logo2, logo3Placeholder];
+import defaultLogo1 from '../assets/BlackLogo.svg';
+import defaultLogo2 from '../assets/jstudios.svg';
 
 export function Navigation() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,14 +14,47 @@ export function Navigation() {
   );
 
   const [logoIndex, setLogoIndex] = useState(0);
+  const [carouselLogos, setCarouselLogos] = useState<(string | null)[]>([defaultLogo1, defaultLogo2, null]);
 
-    useEffect(() => {
+  // Helper to determine logo value: empty string means hidden, null means use default, URL means use that
+  const getLogoValue = (dbValue: string | null | undefined, defaultValue: string | null): string | null => {
+    if (dbValue === 'HIDDEN') return null; // explicitly hidden
+    if (dbValue && dbValue.length > 0) return dbValue; // custom URL
+    return defaultValue; // use default (null or undefined in DB)
+  };
+
+  // Fetch site settings for carousel logos
+  useEffect(() => {
+    const loadSiteSettings = async () => {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('nav_logo_1_url, nav_logo_2_url, nav_logo_3_url')
+        .single();
+
+      if (data) {
+        setCarouselLogos([
+          getLogoValue(data.nav_logo_1_url, defaultLogo1),
+          getLogoValue(data.nav_logo_2_url, defaultLogo2),
+          getLogoValue(data.nav_logo_3_url, null)
+        ]);
+      }
+    };
+
+    loadSiteSettings();
+  }, []);
+
+  // Filter out null logos and rotate through them
+  const activeLogos = carouselLogos.filter((logo): logo is string => logo !== null);
+
+  useEffect(() => {
+    if (activeLogos.length <= 1) return;
+
     const interval = setInterval(() => {
-      setLogoIndex((prev) => (prev + 1) % logos.length);
+      setLogoIndex((prev) => (prev + 1) % activeLogos.length);
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [activeLogos.length]);
 
 
   const location = useLocation();
@@ -76,19 +104,13 @@ export function Navigation() {
               className={styles.carouselTrack}
               style={{ transform: `translateX(-${logoIndex * 100}%)` }}
             >
-              {logos.map((logoSrc, index) => (
+              {activeLogos.map((logoSrc, index) => (
                 <View key={index} className={styles.carouselSlide}>
-                  {logoSrc ? (
-                    <img
-                      src={logoSrc}
-                      alt={index === 0 ? "Corte Fino" : index === 1 ? "J Studios" : "Logo 3"}
-                      className={styles.logoImage}
-                    />
-                  ) : (
-                    <View className={styles.logoPlaceholder}>
-                      Logo 3
-                    </View>
-                  )}
+                  <img
+                    src={logoSrc}
+                    alt={`Logo ${index + 1}`}
+                    className={styles.logoImage}
+                  />
                 </View>
               ))}
             </View>

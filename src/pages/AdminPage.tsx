@@ -492,7 +492,7 @@ export default function AdminPage() {
   };
 
   // Site Settings Management
-  const handleSiteSettingChange = async (field: 'hero_background_url' | 'hero_logo_url', url: string | null) => {
+  const handleSiteSettingChange = async (field: 'hero_background_url' | 'hero_logo_url' | 'nav_logo_1_url' | 'nav_logo_2_url' | 'nav_logo_3_url', url: string | null) => {
     try {
       if (siteSettings) {
         // Update existing settings
@@ -1018,7 +1018,84 @@ export default function AdminPage() {
           </View>
 
           <View className={styles.form}>
+            {/* Navigation Carousel Logos */}
             <View className={styles.formGroup}>
+              <Text className={styles.subsectionTitle}>Navigation Carousel Logos</Text>
+              <Text className={styles.sectionDescription}>
+                These logos rotate in the navigation bar. Use "Hide" to remove a logo from the carousel. Note: Refresh the page after making changes to see updates in the navigation.
+              </Text>
+
+              <View style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <View>
+                  <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <Text className={styles.label}>Logo 1 (default: Corte Fino)</Text>
+                    <label className={styles.checkboxLabel} style={{ marginBottom: 0 }}>
+                      <input
+                        type="checkbox"
+                        checked={siteSettings?.nav_logo_1_url === 'HIDDEN'}
+                        onChange={(e) => handleSiteSettingChange('nav_logo_1_url', e.target.checked ? 'HIDDEN' : null)}
+                      />
+                      <Text>Hide</Text>
+                    </label>
+                  </View>
+                  {siteSettings?.nav_logo_1_url !== 'HIDDEN' && (
+                    <ImageUpload
+                      currentImageUrl={siteSettings?.nav_logo_1_url && siteSettings.nav_logo_1_url !== 'HIDDEN' ? siteSettings.nav_logo_1_url : undefined}
+                      onImageChange={(url) => handleSiteSettingChange('nav_logo_1_url', url)}
+                      bucket="site-images"
+                      label="Nav Logo 1"
+                    />
+                  )}
+                </View>
+
+                <View>
+                  <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <Text className={styles.label}>Logo 2 (default: J Studios)</Text>
+                    <label className={styles.checkboxLabel} style={{ marginBottom: 0 }}>
+                      <input
+                        type="checkbox"
+                        checked={siteSettings?.nav_logo_2_url === 'HIDDEN'}
+                        onChange={(e) => handleSiteSettingChange('nav_logo_2_url', e.target.checked ? 'HIDDEN' : null)}
+                      />
+                      <Text>Hide</Text>
+                    </label>
+                  </View>
+                  {siteSettings?.nav_logo_2_url !== 'HIDDEN' && (
+                    <ImageUpload
+                      currentImageUrl={siteSettings?.nav_logo_2_url && siteSettings.nav_logo_2_url !== 'HIDDEN' ? siteSettings.nav_logo_2_url : undefined}
+                      onImageChange={(url) => handleSiteSettingChange('nav_logo_2_url', url)}
+                      bucket="site-images"
+                      label="Nav Logo 2"
+                    />
+                  )}
+                </View>
+
+                <View>
+                  <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <Text className={styles.label}>Logo 3 (optional)</Text>
+                    <label className={styles.checkboxLabel} style={{ marginBottom: 0 }}>
+                      <input
+                        type="checkbox"
+                        checked={siteSettings?.nav_logo_3_url === 'HIDDEN'}
+                        onChange={(e) => handleSiteSettingChange('nav_logo_3_url', e.target.checked ? 'HIDDEN' : null)}
+                      />
+                      <Text>Hide</Text>
+                    </label>
+                  </View>
+                  {siteSettings?.nav_logo_3_url !== 'HIDDEN' && (
+                    <ImageUpload
+                      currentImageUrl={siteSettings?.nav_logo_3_url && siteSettings.nav_logo_3_url !== 'HIDDEN' ? siteSettings.nav_logo_3_url : undefined}
+                      onImageChange={(url) => handleSiteSettingChange('nav_logo_3_url', url)}
+                      bucket="site-images"
+                      label="Nav Logo 3"
+                    />
+                  )}
+                </View>
+              </View>
+            </View>
+
+            {/* Hero Section */}
+            <View className={styles.formGroup} style={{ marginTop: '2rem' }}>
               <Text className={styles.subsectionTitle}>Hero Logo</Text>
               <Text className={styles.sectionDescription}>
                 The main logo displayed in the center of the home page hero section.
