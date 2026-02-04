@@ -1,5 +1,13 @@
 import { style, keyframes } from "@vanilla-extract/css";
 
+const darker_bg = "#101214";
+const dark_bg = "#222222";
+const button =  "#96cfe0";
+const text_primary = "#f5f5f5";
+const text_secondary = "#b0b0b0";
+const text_muted = "#8a8a8a";
+const border_subtle = "rgba(255,255,255,0.08)";
+
 const fadeIn = keyframes({
   from: { opacity: 0 },
   to: { opacity: 1 },
@@ -12,8 +20,8 @@ const slideInUp = keyframes({
 
 export const container = style({
   minHeight: "100vh",
-  backgroundColor: "#fafafa",
-  color: "#1a1a1a",
+  backgroundColor: darker_bg,
+  // color: "#1a1a1a",
   padding: 16,
   paddingTop: 72,
   animation: `${fadeIn} 0.5s ease-out`,
@@ -27,90 +35,72 @@ export const container = style({
 
 export const header = style({
   maxWidth: 1200,
-  margin: "0 auto 32px",
   textAlign: "center",
   display: "flex",
   flexDirection: "column",
   gap: 12,
   animation: `${slideInUp} 0.6s ease-out`,
+  marginBottom: 40,
   "@media": {
     "screen and (min-width: 768px)": {
-      marginBottom: 48,
       gap: 16,
     },
   },
 });
 
-export const title = style({
-  fontSize: 32,
-  fontWeight: 300,
-  letterSpacing: "-0.01em",
-  color: "#1a1a1a",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 48,
-    },
-  },
-});
-
-export const subtitle = style({
-  fontSize: 16,
-  color: "#666",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 18,
-    },
-  },
-});
-
-export const comingSoon = style({
-  maxWidth: 800,
-  margin: "0 auto",
-  padding: 48,
-  backgroundColor: "#ffffff",
-  borderRadius: 2,
-  border: "1px solid #e5e5e5",
-  textAlign: "center",
-});
-
-export const comingSoonText = style({
-  fontSize: 24,
-  fontWeight: 500,
-  color: "#1a1a1a",
-  marginBottom: 24,
-});
-
-export const featureList = style({
-  textAlign: "left",
-  display: "inline-block",
-  fontSize: 16,
-  lineHeight: 2,
-  color: "#666",
-  marginTop: 24,
-});
+// export const title = style({
+//   fontSize: 26,
+//   fontWeight: 600,
+//   letterSpacing: "-0.02em",
+//   color: text_primary,
+//   marginTop: 28,
+//   "@media": {
+//     "screen and (min-width: 768px)": {
+//       fontSize: 40,
+//     },
+//   },
+// });
 
 export const backLink = style({
-  maxWidth: 1200,
-  margin: "48px auto 0",
-  textAlign: "center",
-  color: "#1a1a1a",
-  textDecoration: "none",
-  fontSize: 16,
-  fontWeight: 400,
-  transition: "opacity 0.2s",
-  ":hover": {
-    opacity: 0.6,
-  },
+  margin: "0 auto",
+  position: "fixed",
 });
 
 export const link = style({
-  color: "#1a1a1a",
+  color: text_primary,
   textDecoration: "none",
-  fontSize: 16,
+  fontSize: 20,
   fontWeight: 400,
   transition: "opacity 0.2s",
   ":hover": {
     opacity: 0.6,
+  },
+});
+
+// Reschedule notice
+export const rescheduleNotice = style({
+  maxWidth: 850,
+  margin: "0 auto 12px",
+  padding: "16px 20px",
+  backgroundColor: "#fef3c7",
+  border: "1px solid #fcd34d",
+  borderRadius: 8,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      marginBottom: 32,
+    },
+  },
+});
+
+export const rescheduleNoticeText = style({
+  fontSize: 14,
+  color: "#92400e",
+  lineHeight: 1.5,
+  textAlign: "center",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 15,
+    },
   },
 });
 
@@ -120,13 +110,13 @@ export const progressBar = style({
   alignItems: "center",
   justifyContent: "center",
   maxWidth: 800,
-  margin: "0 auto 32px",
+  margin: "0 auto",
   padding: "0 16px",
   animation: `${slideInUp} 0.7s ease-out`,
   "@media": {
     "screen and (min-width: 768px)": {
-      marginBottom: 48,
-      padding: "0 24px",
+      // marginBottom: 48,
+      // padding: "0 24px",
     },
   },
 });
@@ -136,7 +126,6 @@ export const progressStep = style({
   flexDirection: "column",
   alignItems: "center",
   gap: 6,
-  opacity: 0.3,
   transition: "all 0.3s ease",
   "@media": {
     "screen and (min-width: 768px)": {
@@ -150,37 +139,37 @@ export const progressStepActive = style({
 });
 
 export const progressNumber = style({
-  width: 32,
-  height: 32,
+  width: 36,
+  height: 36,
   borderRadius: "50%",
-  backgroundColor: "#ffffff",
-  border: "2px solid #e5e5e5",
+  backgroundColor: text_muted,
+  // border: "2px solid #e5e5e5",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   fontWeight: 500,
-  fontSize: 14,
+  fontSize: 15,
   color: "#1a1a1a",
   transition: "all 0.3s ease",
   "@media": {
     "screen and (min-width: 768px)": {
-      width: 40,
-      height: 40,
-      fontSize: 16,
+      width: 48,
+      height: 48,
+      fontSize: 18,
     },
   },
   selectors: {
     [`${progressStepActive} &`]: {
       borderColor: "#1a1a1a",
-      backgroundColor: "#1a1a1a",
-      color: "#ffffff",
+      backgroundColor: text_primary,
+      color: "#1a1a1a",
     },
   },
 });
 
 export const progressLabel = style({
   fontSize: 10,
-  color: "#666",
+  color: text_muted,
   textAlign: "center",
   fontWeight: 400,
   "@media": {
@@ -193,14 +182,14 @@ export const progressLabel = style({
 export const progressLine = style({
   width: 40,
   height: 2,
-  backgroundColor: "#e5e5e5",
+  backgroundColor: text_primary,
   margin: "0 4px",
   marginBottom: 18,
   transition: "background-color 0.3s ease",
   "@media": {
     "screen and (min-width: 768px)": {
-      width: 80,
-      margin: "0 8px",
+      width: 100,
+      margin: "0 16px",
       marginBottom: 24,
     },
   },
@@ -212,24 +201,24 @@ export const stepContainer = style({
   margin: "0 auto",
   padding: "0 16px",
   animation: `${slideInUp} 0.5s ease-out`,
+  textAlign: 'center',
+  marginTop: 12,
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: "0 24px",
+      marginTop: 16,
     },
   },
 });
 
 export const stepTitle = style({
   fontSize: 24,
-  fontWeight: 300,
-  marginBottom: 10,
+  fontWeight: 600,
   textAlign: "center",
   letterSpacing: "-0.01em",
-  color: "#1a1a1a",
+  color: text_primary,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 32,
-      marginBottom: 12,
+      fontSize: 28,
     },
   },
 });
@@ -253,21 +242,23 @@ export const serviceGrid = style({
   display: "grid",
   gridTemplateColumns: "1fr",
   gap: 16,
-  marginTop: 24,
+  marginTop: 16,
+  textAlign: 'left',
   "@media": {
     "screen and (min-width: 768px)": {
       gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
       gap: 24,
-      marginTop: 32,
+      marginTop: 28,
     },
   },
 });
 
 export const serviceCard = style({
   padding: 0,
-  backgroundColor: "#ffffff",
+  backgroundColor: dark_bg,
   borderRadius: 8,
-  border: "1px solid #e5e5e5",
+  border: `1px solid ${border_subtle}`,
+  boxShadow: "0 12px 32px rgba(0,0,0,0.6)",  
   cursor: "pointer",
   transition: "all 0.3s ease",
   position: "relative",
@@ -275,9 +266,9 @@ export const serviceCard = style({
   display: "flex",
   flexDirection: "column",
   ":hover": {
-    borderColor: "#1a1a1a",
     transform: "translateY(-2px)",
     boxShadow: "0 8px 16px rgba(0,0,0,0.08)",
+    borderColor: text_muted,
   },
   ":active": {
     transform: "scale(0.98)",
@@ -309,6 +300,8 @@ export const serviceImage = style({
 
 export const serviceCardContent = style({
   padding: 20,
+  display: "flex",
+  flexDirection: "column",
   "@media": {
     "screen and (min-width: 768px)": {
       padding: 24,
@@ -319,28 +312,28 @@ export const serviceCardContent = style({
 export const serviceName = style({
   fontSize: 20,
   fontWeight: 500,
-  marginBottom: 12,
-  color: "#1a1a1a",
+  marginBottom: 4,
+  color: text_primary,
 });
 
 export const serviceDescription = style({
-  fontSize: 14,
-  color: "#666",
-  marginBottom: 16,
+  fontSize: 16,
+  color: text_secondary,
+  marginBottom: 8,
   lineHeight: 1.5,
   fontWeight: 300,
 });
 
 export const serviceDuration = style({
-  fontSize: 14,
-  color: "#1a1a1a",
+  fontSize: 16,
+  color: text_primary,
   marginBottom: 8,
   fontWeight: 400,
 });
 
 export const servicePoints = style({
   fontSize: 14,
-  color: "#666",
+  color: button,
   fontWeight: 400,
 });
 
@@ -349,33 +342,33 @@ export const barberGrid = style({
   display: "grid",
   gridTemplateColumns: "1fr",
   gap: 16,
-  marginTop: 24,
+  marginTop: 12,
+  textAlign: 'left',
   "@media": {
     "screen and (min-width: 768px)": {
       gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
       gap: 24,
-      marginTop: 32,
+      marginTop: 20,
     },
   },
 });
 
 export const barberCard = style({
-  padding: 24,
-  backgroundColor: "#ffffff",
-  borderRadius: 4,
-  border: "1px solid #e5e5e5",
+  padding: 16,
+  backgroundColor: dark_bg,
+  borderRadius: 8,
+  border: `1px solid ${border_subtle}`,
+  boxShadow: "0 12px 32px rgba(0,0,0,0.6)",  
   cursor: "pointer",
   transition: "all 0.3s ease",
   position: "relative",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      padding: 32,
-    },
-  },
+  overflow: "hidden",
+  display: "flex",
+  flexDirection: "column",
   ":hover": {
-    borderColor: "#1a1a1a",
     transform: "translateY(-2px)",
     boxShadow: "0 8px 16px rgba(0,0,0,0.08)",
+    borderColor: text_muted,
   },
   ":active": {
     transform: "scale(0.98)",
@@ -404,15 +397,15 @@ export const barberImage = style({
 });
 
 export const barberName = style({
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 500,
   marginBottom: 12,
-  color: "#1a1a1a",
+  color: text_primary,
 });
 
 export const barberBio = style({
   fontSize: 14,
-  color: "#666",
+  color: text_secondary,
   marginBottom: 12,
   lineHeight: 1.5,
   fontWeight: 300,
@@ -420,85 +413,11 @@ export const barberBio = style({
 
 export const barberSocial = style({
   fontSize: 14,
-  color: "#1a1a1a",
+  color: button,
   fontWeight: 400,
 });
 
 // Date & Time Selection Styles
-export const dateTimeContainer = style({
-  marginTop: 24,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      marginTop: 32,
-    },
-  },
-});
-
-export const dateSection = style({
-  marginBottom: 24,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      marginBottom: 32,
-    },
-  },
-});
-
-export const timeSection = style({
-  marginBottom: 24,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      marginBottom: 32,
-    },
-  },
-});
-
-export const sectionLabel = style({
-  fontSize: 16,
-  fontWeight: 500,
-  marginBottom: 12,
-  color: "#1a1a1a",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 18,
-      marginBottom: 16,
-    },
-  },
-});
-
-export const dateGrid = style({
-  display: "flex",
-  flexDirection: "column",
-  gap: 12,
-  maxHeight: 400,
-  overflowY: "auto",
-});
-
-export const dateButton = style({
-  padding: 16,
-  backgroundColor: "#ffffff",
-  border: "1px solid #e5e5e5",
-  borderRadius: 4,
-  color: "#1a1a1a",
-  fontSize: 16,
-  cursor: "pointer",
-  textAlign: "left",
-  transition: "all 0.2s ease",
-  fontWeight: 400,
-  ":hover": {
-    borderColor: "#1a1a1a",
-    transform: "translateX(4px)",
-  },
-});
-
-export const dateButtonActive = style({
-  borderColor: "#1a1a1a",
-  backgroundColor: "#1a1a1a",
-  color: "#ffffff",
-  ":hover": {
-    transform: "translateX(0)",
-  },
-});
-
 export const timeGrid = style({
   display: "grid",
   gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
@@ -631,24 +550,23 @@ export const buttonGroup = style({
 });
 
 export const backButton = style({
-  padding: "12px 20px",
+  padding: "12px 16px",
   backgroundColor: "transparent",
-  border: "1px solid #e5e5e5",
+  border: "2px solid #e5e5e5",
   borderRadius: 4,
-  color: "#666",
-  fontSize: 15,
-  fontWeight: 400,
+  color: text_primary,
+  fontSize: 16,
+  fontWeight: 500,
   cursor: "pointer",
   transition: "all 0.2s ease",
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: "12px 24px",
-      fontSize: 16,
+      fontSize: 18,
     },
   },
   ":hover": {
-    borderColor: "#1a1a1a",
-    color: "#1a1a1a",
+    borderColor: button,
+    color: button,
   },
 });
 
@@ -696,33 +614,6 @@ export const cancelButton = style({
   ":hover": {
     borderColor: "#999",
     color: "#999",
-  },
-});
-
-// Reschedule notice
-export const rescheduleNotice = style({
-  maxWidth: 800,
-  margin: "0 auto 24px",
-  padding: "16px 20px",
-  backgroundColor: "#fef3c7",
-  border: "1px solid #fcd34d",
-  borderRadius: 8,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      marginBottom: 32,
-    },
-  },
-});
-
-export const rescheduleNoticeText = style({
-  fontSize: 14,
-  color: "#92400e",
-  lineHeight: 1.5,
-  textAlign: "center",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 15,
-    },
   },
 });
 

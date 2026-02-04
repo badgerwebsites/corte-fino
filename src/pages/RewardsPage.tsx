@@ -167,6 +167,11 @@ export default function RewardsPage() {
     <>
       <Navigation />
       <View className={styles.container}>
+        <View className={styles.backLink}>
+          <Link to={user ? '/dashboard' : '/'} className={styles.link}>
+            ← Back
+          </Link>
+      </View>
         <View className={styles.howItWorks}>
           <View className={styles.stepsList}>
             <View className={styles.step}>
@@ -284,11 +289,11 @@ export default function RewardsPage() {
         })}
       </View>
 
-      <View className={styles.backLink}>
+      {/* <View className={styles.backLink}>
         <Link to={user ? '/dashboard' : '/'} className={styles.link}>
           ← Back
         </Link>
-      </View>
+      </View> */}
     </View>
     </>
   );

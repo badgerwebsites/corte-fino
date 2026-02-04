@@ -78,7 +78,7 @@ export default function HomePage() {
               className={styles.heroBookButton}
               onClick={() => navigate('/book')}
             >
-              Book Your Appointment
+              Book Appointment
             </button>
           </View>
 

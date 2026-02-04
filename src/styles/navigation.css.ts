@@ -9,7 +9,7 @@ export const nav = style({
   zIndex: 1000,
   backgroundColor: '#101214',
   boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-  padding: '12px 4px',
+  padding: '12px 12px',
   borderBottom: '1px solid #ffffff',
 
   '@media': {
@@ -34,14 +34,14 @@ export const logoLink = style({
 });
 
 export const carouselContainer = style({
-  width: 100,
+  width: 120,
   height: 36,
   overflow: 'hidden',
   position: 'relative',
 
   '@media': {
     'screen and (min-width: 768px)': {
-      width: 140,
+      width: 150,
       height: 50,
     },
   },

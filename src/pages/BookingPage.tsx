@@ -505,16 +505,16 @@ export default function BookingPage() {
     setStep(1);
   };
 
-  if (loading) {
-    return (
-      <>
-        <Navigation />
-        <View className={styles.container}>
-          <Text className={styles.title}>Loading...</Text>
-        </View>
-      </>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <>
+  //       <Navigation />
+  //       <View className={styles.container}>
+  //         <Text className={styles.title}>Loading...</Text>
+  //       </View>
+  //     </>
+  //   );
+  // }
 
   const today = startOfDay(new Date());
   const twoMonthsFromNow = addDays(today, 60);
@@ -524,12 +524,22 @@ export default function BookingPage() {
       <Navigation />
       <View className={styles.container}>
       <View className={styles.header}>
-        <Text className={styles.title}>
-          {isReschedule ? 'Reschedule Appointment' : 'Book Your Appointment'}
-        </Text>
-        <Link to={isReschedule ? '/dashboard' : '/'} className={styles.backLink}>
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate(-1);
+          }}
+          className={`${styles.backLink} ${styles.link}`}
+        >
+          ← Back
+        </a>
+        {/* <Text className={styles.title}>
+          {isReschedule ? 'Reschedule Appointment' : 'Book Appointment'} */}
+        {/* </Text> */}
+        {/* <Link to={isReschedule ? '/dashboard' : '/'} className={styles.backLink}>
           {isReschedule ? '← Back to Dashboard' : '← Back to Home'}
-        </Link>
+        </Link> */}
       </View>
 
       {isReschedule && (
@@ -554,7 +564,7 @@ export default function BookingPage() {
         <View className={styles.progressLine} />
         <View className={`${styles.progressStep} ${step >= 3 ? styles.progressStepActive : ''}`}>
           <View className={styles.progressNumber}>3</View>
-          <Text className={styles.progressLabel}>Date & Time</Text>
+          <Text className={styles.progressLabel}>Time</Text>
         </View>
         <View className={styles.progressLine} />
         <View className={`${styles.progressStep} ${step >= 4 ? styles.progressStepActive : ''}`}>
@@ -566,7 +576,7 @@ export default function BookingPage() {
       {/* Step 1: Select Service */}
       {step === 1 && (
         <View className={styles.stepContainer}>
-          <Text className={styles.stepTitle}>Select a Service</Text>
+          {/* <Text className={styles.stepTitle}>Select a Service</Text> */}
           <View className={styles.serviceGrid}>
             {services.map((service) => (
               <View
@@ -585,10 +595,10 @@ export default function BookingPage() {
                 )}
                 <View className={styles.serviceCardContent}>
                   <Text className={styles.serviceName}>{service.name}</Text>
+                  <Text className={styles.serviceDuration}>{service.duration_minutes} minutes</Text>
                   {service.description && (
                     <Text className={styles.serviceDescription}>{service.description}</Text>
                   )}
-                  <Text className={styles.serviceDuration}>{service.duration_minutes} minutes</Text>
                   <Text className={styles.servicePoints}>+{service.reward_points} reward points</Text>
                 </View>
               </View>
@@ -600,13 +610,16 @@ export default function BookingPage() {
       {/* Step 2: Select Barber */}
       {step === 2 && (
         <View className={styles.stepContainer}>
-          <Text className={styles.stepTitle}>Choose Your Barber</Text>
-          <Text className={styles.stepSubtitle}>
+          {/* <Text className={styles.stepTitle}>Choose Your Barber</Text> */}
+          <button className={styles.backButton} onClick={() => setStep(1)}>
+            ← Back to Service
+          </button>
+          {/* <Text className={styles.stepSubtitle}>
             Selected: {selectedService?.name}
-          </Text>
+          </Text> */}
 
           <View className={styles.barberGrid}>
-            <View
+            {/* <View
               className={styles.barberCard}
               onClick={() => handleBarberSelect(null, true)}
             >
@@ -614,7 +627,7 @@ export default function BookingPage() {
               <Text className={styles.barberBio}>
                 We'll match you with the first available barber
               </Text>
-            </View>
+            </View> */}
 
             {barbers.map((barber) => (
               <View
@@ -641,20 +654,19 @@ export default function BookingPage() {
               </View>
             ))}
           </View>
-
-          <button className={styles.backButton} onClick={() => setStep(1)}>
-            ← Back to Services
-          </button>
         </View>
       )}
 
       {/* Step 3: Select Date & Time */}
       {step === 3 && (
         <View className={styles.stepContainer}>
-          <Text className={styles.stepTitle}>Pick Date & Time</Text>
-          <Text className={styles.stepSubtitle}>
+          <button className={styles.backButton} onClick={() => setStep(2)}>
+            ← Back to Barber
+          </button>
+          {/* <Text className={styles.stepTitle}>Pick Date & Time</Text> */}
+          {/* <Text className={styles.stepSubtitle}>
             {selectedService?.name} with {anyBarber ? 'any available barber' : selectedBarber?.name}
-          </Text>
+          </Text> */}
 
           <View className={calendarStyles.calendarContainer}>
             <View className={calendarStyles.calendarWrapper}>
@@ -702,10 +714,6 @@ export default function BookingPage() {
               </View>
             )}
           </View>
-
-          <button className={styles.backButton} onClick={() => setStep(2)}>
-            ← Back to Barber Selection
-          </button>
         </View>
       )}
 

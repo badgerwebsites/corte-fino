@@ -23,8 +23,8 @@ export const container = style({
 
 export const howItWorks = style({
   flex: 1,
-  padding: 16,
-  marginBottom: 12,
+  // padding: 16,
+  marginBottom: 20,
 });
 
 export const stepsList = style({
@@ -378,44 +378,11 @@ export const disabled = style({
   },
 });
 
-export const signInPrompt = style({
-  maxWidth: 600,
-  margin: "48px auto",
-  padding: 32,
-  backgroundColor: "#ffffff",
-  borderRadius: 4,
-  border: "1px solid #e5e5e5",
-  textAlign: "center",
-});
-
-export const signInButton = style({
-  display: "inline-block",
-  marginTop: 16,
-  padding: "12px 32px",
-  fontSize: 16,
-  fontWeight: 500,
-  backgroundColor: "#1a1a1a",
-  color: "#ffffff",
-  border: "none",
-  borderRadius: 2,
-  textDecoration: "none",
-  cursor: "pointer",
-  transition: "all 0.3s ease",
-  letterSpacing: "0.05em",
-  ":hover": {
-    backgroundColor: "#333",
-    transform: "translateY(-2px)",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
-  },
-  ":active": {
-    transform: "translateY(0)",
-  },
-});
-
 export const backLink = style({
-  maxWidth: 1200,
+  // maxWidth: 1200,
   margin: "0 auto",
-  textAlign: "center",
+  position: "fixed",
+  // textAlign: "center",
 });
 
 export const link = style({
