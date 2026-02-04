@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
-import type { Barber, Service, BarberServicePricing, RewardRedemptionWithDetails, Reward, RewardType } from '../types/database.types';
+import type { Barber, Service, BarberServicePricing, RewardRedemptionWithDetails, Reward, RewardType, SiteSettings } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { BarberScheduleManager } from '../components/BarberScheduleManager';
 import { AdminCalendar } from '../components/AdminCalendar';
@@ -20,8 +20,9 @@ export default function AdminPage() {
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
   const [pendingRedemptions, setPendingRedemptions] = useState<RewardRedemptionWithDetails[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'calendar' | 'pricing' | 'services' | 'barbers' | 'rewards'>('calendar');
+  const [activeTab, setActiveTab] = useState<'calendar' | 'pricing' | 'services' | 'barbers' | 'rewards' | 'settings'>('calendar');
   const [verifyCode, setVerifyCode] = useState('');
 
   // Barber form state
@@ -79,7 +80,7 @@ export default function AdminPage() {
 
   const loadData = async () => {
     try {
-      const [barbersRes, servicesRes, pricingRes, redemptionsRes, rewardsRes] = await Promise.all([
+      const [barbersRes, servicesRes, pricingRes, redemptionsRes, rewardsRes, settingsRes] = await Promise.all([
         supabase.from('barbers').select('*').order('name'),
         supabase.from('services').select('*').order('name'),
         supabase.from('barber_service_pricing').select('*'),
@@ -89,6 +90,7 @@ export default function AdminPage() {
           reward:rewards(*)
         `).eq('fulfilled', false).order('redeemed_at', { ascending: false }),
         supabase.from('rewards').select('*').order('sort_order'),
+        supabase.from('site_settings').select('*').single(),
       ]);
 
       if (barbersRes.error) throw barbersRes.error;
@@ -102,6 +104,7 @@ export default function AdminPage() {
       setPricing(pricingRes.data || []);
       setPendingRedemptions(redemptionsRes.data || []);
       setRewards(rewardsRes.data || []);
+      setSiteSettings(settingsRes.data || null);
     } catch (error) {
       console.error('Error loading admin data:', error);
       alert('Failed to load data');
@@ -488,6 +491,35 @@ export default function AdminPage() {
     }
   };
 
+  // Site Settings Management
+  const handleSiteSettingChange = async (field: 'hero_background_url' | 'hero_logo_url', url: string | null) => {
+    try {
+      if (siteSettings) {
+        // Update existing settings
+        const { error } = await supabase
+          .from('site_settings')
+          .update({ [field]: url })
+          .eq('id', siteSettings.id);
+
+        if (error) throw error;
+      } else {
+        // Create new settings row
+        const { error } = await supabase
+          .from('site_settings')
+          .insert([{ [field]: url }]);
+
+        if (error) throw error;
+      }
+
+      loadData();
+      const fieldName = field === 'hero_background_url' ? 'Hero background' : 'Hero logo';
+      alert(`${fieldName} updated successfully!`);
+    } catch (error) {
+      console.error(`Error updating ${field}:`, error);
+      alert(`Failed to update setting`);
+    }
+  };
+
   if (loading) {
     return (
       <>
@@ -549,6 +581,12 @@ export default function AdminPage() {
           {pendingRedemptions.length > 0 && (
             <span className={styles.tabBadge}>{pendingRedemptions.length}</span>
           )}
+        </button>
+        <button
+          className={`${styles.tab} ${activeTab === 'settings' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('settings')}
+        >
+          Settings
         </button>
       </View>
 
@@ -970,6 +1008,46 @@ export default function AdminPage() {
               <BarberScheduleManager barbers={[editingBarber]} onUpdate={loadData} />
             </View>
           )}
+        </View>
+      )}
+
+      {activeTab === 'settings' && (
+        <View className={styles.section}>
+          <View className={styles.sectionHeader}>
+            <Text className={styles.sectionTitle}>Site Settings</Text>
+          </View>
+
+          <View className={styles.form}>
+            <View className={styles.formGroup}>
+              <Text className={styles.subsectionTitle}>Hero Logo</Text>
+              <Text className={styles.sectionDescription}>
+                The main logo displayed in the center of the home page hero section.
+              </Text>
+              <View style={{ marginTop: '1rem' }}>
+                <ImageUpload
+                  currentImageUrl={siteSettings?.hero_logo_url || undefined}
+                  onImageChange={(url) => handleSiteSettingChange('hero_logo_url', url)}
+                  bucket="site-images"
+                  label="Hero Logo"
+                />
+              </View>
+            </View>
+
+            <View className={styles.formGroup} style={{ marginTop: '2rem' }}>
+              <Text className={styles.subsectionTitle}>Hero Background</Text>
+              <Text className={styles.sectionDescription}>
+                The background image that appears behind the logo on the home page.
+              </Text>
+              <View style={{ marginTop: '1rem' }}>
+                <ImageUpload
+                  currentImageUrl={siteSettings?.hero_background_url || undefined}
+                  onImageChange={(url) => handleSiteSettingChange('hero_background_url', url)}
+                  bucket="site-images"
+                  label="Hero Background"
+                />
+              </View>
+            </View>
+          </View>
         </View>
       )}
 

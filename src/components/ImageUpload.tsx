@@ -8,7 +8,7 @@ import * as styles from '../styles/imageUpload.css';
 interface ImageUploadProps {
   currentImageUrl?: string;
   onImageChange: (url: string | null) => void;
-  bucket: 'barber-images' | 'service-images';
+  bucket: 'barber-images' | 'service-images' | 'site-images';
   folder?: string;
   label?: string;
 }

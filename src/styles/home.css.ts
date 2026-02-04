@@ -41,10 +41,10 @@ export const heroFullScreen = style({
   alignItems: "center",
   justifyContent: "center",
   overflow: "hidden",
-  backgroundImage: "url('/images/hero-background.webp')",
   backgroundSize: "cover",
   backgroundPosition: "center",
   backgroundRepeat: "no-repeat",
+  backgroundColor: darker_bg,
   "@media": {
     "screen and (min-width: 768px)": {
       width: "50%",
@@ -82,7 +82,6 @@ export const heroLogoLarge = style({
   width: "100%",
   height: "auto",
   marginBottom: 60,
-  filter: "brightness(0) invert(1)",
   animation: `${fadeInUp} 1s ease-out 0.2s backwards`,
   "@media": {
     "screen and (min-width: 768px)": {
@@ -90,6 +89,10 @@ export const heroLogoLarge = style({
       marginBottom: 80,
     },
   },
+});
+
+export const heroLogoWhite = style({
+  filter: "brightness(0) invert(1)",
 });
 
 export const heroBookButton = style({

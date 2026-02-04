@@ -173,3 +173,11 @@ export interface BarberTimeOff {
   created_at: string;
   updated_at: string;
 }
+
+export interface SiteSettings {
+  id: string;
+  hero_background_url?: string;
+  hero_logo_url?: string;
+  created_at: string;
+  updated_at: string;
+}

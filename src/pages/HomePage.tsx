@@ -7,33 +7,53 @@ import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/home.css';
-import logo from '../assets/BigLogo.svg';
+import defaultLogo from '../assets/BigLogo.svg';
 import scissorsIcon from '../assets/scissors.svg';
 import calendarCheckIcon from '../assets/calendar-check.svg';
 import crownIcon from '../assets/crown.svg';
 import { formatPhone } from "../../utils/formatPhone";
 
+const DEFAULT_HERO_BACKGROUND = '/images/hero-background.webp';
+
 export default function HomePage() {
   const navigate = useNavigate();
   const [barbers, setBarbers] = useState<Barber[]>([]);
+  const [heroBackground, setHeroBackground] = useState<string>(DEFAULT_HERO_BACKGROUND);
+  const [heroLogo, setHeroLogo] = useState<string>(defaultLogo);
+  const [isCustomLogo, setIsCustomLogo] = useState(false);
 
   useEffect(() => {
-    const loadBarbers = async () => {
+    const loadData = async () => {
       try {
-        const { data, error } = await supabase
+        // Load barbers
+        const { data: barbersData, error: barbersError } = await supabase
           .from('barbers')
           .select('*')
           .eq('is_active', true)
           .order('name');
 
-        if (error) throw error;
-        setBarbers(data ?? []);
+        if (barbersError) throw barbersError;
+        setBarbers(barbersData ?? []);
+
+        // Load site settings for hero background and logo
+        const { data: settingsData } = await supabase
+          .from('site_settings')
+          .select('*')
+          .single();
+
+        if (settingsData?.hero_background_url) {
+          setHeroBackground(settingsData.hero_background_url);
+        }
+        if (settingsData?.hero_logo_url) {
+          setHeroLogo(settingsData.hero_logo_url);
+          setIsCustomLogo(true);
+        }
       } catch (error) {
-        console.error('Error loading barbers:', error);
+        console.error('Error loading data:', error);
       }
     };
 
-    loadBarbers();
+    loadData();
   }, []);
 
   return (
@@ -41,14 +61,17 @@ export default function HomePage() {
       <Navigation />
 
       <View className={styles.heroBackground}>
-        <View className={styles.heroFullScreen}>
+        <View
+          className={styles.heroFullScreen}
+          style={{ backgroundImage: `url('${heroBackground}')` }}
+        >
           <View className={styles.heroOverlay} />
 
           <View className={styles.heroContent}>
             <img
-              src={logo}
+              src={heroLogo}
               alt="Corte Fino"
-              className={styles.heroLogoLarge}
+              className={`${styles.heroLogoLarge} ${!isCustomLogo ? styles.heroLogoWhite : ''}`}
             />
 
             <button
