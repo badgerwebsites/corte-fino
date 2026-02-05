@@ -1,5 +1,5 @@
 // components/ImageUpload.tsx
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
@@ -24,6 +24,11 @@ export function ImageUpload({
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync previewUrl when currentImageUrl prop changes (e.g., when editing a service)
+  useEffect(() => {
+    setPreviewUrl(currentImageUrl || null);
+  }, [currentImageUrl]);
 
   const uploadFile = async (file: File) => {
     // Validate file type
