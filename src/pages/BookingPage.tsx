@@ -355,20 +355,26 @@ export default function BookingPage() {
     if (!selectedDate) return slots;
 
     const now = new Date();
-    const isToday = startOfDay(selectedDate).getTime() === startOfDay(now).getTime();
+    // Compare just the date portions (year, month, day) to avoid timezone issues
+    const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
+    const todayStr = format(now, 'yyyy-MM-dd');
+    const isToday = selectedDateStr === todayStr;
 
     if (!isToday) return slots;
 
-    // Get current time in minutes
+    // Get current time in minutes plus a 15 minute buffer
+    // (people need time to get to the appointment)
     const currentHour = now.getHours();
     const currentMinutes = now.getMinutes();
     const currentTimeInMinutes = currentHour * 60 + currentMinutes;
+    const bufferMinutes = 15;
+    const cutoffTime = currentTimeInMinutes + bufferMinutes;
 
-    // Filter out slots that are in the past (add a small buffer of 30 min)
+    // Filter out slots that are in the past or too close to now
     return slots.filter(slot => {
       const [hours, mins] = slot.split(':').map(Number);
       const slotTimeInMinutes = hours * 60 + mins;
-      return slotTimeInMinutes > currentTimeInMinutes;
+      return slotTimeInMinutes >= cutoffTime;
     });
   };
 

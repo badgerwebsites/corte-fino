@@ -11,21 +11,35 @@ interface Props {
   onUpdate: () => void;
 }
 
+interface DaySchedule {
+  isWorking: boolean;
+  startTime: string;
+  endTime: string;
+  breaks: { id?: string; startTime: string; endTime: string }[];
+}
+
 const DAYS_OF_WEEK = [
-  { value: 0, label: 'Sunday' },
-  { value: 1, label: 'Monday' },
-  { value: 2, label: 'Tuesday' },
-  { value: 3, label: 'Wednesday' },
-  { value: 4, label: 'Thursday' },
-  { value: 5, label: 'Friday' },
-  { value: 6, label: 'Saturday' },
+  { value: 0, label: 'Sunday', short: 'Sun' },
+  { value: 1, label: 'Monday', short: 'Mon' },
+  { value: 2, label: 'Tuesday', short: 'Tue' },
+  { value: 3, label: 'Wednesday', short: 'Wed' },
+  { value: 4, label: 'Thursday', short: 'Thu' },
+  { value: 5, label: 'Friday', short: 'Fri' },
+  { value: 6, label: 'Saturday', short: 'Sat' },
 ];
+
+const DEFAULT_START = '09:00';
+const DEFAULT_END = '21:00';
 
 export function BarberScheduleManager({ barbers, onUpdate }: Props) {
   const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
-  const [availability, setAvailability] = useState<BarberAvailability[]>([]);
+  const [, setAvailability] = useState<BarberAvailability[]>([]);
   const [timeOff, setTimeOff] = useState<BarberTimeOff[]>([]);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // Schedule state for each day
+  const [schedules, setSchedules] = useState<Record<number, DaySchedule>>({});
 
   // Time off form state
   const [timeOffForm, setTimeOffForm] = useState({
@@ -68,6 +82,50 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
 
       setAvailability(availabilityRes.data || []);
       setTimeOff(timeOffRes.data || []);
+
+      // Convert availability records to our schedule format
+      const newSchedules: Record<number, DaySchedule> = {};
+
+      for (let day = 0; day <= 6; day++) {
+        const dayRecords = (availabilityRes.data || [])
+          .filter(a => a.day_of_week === day && a.is_available)
+          .sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+        if (dayRecords.length === 0) {
+          newSchedules[day] = {
+            isWorking: false,
+            startTime: DEFAULT_START,
+            endTime: DEFAULT_END,
+            breaks: [],
+          };
+        } else {
+          // Find overall start (earliest) and end (latest) times
+          const overallStart = dayRecords[0].start_time;
+          const overallEnd = dayRecords[dayRecords.length - 1].end_time;
+
+          // Find breaks (gaps between consecutive blocks)
+          const breaks: { startTime: string; endTime: string }[] = [];
+          for (let i = 0; i < dayRecords.length - 1; i++) {
+            const currentEnd = dayRecords[i].end_time;
+            const nextStart = dayRecords[i + 1].start_time;
+            if (currentEnd !== nextStart) {
+              breaks.push({
+                startTime: currentEnd,
+                endTime: nextStart,
+              });
+            }
+          }
+
+          newSchedules[day] = {
+            isWorking: true,
+            startTime: overallStart,
+            endTime: overallEnd,
+            breaks,
+          };
+        }
+      }
+
+      setSchedules(newSchedules);
     } catch (error) {
       console.error('Error loading barber schedule:', error);
       alert('Failed to load schedule');
@@ -76,60 +134,151 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
     }
   };
 
-  const handleToggleDay = async (dayOfWeek: number, currentlyAvailable: boolean) => {
+  // Convert schedule to availability blocks and save
+  const saveSchedule = async (dayOfWeek: number) => {
     if (!selectedBarber) return;
 
+    const schedule = schedules[dayOfWeek];
+    if (!schedule) return;
+
+    setSaving(true);
     try {
-      const existingAvailability = availability.find(a => a.day_of_week === dayOfWeek);
+      // Delete existing availability for this day
+      const { error: deleteError } = await supabase
+        .from('barber_availability')
+        .delete()
+        .eq('barber_id', selectedBarber.id)
+        .eq('day_of_week', dayOfWeek);
 
-      if (existingAvailability) {
-        // Update existing record
-        const { error } = await supabase
-          .from('barber_availability')
-          .update({ is_available: !currentlyAvailable })
-          .eq('id', existingAvailability.id);
+      if (deleteError) throw deleteError;
 
-        if (error) throw error;
-      } else {
-        // Insert new record (only when toggling ON and no record exists)
-        const { error } = await supabase
-          .from('barber_availability')
-          .insert({
-            barber_id: selectedBarber.id,
-            day_of_week: dayOfWeek,
-            start_time: '09:00',
-            end_time: '21:00',
-            is_available: true,
+      if (!schedule.isWorking) {
+        // Not working this day, we're done
+        loadBarberSchedule(selectedBarber.id);
+        onUpdate();
+        setSaving(false);
+        return;
+      }
+
+      // Sort breaks by start time
+      const sortedBreaks = [...schedule.breaks].sort((a, b) =>
+        a.startTime.localeCompare(b.startTime)
+      );
+
+      // Generate availability blocks from schedule
+      const blocks: { start_time: string; end_time: string }[] = [];
+      let currentStart = schedule.startTime;
+
+      for (const brk of sortedBreaks) {
+        // Validate break is within working hours
+        if (brk.startTime < schedule.startTime || brk.endTime > schedule.endTime) {
+          continue; // Skip invalid breaks
+        }
+
+        if (brk.startTime > currentStart) {
+          blocks.push({
+            start_time: currentStart,
+            end_time: brk.startTime,
           });
+        }
+        currentStart = brk.endTime;
+      }
 
-        if (error) throw error;
+      // Add final block after last break
+      if (currentStart < schedule.endTime) {
+        blocks.push({
+          start_time: currentStart,
+          end_time: schedule.endTime,
+        });
+      }
+
+      // Insert new availability blocks
+      if (blocks.length > 0) {
+        const { error: insertError } = await supabase
+          .from('barber_availability')
+          .insert(
+            blocks.map(block => ({
+              barber_id: selectedBarber.id,
+              day_of_week: dayOfWeek,
+              start_time: block.start_time,
+              end_time: block.end_time,
+              is_available: true,
+            }))
+          );
+
+        if (insertError) throw insertError;
       }
 
       loadBarberSchedule(selectedBarber.id);
       onUpdate();
     } catch (error) {
-      console.error('Error toggling day:', error);
-      alert('Failed to update availability');
+      console.error('Error saving schedule:', error);
+      alert('Failed to save schedule');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleUpdateTime = async (availabilityId: string, field: 'start_time' | 'end_time', value: string) => {
-    if (!selectedBarber) return;
+  const updateSchedule = (dayOfWeek: number, updates: Partial<DaySchedule>) => {
+    setSchedules(prev => ({
+      ...prev,
+      [dayOfWeek]: {
+        ...prev[dayOfWeek],
+        ...updates,
+      },
+    }));
+  };
 
-    try {
-      const { error } = await supabase
-        .from('barber_availability')
-        .update({ [field]: value })
-        .eq('id', availabilityId);
+  const addBreak = (dayOfWeek: number) => {
+    const schedule = schedules[dayOfWeek];
+    if (!schedule) return;
 
-      if (error) throw error;
+    // Default new break to middle of the day
+    const startMinutes = timeToMinutes(schedule.startTime);
+    const endMinutes = timeToMinutes(schedule.endTime);
+    const midpoint = Math.floor((startMinutes + endMinutes) / 2);
 
-      loadBarberSchedule(selectedBarber.id);
-      onUpdate();
-    } catch (error) {
-      console.error('Error updating time:', error);
-      alert('Failed to update time');
-    }
+    const newBreakStart = minutesToTime(midpoint);
+    const newBreakEnd = minutesToTime(midpoint + 60);
+
+    updateSchedule(dayOfWeek, {
+      breaks: [...schedule.breaks, { startTime: newBreakStart, endTime: newBreakEnd }],
+    });
+  };
+
+  const updateBreak = (dayOfWeek: number, breakIndex: number, field: 'startTime' | 'endTime', value: string) => {
+    const schedule = schedules[dayOfWeek];
+    if (!schedule) return;
+
+    const newBreaks = [...schedule.breaks];
+    newBreaks[breakIndex] = { ...newBreaks[breakIndex], [field]: value };
+    updateSchedule(dayOfWeek, { breaks: newBreaks });
+  };
+
+  const removeBreak = (dayOfWeek: number, breakIndex: number) => {
+    const schedule = schedules[dayOfWeek];
+    if (!schedule) return;
+
+    const newBreaks = schedule.breaks.filter((_, i) => i !== breakIndex);
+    updateSchedule(dayOfWeek, { breaks: newBreaks });
+  };
+
+  const timeToMinutes = (time: string): number => {
+    const [hours, mins] = time.split(':').map(Number);
+    return hours * 60 + mins;
+  };
+
+  const minutesToTime = (minutes: number): string => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+  };
+
+  const formatTime = (time: string): string => {
+    const [hours, mins] = time.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    return `${displayHours}:${mins.toString().padStart(2, '0')} ${period}`;
   };
 
   const handleAddTimeOff = async (e: React.FormEvent) => {
@@ -189,21 +338,13 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
     }
   };
 
-  const isDayAvailable = (dayOfWeek: number): boolean => {
-    return availability.some(a => a.day_of_week === dayOfWeek && a.is_available);
-  };
-
-  const getDayAvailability = (dayOfWeek: number): BarberAvailability | null => {
-    return availability.find(a => a.day_of_week === dayOfWeek) || null;
-  };
-
   return (
     <View className={styles.section}>
       <View className={styles.sectionHeader}>
         <View>
-          <Text className={styles.sectionTitle}>Manage Barber Schedules</Text>
+          <Text className={styles.sectionTitle}>Manage Schedule</Text>
           <Text className={styles.sectionDescription}>
-            Set weekly availability and time off for each barber
+            Set working hours and breaks for each day of the week
           </Text>
         </View>
       </View>
@@ -231,61 +372,312 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
 
       {selectedBarber && !loading && (
         <>
-          <div style={{ marginTop: '2rem' }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-              Weekly Availability
+          <div style={{ marginTop: '1.5rem' }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', color: '#1a1a1a' }}>
+              Weekly Schedule for {selectedBarber.name}
             </h3>
-            <p style={{ color: '#666', fontSize: '0.875rem', marginBottom: '1rem' }}>
-              Toggle days and set working hours for {selectedBarber.name}
-            </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {DAYS_OF_WEEK.map((day) => {
-                const isAvailable = isDayAvailable(day.value);
-                const dayAvail = getDayAvailability(day.value);
+                const schedule = schedules[day.value] || {
+                  isWorking: false,
+                  startTime: DEFAULT_START,
+                  endTime: DEFAULT_END,
+                  breaks: [],
+                };
 
                 return (
                   <div
                     key={day.value}
-                    className={styles.scheduleDayCard}
                     style={{
-                      backgroundColor: isAvailable ? '#f0f9ff' : '#f7fafc',
-                      border: isAvailable ? '2px solid #1a1a1a' : '2px solid #e5e5e5',
+                      backgroundColor: schedule.isWorking ? '#ffffff' : '#f9fafb',
+                      border: schedule.isWorking ? '2px solid #10b981' : '2px solid #e5e7eb',
+                      borderRadius: '0.75rem',
+                      padding: '1rem',
+                      transition: 'all 0.2s',
                     }}
                   >
-                    <div className={styles.scheduleDayHeader}>
-                      <input
-                        type="checkbox"
-                        checked={isAvailable}
-                        onChange={() => handleToggleDay(day.value, isAvailable)}
-                        style={{ width: '20px', height: '20px', cursor: 'pointer', flexShrink: 0 }}
-                      />
-                      <span style={{ fontSize: '1rem', fontWeight: 500 }}>
-                        {day.label}
-                      </span>
+                    {/* Day Header */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: schedule.isWorking ? '1rem' : 0,
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <input
+                          type="checkbox"
+                          checked={schedule.isWorking}
+                          onChange={(e) => {
+                            updateSchedule(day.value, { isWorking: e.target.checked });
+                          }}
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            cursor: 'pointer',
+                            accentColor: '#10b981',
+                          }}
+                        />
+                        <span style={{
+                          fontSize: '1rem',
+                          fontWeight: 600,
+                          color: schedule.isWorking ? '#1a1a1a' : '#6b7280',
+                        }}>
+                          {day.label}
+                        </span>
+                        {!schedule.isWorking && (
+                          <span style={{
+                            fontSize: '0.875rem',
+                            color: '#9ca3af',
+                            fontStyle: 'italic',
+                          }}>
+                            — Not working
+                          </span>
+                        )}
+                      </div>
+
+                      {schedule.isWorking && (
+                        <button
+                          onClick={() => saveSchedule(day.value)}
+                          disabled={saving}
+                          style={{
+                            padding: '0.375rem 0.75rem',
+                            backgroundColor: '#10b981',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '0.375rem',
+                            fontSize: '0.875rem',
+                            fontWeight: 500,
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                            opacity: saving ? 0.7 : 1,
+                          }}
+                        >
+                          {saving ? 'Saving...' : 'Save'}
+                        </button>
+                      )}
                     </div>
 
-                    {isAvailable && dayAvail && (
-                      <div className={styles.scheduleTimeRow}>
-                        <div className={styles.scheduleTimeInput}>
-                          <label className={styles.label}>Start Time</label>
-                          <input
-                            type="time"
-                            className={styles.input}
-                            value={dayAvail.start_time}
-                            onChange={(e) => handleUpdateTime(dayAvail.id, 'start_time', e.target.value)}
-                          />
+                    {schedule.isWorking && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {/* Working Hours */}
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: '1rem',
+                          padding: '1rem',
+                          backgroundColor: '#f0fdf4',
+                          borderRadius: '0.5rem',
+                          border: '1px solid #bbf7d0',
+                        }}>
+                          <div>
+                            <label style={{
+                              display: 'block',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              color: '#166534',
+                              marginBottom: '0.375rem',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.05em',
+                            }}>
+                              Start Time
+                            </label>
+                            <input
+                              type="time"
+                              value={schedule.startTime}
+                              onChange={(e) => updateSchedule(day.value, { startTime: e.target.value })}
+                              style={{
+                                width: '100%',
+                                padding: '0.5rem',
+                                border: '1px solid #d1d5db',
+                                borderRadius: '0.375rem',
+                                fontSize: '1rem',
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{
+                              display: 'block',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              color: '#166534',
+                              marginBottom: '0.375rem',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.05em',
+                            }}>
+                              End Time
+                            </label>
+                            <input
+                              type="time"
+                              value={schedule.endTime}
+                              onChange={(e) => updateSchedule(day.value, { endTime: e.target.value })}
+                              style={{
+                                width: '100%',
+                                padding: '0.5rem',
+                                border: '1px solid #d1d5db',
+                                borderRadius: '0.375rem',
+                                fontSize: '1rem',
+                              }}
+                            />
+                          </div>
                         </div>
-                        <div className={styles.scheduleTimeInput}>
-                          <label className={styles.label}>End Time</label>
-                          <input
-                            type="time"
-                            className={styles.input}
-                            value={dayAvail.end_time}
-                            onChange={(e) => handleUpdateTime(dayAvail.id, 'end_time', e.target.value)}
-                          />
+
+                        {/* Breaks Section */}
+                        <div style={{
+                          padding: '1rem',
+                          backgroundColor: '#fef3c7',
+                          borderRadius: '0.5rem',
+                          border: '1px solid #fde68a',
+                        }}>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: schedule.breaks.length > 0 ? '0.75rem' : 0,
+                          }}>
+                            <label style={{
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              color: '#92400e',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.05em',
+                            }}>
+                              Breaks {schedule.breaks.length > 0 && `(${schedule.breaks.length})`}
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => addBreak(day.value)}
+                              style={{
+                                padding: '0.25rem 0.5rem',
+                                backgroundColor: '#f59e0b',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '0.25rem',
+                                fontSize: '0.75rem',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              + Add Break
+                            </button>
+                          </div>
+
+                          {schedule.breaks.length === 0 ? (
+                            <p style={{
+                              fontSize: '0.875rem',
+                              color: '#92400e',
+                              margin: 0,
+                              marginTop: '0.5rem',
+                            }}>
+                              No breaks scheduled. Click "Add Break" to add one.
+                            </p>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                              {schedule.breaks.map((brk, index) => (
+                                <div
+                                  key={index}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                    padding: '0.5rem',
+                                    backgroundColor: 'white',
+                                    borderRadius: '0.375rem',
+                                    border: '1px solid #fde68a',
+                                  }}
+                                >
+                                  <span style={{
+                                    fontSize: '0.75rem',
+                                    fontWeight: 500,
+                                    color: '#78716c',
+                                    minWidth: '3rem',
+                                  }}>
+                                    Break {index + 1}
+                                  </span>
+                                  <input
+                                    type="time"
+                                    value={brk.startTime}
+                                    onChange={(e) => updateBreak(day.value, index, 'startTime', e.target.value)}
+                                    style={{
+                                      flex: 1,
+                                      padding: '0.375rem',
+                                      border: '1px solid #d1d5db',
+                                      borderRadius: '0.25rem',
+                                      fontSize: '0.875rem',
+                                    }}
+                                  />
+                                  <span style={{ color: '#9ca3af' }}>to</span>
+                                  <input
+                                    type="time"
+                                    value={brk.endTime}
+                                    onChange={(e) => updateBreak(day.value, index, 'endTime', e.target.value)}
+                                    style={{
+                                      flex: 1,
+                                      padding: '0.375rem',
+                                      border: '1px solid #d1d5db',
+                                      borderRadius: '0.25rem',
+                                      fontSize: '0.875rem',
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => removeBreak(day.value, index)}
+                                    style={{
+                                      padding: '0.375rem',
+                                      backgroundColor: '#fecaca',
+                                      color: '#dc2626',
+                                      border: 'none',
+                                      borderRadius: '0.25rem',
+                                      cursor: 'pointer',
+                                      fontSize: '0.75rem',
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Schedule Summary */}
+                        <div style={{
+                          padding: '0.75rem',
+                          backgroundColor: '#f3f4f6',
+                          borderRadius: '0.375rem',
+                          fontSize: '0.875rem',
+                          color: '#4b5563',
+                        }}>
+                          <strong>Available:</strong>{' '}
+                          {formatTime(schedule.startTime)} - {formatTime(schedule.endTime)}
+                          {schedule.breaks.length > 0 && (
+                            <span>
+                              {' '}(excluding {schedule.breaks.length} break{schedule.breaks.length > 1 ? 's' : ''})
+                            </span>
+                          )}
                         </div>
                       </div>
+                    )}
+
+                    {!schedule.isWorking && (
+                      <button
+                        onClick={() => saveSchedule(day.value)}
+                        disabled={saving}
+                        style={{
+                          marginTop: '0.75rem',
+                          padding: '0.375rem 0.75rem',
+                          backgroundColor: '#6b7280',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '0.375rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 500,
+                          cursor: saving ? 'not-allowed' : 'pointer',
+                          opacity: saving ? 0.7 : 1,
+                        }}
+                      >
+                        {saving ? 'Saving...' : 'Save as Day Off'}
+                      </button>
                     )}
                   </div>
                 );
@@ -293,12 +685,13 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
             </div>
           </div>
 
+          {/* Time Off Section */}
           <div style={{ marginTop: '3rem' }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-              Time Off / Blocked Dates
+            <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem', color: '#1a1a1a' }}>
+              Time Off / Vacation Days
             </h3>
-            <p style={{ color: '#666', fontSize: '0.875rem', marginBottom: '1rem' }}>
-              Add specific dates when {selectedBarber.name} is unavailable
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem' }}>
+              Block specific dates when {selectedBarber.name} is unavailable
             </p>
 
             <form onSubmit={handleAddTimeOff} className={styles.form}>
@@ -343,18 +736,18 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
             </form>
 
             {timeOff.length > 0 && (
-              <div style={{ marginTop: '2rem' }}>
-                <h4 style={{ fontSize: '1rem', fontWeight: 500, marginBottom: '1rem' }}>
-                  Upcoming Time Off
+              <div style={{ marginTop: '1.5rem' }}>
+                <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: '#374151' }}>
+                  Scheduled Time Off
                 </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {timeOff.map((period) => (
                     <div
                       key={period.id}
                       style={{
-                        padding: '1rem',
-                        backgroundColor: '#fff3cd',
-                        border: '1px solid #ffc107',
+                        padding: '0.75rem 1rem',
+                        backgroundColor: '#fef3c7',
+                        border: '1px solid #fde68a',
                         borderRadius: '0.5rem',
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -364,18 +757,38 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                       }}
                     >
                       <div>
-                        <div style={{ fontWeight: 500 }}>
-                          {new Date(period.start_date).toLocaleDateString()} - {new Date(period.end_date).toLocaleDateString()}
+                        <div style={{ fontWeight: 500, color: '#92400e' }}>
+                          {new Date(period.start_date + 'T00:00:00').toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                          {period.start_date !== period.end_date && (
+                            <> — {new Date(period.end_date + 'T00:00:00').toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric'
+                            })}</>
+                          )}
                         </div>
                         {period.reason && (
-                          <div style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.25rem' }}>
+                          <div style={{ fontSize: '0.875rem', color: '#a16207', marginTop: '0.25rem' }}>
                             {period.reason}
                           </div>
                         )}
                       </div>
                       <button
-                        className={styles.deleteButton}
                         onClick={() => handleDeleteTimeOff(period.id)}
+                        style={{
+                          padding: '0.375rem 0.75rem',
+                          backgroundColor: '#dc2626',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '0.375rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                        }}
                       >
                         Delete
                       </button>
@@ -395,7 +808,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
       )}
 
       {!selectedBarber && (
-        <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+        <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
           <Text>Select a barber to manage their schedule</Text>
         </div>
       )}
