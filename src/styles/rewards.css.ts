@@ -381,7 +381,7 @@ export const disabled = style({
 export const backLink = style({
   // maxWidth: 1200,
   margin: "0 auto",
-  position: "fixed",
+  // position: "fixed",
   // textAlign: "center",
 });
 

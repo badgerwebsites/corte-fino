@@ -171,7 +171,7 @@ export default function RewardsPage() {
           <Link to={user ? '/dashboard' : '/'} className={styles.link}>
             ← Back
           </Link>
-      </View>
+        </View>
         <View className={styles.howItWorks}>
           <View className={styles.stepsList}>
             <View className={styles.step}>

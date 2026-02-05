@@ -22,7 +22,7 @@ export const container = style({
   minHeight: "100vh",
   backgroundColor: darker_bg,
   // color: "#1a1a1a",
-  padding: 16,
+  padding: 8,
   paddingTop: 72,
   animation: `${fadeIn} 0.5s ease-out`,
   "@media": {
@@ -48,22 +48,10 @@ export const header = style({
   },
 });
 
-// export const title = style({
-//   fontSize: 26,
-//   fontWeight: 600,
-//   letterSpacing: "-0.02em",
-//   color: text_primary,
-//   marginTop: 28,
-//   "@media": {
-//     "screen and (min-width: 768px)": {
-//       fontSize: 40,
-//     },
-//   },
-// });
-
 export const backLink = style({
-  margin: "0 auto",
-  position: "fixed",
+  // margin: "0 auto",
+  // position: "fixed",
+  marginBottom: 12,
 });
 
 export const link = style({
@@ -148,7 +136,7 @@ export const progressNumber = style({
   alignItems: "center",
   justifyContent: "center",
   fontWeight: 500,
-  fontSize: 15,
+  fontSize: 16,
   color: "#1a1a1a",
   transition: "all 0.3s ease",
   "@media": {
@@ -223,26 +211,13 @@ export const stepTitle = style({
   },
 });
 
-export const stepSubtitle = style({
-  fontSize: 14,
-  color: "#666",
-  textAlign: "center",
-  marginBottom: 24,
-  fontWeight: 300,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 16,
-      marginBottom: 32,
-    },
-  },
-});
-
 // Service Selection Styles
 export const serviceGrid = style({
   display: "grid",
   gridTemplateColumns: "1fr",
   gap: 16,
   marginTop: 16,
+  marginBottom: 80,
   textAlign: 'left',
   "@media": {
     "screen and (min-width: 768px)": {
@@ -344,6 +319,7 @@ export const barberGrid = style({
   gap: 16,
   marginTop: 12,
   textAlign: 'left',
+  marginBottom: 80,
   "@media": {
     "screen and (min-width: 768px)": {
       gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
@@ -418,10 +394,23 @@ export const barberSocial = style({
 });
 
 // Date & Time Selection Styles
+export const timeColumn = style({
+  flex: "1 1 0",
+  minWidth: 0,
+});
+
+export const timeLabel = style({
+  fontSize: 20,
+  fontWeight: 600,
+  color: text_primary,
+});
+
 export const timeGrid = style({
   display: "grid",
   gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
   gap: 10,
+  marginTop: 12,
+  marginBottom: 80,
   "@media": {
     "screen and (min-width: 768px)": {
       gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
@@ -432,23 +421,23 @@ export const timeGrid = style({
 
 export const timeButton = style({
   padding: 10,
-  backgroundColor: "#ffffff",
-  border: "1px solid #e5e5e5",
+  backgroundColor: darker_bg,
+  border: `2px solid ${text_muted}`,
   borderRadius: 4,
-  color: "#1a1a1a",
-  fontSize: 13,
+  color: text_primary,
+  fontSize: 16,
   cursor: "pointer",
   textAlign: "center",
   transition: "all 0.2s ease",
-  fontWeight: 400,
+  fontWeight: 500,
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: 12,
-      fontSize: 14,
+      fontSize: 16,
     },
   },
   ":hover": {
-    borderColor: "#1a1a1a",
+    borderColor: button,
+    color: button,
   },
   ":active": {
     transform: "scale(0.95)",
@@ -456,85 +445,119 @@ export const timeButton = style({
 });
 
 export const timeButtonActive = style({
-  borderColor: "#1a1a1a",
-  backgroundColor: "#1a1a1a",
-  color: "#ffffff",
+  borderColor: button,
+  color: button,
+});
+
+export const noTimesMessage = style({
+  padding: 20,
+  textAlign: "center",
+  // backgroundColor: dark_bg,
+  borderRadius: 6,
+  border: `1px solid ${border_subtle}`,
+  color: text_secondary,
+  fontSize: 14,
 });
 
 // Confirmation Styles
+export const confirmContainer = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 12,
+  alignItems: "center",
+});
+
 export const confirmCard = style({
-  marginTop: 24,
-  padding: 24,
-  backgroundColor: "#ffffff",
-  borderRadius: 4,
-  border: "1px solid #e5e5e5",
+  // marginTop: 12,
+  marginBottom: 100,
+  padding: 16,
+  backgroundColor: dark_bg,
+  borderRadius: 8,
+  border: `1px solid ${border_subtle}`,
+  boxShadow: "0 12px 32px rgba(0,0,0,0.6)",  
   maxWidth: 600,
-  margin: "24px auto",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
   "@media": {
     "screen and (min-width: 768px)": {
-      marginTop: 32,
+      // marginTop: 24,
       padding: 40,
-      margin: "32px auto",
+      // margin: "32px auto",
     },
   },
 });
 
 export const confirmSection = style({
-  marginBottom: 24,
-  paddingBottom: 24,
-  borderBottom: "1px solid #f0f0f0",
+  display: "flex",
+  flexDirection: "column",
+  // gap: 10,
+  paddingBottom: 16,
+  marginBottom: 16,
+  borderBottom: "1px solid rgba(255,255,255,0.08)",
+  alignItems: 'center',
+
+  "@media": {
+    "screen and (min-width: 768px)": {
+      gap: 14,
+      paddingBottom: 28,
+      marginBottom: 28,
+      flexDirection: "row",
+    },
+  },
 });
 
 export const confirmLabel = style({
-  fontSize: 11,
+  fontSize: 14,
   color: "#999",
-  marginBottom: 8,
+  // marginBottom: 8,
   textTransform: "uppercase",
   letterSpacing: "0.1em",
   fontWeight: 600,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
 });
 
 export const confirmValue = style({
   fontSize: 20,
   fontWeight: 500,
-  color: "#1a1a1a",
-  marginBottom: 4,
+  color: text_primary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 24,
+    },
+  },
 });
 
 export const confirmDetail = style({
   fontSize: 14,
-  color: "#666",
-  fontWeight: 300,
+  color: text_muted,
+  fontWeight: 400,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 18,
+    },
+  },
 });
 
 export const priceAmount = style({
-  fontSize: 36,
-  fontWeight: 300,
-  color: "#1a1a1a",
-  marginBottom: 8,
+  fontSize: 28,
+  fontWeight: 400,
+  color: text_primary,
 });
 
 export const policySection = style({
-  padding: 20,
-  backgroundColor: "#fafafa",
+  padding: 12,
+  backgroundColor: "#fef3c7",
   borderRadius: 4,
-  border: "1px solid #e5e5e5",
-  marginBottom: 24,
-});
-
-export const policyTitle = style({
-  fontSize: 14,
-  fontWeight: 600,
-  color: "#1a1a1a",
-  marginBottom: 12,
+  border: "1px solid #fcd34d",
+  marginBottom: 20,
 });
 
 export const policyText = style({
-  fontSize: 13,
-  color: "#666",
-  lineHeight: 1.6,
-  fontWeight: 300,
+  fontSize: 15,
+  color: "#92400e",
+  fontWeight: 400,
 });
 
 // Button Styles
@@ -571,27 +594,28 @@ export const backButton = style({
 });
 
 export const confirmButton = style({
-  padding: "14px 28px",
-  backgroundColor: "#1a1a1a",
-  border: "none",
-  borderRadius: 4,
-  color: "#ffffff",
-  fontSize: 15,
+  padding: "12px 24px",
+  fontSize: 18,
   fontWeight: 500,
+  backgroundColor: button,
+  color: "#1a1a1a",
+  borderRadius: 8,
+  border: `1px solid ${text_muted}`,
   cursor: "pointer",
   transition: "all 0.3s ease",
   letterSpacing: "0.05em",
+  ':hover': {
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
+  },
+  ":active": {
+    transform: "translateY(0)",
+  },
   "@media": {
     "screen and (min-width: 768px)": {
       padding: "16px 32px",
-      fontSize: 16,
+      fontSize: 20,
     },
-  },
-  ":hover": {
-    backgroundColor: "#333",
-  },
-  ":active": {
-    transform: "scale(0.98)",
   },
 });
 

@@ -1,163 +1,169 @@
-import { style, globalStyle } from '@vanilla-extract/css';
+import { style, globalStyle } from "@vanilla-extract/css";
+
+const darker_bg = "#101214";
+const dark_bg = "#222222";
+const text_primary = "#f5f5f5";
+const text_muted = "#8a8a8a";
+const accent = "#96cfe0";
+// const border_subtle = "rgba(255,255,255,0.08)";
+const border_hover = "rgba(255,255,255,0.18)";
+
+export const dateTimeLayout = style({
+  display: "flex",
+  flexDirection: "column",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 16,
+    },
+  },
+});
+
+export const dateColumn = style({
+  position: "relative",
+  width: "fit-content",
+});
 
 export const calendarContainer = style({
-  padding: '16px',
-  backgroundColor: '#ffffff',
-  borderRadius: 4,
-  border: '1px solid #e5e5e5',
-  maxWidth: 600,
-  margin: '0 auto',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '24px',
+  // padding: 20,
+  // backgroundColor: darker_bg,
+  // borderRadius: 8,
+  // border: `1px solid ${border_subtle}`,
+  // boxShadow: "0 12px 32px rgba(0,0,0,0.6)",
+  marginTop: 12,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 24,
+      marginTop: 0,
     },
   },
 });
 
-export const calendarWrapper = style({});
-
-// React Day Picker global styles
-globalStyle(`${calendarWrapper} .rdp`, {
-  fontSize: '14px',
-  margin: 0,
+export const rdpRoot = style({
+  color: text_primary,
+  fontSize: 18,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 20,
+    },
+  },
 });
 
-globalStyle(`${calendarWrapper} .rdp-months`, {
-  justifyContent: 'center',
+export const captionLabel = style({
+  textAlign: "center",
+  fontSize: 24,
+  fontWeight: 600,
+  color: text_primary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+        fontSize: 24,
+    },
+  },
 });
 
-globalStyle(`${calendarWrapper} .rdp-month`, {
-  width: '100%',
+export const nav = style({
+  position: "absolute",
+  left: 4,
+  right: 4,
+  display: "flex",
+  justifyContent: "space-between",
+  pointerEvents: "none",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      left: 80,
+      right: 80,    
+    },
+  },
 });
 
-globalStyle(`${calendarWrapper} .rdp-caption`, {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: '16px',
-  padding: '0 8px',
+globalStyle(`${nav} button`, {
+  all: "unset",
+  pointerEvents: "auto",
+  cursor: "pointer",
+  width: 32,
+  height: 32,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
 });
 
-globalStyle(`${calendarWrapper} .rdp-caption_label`, {
-  fontSize: '16px',
-  fontWeight: 500,
-  color: '#1a1a1a',
-});
-
-globalStyle(`${calendarWrapper} .rdp-nav`, {
-  display: 'flex',
-  gap: '8px',
-});
-
-globalStyle(`${calendarWrapper} .rdp-nav_button`, {
-  width: '32px',
-  height: '32px',
-  padding: 0,
-  border: '1px solid #e5e5e5',
-  borderRadius: '4px',
-  backgroundColor: '#ffffff',
-  color: '#1a1a1a',
-  cursor: 'pointer',
-  transition: 'all 0.2s',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-});
-
-globalStyle(`${calendarWrapper} .rdp-nav_button:hover:not([disabled])`, {
-  borderColor: '#1a1a1a',
-  backgroundColor: '#f0f0f0',
-});
-
-globalStyle(`${calendarWrapper} .rdp-nav_button[disabled]`, {
+globalStyle(`${nav} button:disabled`, {
   opacity: 0.3,
-  cursor: 'not-allowed',
+  cursor: "not-allowed",
 });
 
-globalStyle(`${calendarWrapper} .rdp-head_cell`, {
-  fontWeight: 500,
-  fontSize: '12px',
-  color: '#666',
-  textTransform: 'uppercase',
-  padding: '8px',
+globalStyle(`${nav} button svg`, {
+  width: 20,
+  height: 20,
+  stroke: text_primary,
+  strokeWidth: 2.5,
+  transition: "opacity 0.15s ease",
 });
 
-globalStyle(`${calendarWrapper} .rdp-cell`, {
-  padding: '2px',
+globalStyle(`${nav} button:hover svg`, {
+  opacity: 0.6,
 });
 
-globalStyle(`${calendarWrapper} .rdp-day`, {
-  width: '40px',
-  height: '40px',
-  border: '1px solid transparent',
-  borderRadius: '4px',
-  fontSize: '14px',
+export const day = style({
+  width: 34,
+  height: 34,
+  borderRadius: 6,
+  backgroundColor: darker_bg,
+  border: `1px solid ${text_muted}`,
+  color: text_primary,
+  fontSize: 16,
   fontWeight: 400,
-  color: '#1a1a1a',
-  cursor: 'pointer',
-  transition: 'all 0.2s',
-  backgroundColor: '#ffffff',
-});
+  cursor: "pointer",
+  transition: "all 0.15s ease",
 
-globalStyle(`${calendarWrapper} .rdp-day:hover:not([disabled]):not(.rdp-day_selected)`, {
-  backgroundColor: '#f0f0f0',
-  borderColor: '#d0d0d0',
-});
+  ":hover": {
+    backgroundColor: dark_bg,
+    borderColor: border_hover,
+  },
+  selectors: {
+    /* SELECTED — highest priority */
+    '&[aria-selected="true"]': {
+      backgroundColor: accent,
+      color: darker_bg,
+      borderColor: accent,
+      fontWeight: 600,
+    },
 
-globalStyle(`${calendarWrapper} .rdp-day_selected`, {
-  backgroundColor: '#1a1a1a !important',
-  color: '#ffffff !important',
-  fontWeight: 500,
-  borderColor: '#1a1a1a !important',
-});
+    /* TODAY but NOT selected */
+    '&[data-today="true"]:not([aria-selected="true"])': {
+      borderColor: accent,
+      color: accent,
+      fontWeight: 700,
+    },
 
-globalStyle(`${calendarWrapper} .rdp-day_today`, {
-  borderColor: '#1a1a1a',
-  fontWeight: 500,
-});
-
-globalStyle(`${calendarWrapper} .rdp-day_disabled`, {
-  opacity: 0.3,
-  cursor: 'not-allowed',
-  color: '#999',
-});
-
-globalStyle(`${calendarWrapper} .rdp-day_outside`, {
-  opacity: 0.3,
-  color: '#999',
-});
-
-globalStyle(`${calendarWrapper} .rdp-day_unavailable`, {
-  opacity: 0.3,
-  textDecoration: 'line-through',
-  cursor: 'not-allowed',
-});
-
-export const timeSelectionWrapper = style({
-  marginTop: '24px',
-  paddingTop: '24px',
-  borderTop: '2px solid #f0f0f0',
-});
-
-export const timeLabel = style({
-  fontSize: '16px',
-  fontWeight: 500,
-  marginBottom: '12px',
-  color: '#1a1a1a',
-  display: 'block',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      fontSize: '18px',
-      marginBottom: '16px',
+    /* DISABLED */
+    '&:disabled, &[aria-disabled="true"], &[data-disabled="true"]': {
+      opacity: 0.35,
+      color: text_muted,
+      cursor: "not-allowed",
+      pointerEvents: "none",
+    },
+  },
+  "@media": {
+    "screen and (min-width: 768px)": {
+      width: 48,
+      height: 48,  
+      fontSize: 18, 
     },
   },
 });
 
-export const noTimesMessage = style({
-  padding: '20px',
-  textAlign: 'center',
-  backgroundColor: '#f0f0f0',
-  borderRadius: '4px',
-  color: '#666',
-  fontSize: '14px',
+export const dayButton = style({
+  all: "unset",
+  width: "100%",
+  height: "100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "inherit",
+  fontSize: "inherit",
+  fontWeight: "inherit",
 });
+
+

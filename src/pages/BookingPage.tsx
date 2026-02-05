@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { DayPicker } from 'react-day-picker';
-import { addDays, format, isBefore, startOfDay, getDay } from 'date-fns';
+import { addMonths, format, isBefore, startOfDay, getDay } from 'date-fns';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
 import type { Barber, Service, BarberServicePricing, BarberAvailability, BarberTimeOff, Booking } from '../types/database.types';
@@ -11,7 +11,7 @@ import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/booking.css';
 import * as calendarStyles from '../styles/calendar.css';
-import 'react-day-picker/dist/style.css';
+// import 'react-day-picker/dist/style.css';
 
 type BookingStep = 1 | 2 | 3 | 4;
 
@@ -301,8 +301,6 @@ export default function BookingPage() {
     }
   };
 
-
-
   // Check if a date is available for the selected barber
   const isDateAvailable = (date: Date): boolean => {
     const dayOfWeek = getDay(date); // 0 = Sunday, 6 = Saturday
@@ -502,14 +500,14 @@ export default function BookingPage() {
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
-  const resetBooking = () => {
-    setSelectedService(null);
-    setSelectedBarber(null);
-    setAnyBarber(false);
-    setSelectedDate(undefined);
-    setSelectedTime('');
-    setStep(1);
-  };
+  // const resetBooking = () => {
+  //   setSelectedService(null);
+  //   setSelectedBarber(null);
+  //   setAnyBarber(false);
+  //   setSelectedDate(undefined);
+  //   setSelectedTime('');
+  //   setStep(1);
+  // };
 
   // if (loading) {
   //   return (
@@ -523,30 +521,17 @@ export default function BookingPage() {
   // }
 
   const today = startOfDay(new Date());
-  const twoMonthsFromNow = addDays(today, 60);
+  const endMonth = addMonths(today, 6);
 
   return (
     <>
       <Navigation />
       <View className={styles.container}>
-      <View className={styles.header}>
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            navigate(-1);
-          }}
-          className={`${styles.backLink} ${styles.link}`}
-        >
-          ← Back
-        </a>
-        {/* <Text className={styles.title}>
-          {isReschedule ? 'Reschedule Appointment' : 'Book Appointment'} */}
-        {/* </Text> */}
-        {/* <Link to={isReschedule ? '/dashboard' : '/'} className={styles.backLink}>
-          {isReschedule ? '← Back to Dashboard' : '← Back to Home'}
-        </Link> */}
-      </View>
+        <View className={styles.backLink}>
+          <Link to={user ? '/dashboard' : '/'} className={styles.link}>
+            ← Back
+          </Link>
+        </View>
 
       {isReschedule && (
         <View className={styles.rescheduleNotice}>
@@ -663,59 +648,83 @@ export default function BookingPage() {
         </View>
       )}
 
-      {/* Step 3: Select Date & Time */}
       {step === 3 && (
         <View className={styles.stepContainer}>
           <button className={styles.backButton} onClick={() => setStep(2)}>
             ← Back to Barber
           </button>
-          {/* <Text className={styles.stepTitle}>Pick Date & Time</Text> */}
-          {/* <Text className={styles.stepSubtitle}>
-            {selectedService?.name} with {anyBarber ? 'any available barber' : selectedBarber?.name}
-          </Text> */}
 
-          <View className={calendarStyles.calendarContainer}>
-            <View className={calendarStyles.calendarWrapper}>
-              <DayPicker
-                mode="single"
-                selected={selectedDate}
-                onSelect={handleDateSelect}
-                disabled={(date) => {
-                  return isBefore(date, today) || !isDateAvailable(date);
-                }}
-                startMonth={today}
-                endMonth={twoMonthsFromNow}
-                modifiers={{
-                  unavailable: (date) => !isDateAvailable(date),
-                }}
-              />
+          {/* Date + Time Layout */}
+          <View className={calendarStyles.dateTimeLayout}>
+            
+            {/* DATE COLUMN */}
+            <View className={calendarStyles.dateColumn}>
+              <View className={calendarStyles.calendarContainer}>
+                <DayPicker
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={handleDateSelect}
+                  disabled={(date) =>
+                    isBefore(date, today) || !isDateAvailable(date)
+                  }
+                  startMonth={today}
+                  endMonth={endMonth}
+                  modifiers={{
+                    unavailable: (date) => !isDateAvailable(date),
+                  }}
+                  classNames={{
+                    root: calendarStyles.rdpRoot,
+                    caption_label: calendarStyles.captionLabel,
+                    nav: calendarStyles.nav,
+                    day: calendarStyles.day,
+                    day_button: calendarStyles.dayButton,
+                  }}
+                />
+              </View>
             </View>
 
+            {/* TIME COLUMN */}
             {selectedDate && (
-              <View className={calendarStyles.timeSelectionWrapper}>
-                <Text className={calendarStyles.timeLabel}>Available Times</Text>
-                <View className={styles.timeGrid}>
-                  {getAvailableTimeSlots().length > 0 ? (
-                    getAvailableTimeSlots().map((time) => {
-                      // Show time period label only if specific barber is selected
-                      const timePeriodLabel = selectedBarber ?
-                        (getTimePeriod(time, selectedBarber) === 'evening' ? ' (Evening)' : '') : '';
+              <View className={styles.timeColumn}>
+                <View className={calendarStyles.calendarContainer}>
+                  <Text className={styles.timeLabel}>
+                    {selectedDate
+                      ? selectedDate.toLocaleDateString("en-US", {
+                          weekday: "long",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : "Available Times"}
+                  </Text>
 
-                      return (
-                        <button
-                          key={time}
-                          className={`${styles.timeButton} ${selectedTime === time ? styles.timeButtonActive : ''}`}
-                          onClick={() => handleTimeSelect(time)}
-                        >
-                          {formatTimeTo12Hour(time)}{timePeriodLabel}
-                        </button>
-                      );
-                    })
-                  ) : (
-                    <Text className={calendarStyles.noTimesMessage}>
-                      No available times for this date. Please select another date.
-                    </Text>
-                  )}
+                  <View className={styles.timeGrid}>
+                    {getAvailableTimeSlots().length > 0 ? (
+                      getAvailableTimeSlots().map((time) => {
+                        const timePeriodLabel = selectedBarber
+                          ? getTimePeriod(time, selectedBarber) === "evening"
+                            ? " (Evening)"
+                            : ""
+                          : "";
+
+                        return (
+                          <button
+                            key={time}
+                            className={`${styles.timeButton} ${
+                              selectedTime === time ? styles.timeButtonActive : ""
+                            }`}
+                            onClick={() => handleTimeSelect(time)}
+                          >
+                            {formatTimeTo12Hour(time)}
+                            {timePeriodLabel}
+                          </button>
+                        );
+                      })
+                    ) : (
+                      <Text className={styles.noTimesMessage}>
+                        No available times. Please select another date.
+                      </Text>
+                    )}
+                  </View>
                 </View>
               </View>
             )}
@@ -726,68 +735,72 @@ export default function BookingPage() {
       {/* Step 4: Confirm & Pay */}
       {step === 4 && (
         <View className={styles.stepContainer}>
-          <Text className={styles.stepTitle}>Confirm Your Booking</Text>
+          <View className={styles.confirmContainer}>
+            <button className={styles.backButton} onClick={() => setStep(3)}>
+              ← Back to Date & Time
+            </button>
+            <Text className={styles.stepTitle}>Confirm Your Booking</Text>
 
-          <View className={styles.confirmCard}>
-            <View className={styles.confirmSection}>
-              <Text className={styles.confirmLabel}>Service</Text>
-              <Text className={styles.confirmValue}>{selectedService?.name}</Text>
-              <Text className={styles.confirmDetail}>
-                {selectedService?.duration_minutes} minutes
-              </Text>
-            </View>
-
-            <View className={styles.confirmSection}>
-              <Text className={styles.confirmLabel}>Barber</Text>
-              <Text className={styles.confirmValue}>
-                {anyBarber ? 'Any Available' : selectedBarber?.name}
-              </Text>
-            </View>
-
-            <View className={styles.confirmSection}>
-              <Text className={styles.confirmLabel}>Date & Time</Text>
-              <Text className={styles.confirmValue}>{selectedDate ? formatDate(selectedDate) : ''}</Text>
-              <Text className={styles.confirmDetail}>{selectedTime ? formatTimeTo12Hour(selectedTime) : ''}</Text>
-            </View>
-
-            {selectedBarber && (
+            <View className={styles.confirmCard}>
               <View className={styles.confirmSection}>
-                <Text className={styles.confirmLabel}>Price</Text>
-                <Text className={styles.priceAmount}>${calculatePrice().toFixed(2)}</Text>
+                <Text className={styles.confirmLabel}>Service</Text>
+                <Text className={styles.confirmValue}>{selectedService?.name}</Text>
                 <Text className={styles.confirmDetail}>
-                  {getTimePeriod(selectedTime, selectedBarber) === 'evening'
-                    ? `Evening rate (${formatTimeTo12Hour(selectedBarber.evening_hours_start)}-${formatTimeTo12Hour(selectedBarber.evening_hours_end)})`
-                    : `Regular rate (${formatTimeTo12Hour(selectedBarber.regular_hours_start)}-${formatTimeTo12Hour(selectedBarber.regular_hours_end)})`}
+                  {selectedService?.duration_minutes} minutes
                 </Text>
               </View>
-            )}
 
-            <View className={styles.policySection}>
-              <Text className={styles.policyTitle}>Cancellation Policy</Text>
-              <Text className={styles.policyText}>
-                Cancellations must be made at least 12 hours before your appointment.
-                Cancellations within 12 hours will incur a 50% cancellation fee.
-              </Text>
-            </View>
+              <View className={styles.confirmSection}>
+                <Text className={styles.confirmLabel}>Barber</Text>
+                <Text className={styles.confirmValue}>
+                  {anyBarber ? 'Any Available' : selectedBarber?.name}
+                </Text>
+              </View>
 
-            <View className={styles.buttonGroup}>
-              <button
-                className={styles.confirmButton}
-                onClick={handleBooking}
-                disabled={bookingInProgress}
-              >
-                {bookingInProgress
-                  ? (isReschedule ? 'Rescheduling...' : 'Booking...')
-                  : user
-                    ? (isReschedule ? 'Confirm Reschedule' : 'Confirm Booking')
-                    : 'Login to Book'}
-              </button>
-              <button className={styles.backButton} onClick={() => setStep(3)}>
-                ← Back to Date & Time
-              </button>
-              <button className={styles.cancelButton} onClick={resetBooking}>
-                Start Over
-              </button>
+              <View className={styles.confirmSection}>
+                <Text className={styles.confirmLabel}>Date & Time</Text>
+                <Text className={styles.confirmValue}>{selectedDate ? formatDate(selectedDate) : ''}</Text>
+                <Text className={styles.confirmValue}>{selectedTime ? formatTimeTo12Hour(selectedTime) : ''}</Text>
+              </View>
+
+              {selectedBarber && (
+                <View className={styles.confirmSection}>
+                  <Text className={styles.confirmLabel}>Price</Text>
+                  <Text className={styles.priceAmount}>${calculatePrice().toFixed(2)}</Text>
+                  <Text className={styles.confirmDetail}>
+                    {getTimePeriod(selectedTime, selectedBarber) === 'evening'
+                      ? `Evening rate (${formatTimeTo12Hour(selectedBarber.evening_hours_start)}-${formatTimeTo12Hour(selectedBarber.evening_hours_end)})`
+                      : `Regular rate (${formatTimeTo12Hour(selectedBarber.regular_hours_start)}-${formatTimeTo12Hour(selectedBarber.regular_hours_end)})`}
+                  </Text>
+                </View>
+              )}
+
+              <View className={styles.policySection}>
+                {/* <Text className={styles.policyTitle}>Cancellation Policy</Text> */}
+                <Text className={styles.policyText}>
+                  Cancellations within 12 hours will incur a 50% cancellation fee.
+                </Text>
+              </View>
+
+              <View className={styles.buttonGroup}>
+                <button
+                  className={styles.confirmButton}
+                  onClick={handleBooking}
+                  disabled={bookingInProgress}
+                >
+                  {bookingInProgress
+                    ? (isReschedule ? 'Rescheduling...' : 'Booking...')
+                    : user
+                      ? (isReschedule ? 'Confirm Reschedule' : 'Confirm Booking')
+                      : 'Login to Book'}
+                </button>
+                {/* <button className={styles.backButton} onClick={() => setStep(3)}>
+                  ← Back to Date & Time
+                </button> */}
+                {/* <button className={styles.cancelButton} onClick={resetBooking}>
+                  Start Over
+                </button> */}
+              </View>
             </View>
           </View>
         </View>
