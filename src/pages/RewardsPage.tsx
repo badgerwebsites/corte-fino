@@ -1,6 +1,6 @@
 // pages/RewardsPage.tsx
 import { useEffect, useState, useCallback } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
 import type { Reward, RewardRedemptionWithDetails } from '../types/database.types';
@@ -22,15 +22,31 @@ const generateRedemptionCode = (): string => {
 export default function RewardsPage() {
   const { user, customer, refreshCustomer } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [pendingRedemptions, setPendingRedemptions] = useState<RewardRedemptionWithDetails[]>([]);
   const [activeCode, setActiveCode] = useState<string | null>(null);
+  const [rewardsEnabled, setRewardsEnabled] = useState<boolean | null>(null);
+
+  // Check if rewards are enabled
+  useEffect(() => {
+    const checkRewardsEnabled = async () => {
+      const { data } = await supabase.from('site_settings').select('rewards_enabled').single();
+      const enabled = data?.rewards_enabled !== false;
+      setRewardsEnabled(enabled);
+      if (!enabled) {
+        navigate(user ? '/dashboard' : '/', { replace: true });
+      }
+    };
+    checkRewardsEnabled();
+  }, [navigate, user]);
 
   // Refetch rewards and customer data when navigating to this page
   useEffect(() => {
+    if (rewardsEnabled === false) return;
     loadRewards();
     refreshCustomer();
-  }, [location.key, refreshCustomer]);
+  }, [location.key, refreshCustomer, rewardsEnabled]);
 
   const loadRewards = async () => {
     try {
@@ -162,6 +178,11 @@ export default function RewardsPage() {
       alert('Failed to cancel redemption');
     }
   };
+
+  // Don't render until we know rewards are enabled
+  if (rewardsEnabled === null || rewardsEnabled === false) {
+    return null;
+  }
 
   return (
     <>

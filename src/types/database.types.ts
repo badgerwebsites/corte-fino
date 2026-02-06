@@ -181,6 +181,7 @@ export interface SiteSettings {
   nav_logo_1_url?: string;
   nav_logo_2_url?: string;
   nav_logo_3_url?: string;
+  rewards_enabled?: boolean;
   created_at: string;
   updated_at: string;
 }

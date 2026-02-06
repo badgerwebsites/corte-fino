@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase.ts';
-import type { BookingWithDetails } from '../types/database.types.ts';
+import type { BookingWithDetails, SiteSettings } from '../types/database.types.ts';
 import { Navigation } from '../components/Navigation.tsx';
 import { View } from '../ui/View.tsx';
 import { Text } from '../ui/Text.tsx';
@@ -12,6 +12,7 @@ import * as styles from '../styles/dashboard.css.ts';
 export default function CustomerDashboardPage() {
   const { user, customer, refreshCustomer } = useAuth();
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancellingBooking, setCancellingBooking] = useState<BookingWithDetails | null>(null);
   const [cancelling, setCancelling] = useState(false);
@@ -36,32 +37,36 @@ export default function CustomerDashboardPage() {
       return;
     }
 
-    const loadBookings = async () => {
+    const loadData = async () => {
       try {
         const today = new Date().toISOString().split('T')[0];
-        const { data, error } = await supabase
-          .from('bookings')
-          .select(`
-            *,
-            barber:barbers(*),
-            service:services(*)
-          `)
-          .eq('customer_id', user.id)
-          .in('status', ['pending', 'confirmed'])
-          .gte('booking_date', today)
-          .order('booking_date', { ascending: true });
+        const [bookingsRes, settingsRes] = await Promise.all([
+          supabase
+            .from('bookings')
+            .select(`
+              *,
+              barber:barbers(*),
+              service:services(*)
+            `)
+            .eq('customer_id', user.id)
+            .in('status', ['pending', 'confirmed'])
+            .gte('booking_date', today)
+            .order('booking_date', { ascending: true }),
+          supabase.from('site_settings').select('*').single(),
+        ]);
 
-        if (error) throw error;
+        if (bookingsRes.error) throw bookingsRes.error;
 
         // Filter out appointments that ended more than 1 hour ago
         const now = new Date();
-        const filtered = (data || []).filter(booking => {
+        const filtered = (bookingsRes.data || []).filter(booking => {
           const endDateTime = new Date(`${booking.booking_date}T${booking.end_time}`);
           const oneHourAfterEnd = new Date(endDateTime.getTime() + 60 * 60 * 1000);
           return now < oneHourAfterEnd;
         });
 
         setBookings(filtered);
+        setSiteSettings(settingsRes.data || null);
       } catch (error) {
         console.error('Error loading bookings:', error);
       } finally {
@@ -69,7 +74,7 @@ export default function CustomerDashboardPage() {
       }
     };
 
-    loadBookings();
+    loadData();
   }, [user, navigate]);
 
   const loadBookings = async () => {
@@ -159,9 +164,17 @@ export default function CustomerDashboardPage() {
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
+  // Parse date string to local Date object (avoids UTC timezone issues)
+  const parseLocalDate = (dateStr: string): Date => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
   const formatDateShort = (dateStr: string): string => {
-    const date = new Date(dateStr);
-    const today = new Date(new Date().toDateString());
+    const date = parseLocalDate(dateStr);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -209,7 +222,9 @@ export default function CustomerDashboardPage() {
                 </svg>
                 <Text className={styles.emptyStateTitle}>No upcoming appointments</Text>
                 <Text className={styles.emptyStateText}>
-                  Book your first appointment and start earning reward points.
+                  {siteSettings?.rewards_enabled !== false
+                    ? 'Book your first appointment and start earning reward points.'
+                    : 'Book your first appointment today.'}
                 </Text>
                 <Link to="/book" className={styles.emptyStateButton}>
                   Book Appointment
@@ -264,34 +279,36 @@ export default function CustomerDashboardPage() {
           </View>
 
           {/* Rewards Card */}
-          <View className={styles.section}>
-            <View className={styles.rewardsCard}>
-              <View className={styles.rewardsInfo}>
-                <svg
-                  className={styles.rewardsIcon}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <rect x="3" y="8" width="18" height="13" rx="2" />
-                  <line x1="12" y1="8" x2="12" y2="21" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <path d="M12 8c0-2-1.5-4-3-4-1.5 0-2.5 1-2.5 2.5C6.5 8 9 8 12 8z" />
-                  <path d="M12 8c0-2 1.5-4 3-4 1.5 0 2.5 1 2.5 2.5C17.5 8 15 8 12 8z" />
-                </svg>
-                <Text className={styles.rewardsText}>
-                  <span className={styles.rewardsPoints}>{customer?.reward_points || 0}</span> points
-                </Text>
+          {siteSettings?.rewards_enabled !== false && (
+            <View className={styles.section}>
+              <View className={styles.rewardsCard}>
+                <View className={styles.rewardsInfo}>
+                  <svg
+                    className={styles.rewardsIcon}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <rect x="3" y="8" width="18" height="13" rx="2" />
+                    <line x1="12" y1="8" x2="12" y2="21" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <path d="M12 8c0-2-1.5-4-3-4-1.5 0-2.5 1-2.5 2.5C6.5 8 9 8 12 8z" />
+                    <path d="M12 8c0-2 1.5-4 3-4 1.5 0 2.5 1 2.5 2.5C17.5 8 15 8 12 8z" />
+                  </svg>
+                  <Text className={styles.rewardsText}>
+                    <span className={styles.rewardsPoints}>{customer?.reward_points || 0}</span> points
+                  </Text>
+                </View>
+                <Link to="/rewards" className={styles.rewardsLink}>
+                  Rewards
+                </Link>
               </View>
-              <Link to="/rewards" className={styles.rewardsLink}>
-                Rewards
-              </Link>
             </View>
-          </View>
+          )}
         </View>
       </View>
 
@@ -304,7 +321,7 @@ export default function CustomerDashboardPage() {
             </div>
             <View className={styles.modalBookingInfo}>
               <Text className={styles.modalBookingDate}>
-                {new Date(cancellingBooking.booking_date).toLocaleDateString('en-US', {
+                {parseLocalDate(cancellingBooking.booking_date).toLocaleDateString('en-US', {
                   weekday: 'long',
                   month: 'long',
                   day: 'numeric',

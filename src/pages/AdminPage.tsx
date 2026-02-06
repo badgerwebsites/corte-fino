@@ -498,13 +498,13 @@ export default function AdminPage() {
   };
 
   // Site Settings Management
-  const handleSiteSettingChange = async (field: 'hero_background_url' | 'hero_logo_url' | 'nav_logo_1_url' | 'nav_logo_2_url' | 'nav_logo_3_url', url: string | null) => {
+  const handleSiteSettingChange = async (field: 'hero_background_url' | 'hero_logo_url' | 'nav_logo_1_url' | 'nav_logo_2_url' | 'nav_logo_3_url' | 'rewards_enabled', value: string | boolean | null) => {
     try {
       if (siteSettings) {
         // Update existing settings
         const { error } = await supabase
           .from('site_settings')
-          .update({ [field]: url })
+          .update({ [field]: value })
           .eq('id', siteSettings.id);
 
         if (error) throw error;
@@ -512,14 +512,16 @@ export default function AdminPage() {
         // Create new settings row
         const { error } = await supabase
           .from('site_settings')
-          .insert([{ [field]: url }]);
+          .insert([{ [field]: value }]);
 
         if (error) throw error;
       }
 
       loadData();
-      const fieldName = field === 'hero_background_url' ? 'Hero background' : 'Hero logo';
-      alert(`${fieldName} updated successfully!`);
+      if (field !== 'rewards_enabled') {
+        const fieldName = field === 'hero_background_url' ? 'Hero background' : 'Hero logo';
+        alert(`${fieldName} updated successfully!`);
+      }
     } catch (error) {
       console.error(`Error updating ${field}:`, error);
       alert(`Failed to update setting`);
@@ -1015,6 +1017,24 @@ export default function AdminPage() {
           </View>
 
           <View className={styles.form}>
+            {/* Rewards Program Toggle */}
+            <View className={styles.formGroup}>
+              <Text className={styles.subsectionTitle}>Rewards Program</Text>
+              <Text className={styles.sectionDescription}>
+                Enable or disable the rewards program. When disabled, the rewards section will be hidden from customers.
+              </Text>
+              <View style={{ marginTop: '1rem' }}>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={siteSettings?.rewards_enabled !== false}
+                    onChange={(e) => handleSiteSettingChange('rewards_enabled', e.target.checked)}
+                  />
+                  <Text>Enable rewards program</Text>
+                </label>
+              </View>
+            </View>
+
             {/* Navigation Carousel Logos */}
             <View className={styles.formGroup}>
               <Text className={styles.subsectionTitle}>Navigation Carousel Logos</Text>
