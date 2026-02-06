@@ -183,3 +183,81 @@ export const link = style({
     color: '#6faec6',
   },
 });
+
+export const modalOverlay = style({
+  position: 'fixed',
+  inset: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1000,
+  padding: 24,
+});
+
+export const modal = style({
+  backgroundColor: dark_bg,
+  borderRadius: 16,
+  padding: 32,
+  maxWidth: 400,
+  width: '100%',
+  textAlign: 'center',
+  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+});
+
+export const modalIcon = style({
+  width: 64,
+  height: 64,
+  margin: '0 auto 20px',
+  backgroundColor: 'rgba(150, 207, 224, 0.15)',
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
+export const modalIconSvg = style({
+  width: 32,
+  height: 32,
+  color: button,
+});
+
+export const modalTitle = style({
+  fontSize: 22,
+  fontWeight: 700,
+  color: '#ffffff',
+  marginBottom: 12,
+});
+
+export const modalMessage = style({
+  fontSize: 16,
+  color: '#9ca3af',
+  lineHeight: 1.5,
+  marginBottom: 24,
+});
+
+export const modalButton = style({
+  width: '100%',
+  padding: '14px 24px',
+  fontSize: 16,
+  fontWeight: 600,
+  backgroundColor: button,
+  color: '#1f1f1f',
+  border: 'none',
+  borderRadius: 10,
+  cursor: 'pointer',
+  transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+  ':hover': {
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
+  },
+});
+
+export const success = style({
+  padding: 12,
+  borderRadius: 8,
+  backgroundColor: '#f0fdf4',
+  color: '#166534',
+  fontSize: 14,
+  border: '1px solid #bbf7d0',
+});

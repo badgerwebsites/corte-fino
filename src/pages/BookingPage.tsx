@@ -111,6 +111,56 @@ export default function BookingPage() {
     }
   }, [loading, locationState, services, barbers]);
 
+  // Restore booking state after login (if user was redirected from booking flow)
+  useEffect(() => {
+    if (!loading && user && services.length > 0 && barbers.length > 0) {
+      const savedState = localStorage.getItem('pendingBooking');
+      if (savedState) {
+        try {
+          const bookingState = JSON.parse(savedState);
+
+          // Restore service
+          if (bookingState.serviceId) {
+            const service = services.find(s => s.id === bookingState.serviceId);
+            if (service) {
+              setSelectedService(service);
+            }
+          }
+
+          // Restore barber
+          if (bookingState.barberId) {
+            const barber = barbers.find(b => b.id === bookingState.barberId);
+            if (barber) {
+              setSelectedBarber(barber);
+            }
+          }
+          setAnyBarber(bookingState.anyBarber || false);
+
+          // Restore date
+          if (bookingState.selectedDate) {
+            setSelectedDate(new Date(bookingState.selectedDate));
+          }
+
+          // Restore time
+          if (bookingState.selectedTime) {
+            setSelectedTime(bookingState.selectedTime);
+          }
+
+          // Restore step
+          if (bookingState.step) {
+            setStep(bookingState.step);
+          }
+
+          // Clear the saved state so it doesn't persist on future visits
+          localStorage.removeItem('pendingBooking');
+        } catch (e) {
+          console.error('Error restoring booking state:', e);
+          localStorage.removeItem('pendingBooking');
+        }
+      }
+    }
+  }, [loading, user, services, barbers]);
+
   const loadData = async () => {
     try {
       const [servicesRes, barbersRes, pricingRes, availabilityRes, timeOffRes] = await Promise.all([
@@ -189,8 +239,22 @@ export default function BookingPage() {
     return priceEntry?.price || 0;
   };
 
+  // Save booking state to localStorage before redirecting to login
+  const saveBookingState = () => {
+    const bookingState = {
+      serviceId: selectedService?.id,
+      barberId: selectedBarber?.id,
+      anyBarber,
+      selectedDate: selectedDate?.toISOString(),
+      selectedTime,
+      step,
+    };
+    localStorage.setItem('pendingBooking', JSON.stringify(bookingState));
+  };
+
   const handleBooking = async () => {
     if (!user || !customer) {
+      saveBookingState();
       navigate('/login?redirect=/book');
       return;
     }

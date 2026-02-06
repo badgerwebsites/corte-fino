@@ -68,6 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) throw error;
 
+    // If user was created, try to create the customer record
+    // Don't throw on customer insert failure - the auth user exists and they need to verify email
     if (data.user) {
       const { error: customerError } = await supabase
         .from('customers')
@@ -80,7 +82,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           reward_points: 0,
         });
 
-      if (customerError) throw customerError;
+      if (customerError) {
+        // Log but don't throw - auth user was created successfully
+        // Customer record can be created on first login if needed
+        console.error('Error creating customer record:', customerError);
+      }
     }
   };
 
