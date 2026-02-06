@@ -261,7 +261,7 @@ export const rewardsGrid = style({
   gridTemplateColumns: "1fr",
   gap: 16,
   maxWidth: 1200,
-  margin: "0 auto 12px",
+  marginBottom: 100,
   "@media": {
     "screen and (min-width: 768px)": {
       gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",

@@ -65,9 +65,16 @@ export const link = style({
   },
 });
 
+export const rescheduleNoticeWrapper = style({
+  display: "flex",
+  justifyContent: "center",
+  // marginBottom: 12,
+});
+
 // Reschedule notice
 export const rescheduleNotice = style({
-  maxWidth: 850,
+  // maxWidth: 850,
+  display: "inline-block",
   margin: "0 auto 12px",
   padding: "16px 20px",
   backgroundColor: "#fef3c7",
@@ -87,7 +94,7 @@ export const rescheduleNoticeText = style({
   textAlign: "center",
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 15,
+      fontSize: 16,
     },
   },
 });
@@ -619,28 +626,6 @@ export const confirmButton = style({
   },
 });
 
-export const cancelButton = style({
-  padding: "12px 20px",
-  backgroundColor: "transparent",
-  border: "1px solid #e5e5e5",
-  borderRadius: 4,
-  color: "#666",
-  fontSize: 15,
-  fontWeight: 400,
-  cursor: "pointer",
-  transition: "all 0.2s ease",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      padding: "12px 24px",
-      fontSize: 16,
-    },
-  },
-  ":hover": {
-    borderColor: "#999",
-    color: "#999",
-  },
-});
-
 // Booking Confirmation Screen Styles
 export const confirmationOverlay = style({
   position: "fixed",
@@ -653,17 +638,18 @@ export const confirmationOverlay = style({
   alignItems: "center",
   justifyContent: "center",
   zIndex: 1000,
-  padding: 20,
+  padding: 12,
   animation: `${fadeIn} 0.3s ease-out`,
 });
 
 export const confirmationModal = style({
-  backgroundColor: "#ffffff",
+  backgroundColor: dark_bg,
   borderRadius: 16,
-  padding: 32,
-  maxWidth: 440,
+  padding: 20,
+  maxWidth: 350,
   width: "100%",
   boxShadow: "0 24px 48px rgba(0, 0, 0, 0.16)",
+  border: `1px solid ${border_subtle}`,
   textAlign: "center",
   animation: `${slideInUp} 0.4s ease-out`,
   "@media": {
@@ -674,9 +660,9 @@ export const confirmationModal = style({
 });
 
 export const confirmationIcon = style({
-  width: 72,
-  height: 72,
-  margin: "0 auto 24px",
+  width: 60,
+  height: 60,
+  margin: "0 auto 8px",
   backgroundColor: "#dcfce7",
   borderRadius: "50%",
   display: "flex",
@@ -705,8 +691,7 @@ export const confirmationCheckmark = style({
 export const confirmationTitle = style({
   fontSize: 24,
   fontWeight: 600,
-  color: "#0a0a0a",
-  marginBottom: 12,
+  color: text_primary,
   letterSpacing: "-0.02em",
   "@media": {
     "screen and (min-width: 768px)": {
@@ -715,23 +700,12 @@ export const confirmationTitle = style({
   },
 });
 
-export const confirmationMessage = style({
-  fontSize: 15,
-  color: "#525252",
-  marginBottom: 24,
-  lineHeight: 1.6,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 16,
-    },
-  },
-});
-
 export const confirmationDetails = style({
-  backgroundColor: "#fafafa",
+  backgroundColor: darker_bg,
   borderRadius: 12,
   padding: 20,
-  marginBottom: 28,
+  marginTop: 12,
+  marginBottom: 12,
   textAlign: "left",
 });
 
@@ -754,65 +728,51 @@ export const confirmationDetailRow = style({
 });
 
 export const confirmationDetailLabel = style({
-  fontSize: 13,
-  color: "#737373",
+  fontSize: 14,
+  color: text_secondary,
   fontWeight: 400,
 });
 
 export const confirmationDetailValue = style({
   fontSize: 14,
-  color: "#0a0a0a",
+  color: text_primary,
   fontWeight: 500,
   textAlign: "right",
 });
 
 export const confirmationButtons = style({
-  display: "flex",
-  flexDirection: "column",
-  gap: 12,
-});
-
-export const confirmationPrimaryButton = style({
-  padding: "14px 24px",
-  fontSize: 15,
-  fontWeight: 600,
-  backgroundColor: "#0a0a0a",
-  color: "#ffffff",
-  border: "none",
-  borderRadius: 10,
-  cursor: "pointer",
-  textDecoration: "none",
-  textAlign: "center",
-  transition: "all 0.15s",
-  ":hover": {
-    backgroundColor: "#262626",
-  },
+  marginTop: 24,
+  marginBottom: 8,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 16,
+      marginTop: 32,
     },
   },
 });
 
-export const confirmationSecondaryButton = style({
-  padding: "14px 24px",
-  fontSize: 15,
+export const confirmationPrimaryButton = style({
+  padding: "12px 24px",
+  fontSize: 18,
   fontWeight: 500,
-  backgroundColor: "#f5f5f5",
-  color: "#525252",
-  border: "none",
-  borderRadius: 10,
-  cursor: "pointer",
+  backgroundColor: button,
+  color: "#1a1a1a",
+  borderRadius: 8,
   textDecoration: "none",
-  textAlign: "center",
-  transition: "all 0.15s",
-  ":hover": {
-    backgroundColor: "#e5e5e5",
-    color: "#0a0a0a",
+  border: `1px solid ${text_muted}`,
+  cursor: "pointer",
+  transition: "all 0.3s ease",
+  letterSpacing: "0.05em",
+  ':hover': {
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
+  },
+  ":active": {
+    transform: "translateY(0)",
   },
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 16,
+      padding: "16px 32px",
+      fontSize: 20,
     },
   },
 });

@@ -534,10 +534,12 @@ export default function BookingPage() {
         </View>
 
       {isReschedule && (
-        <View className={styles.rescheduleNotice}>
-          <Text className={styles.rescheduleNoticeText}>
-            You are rescheduling an existing appointment. Your original booking will be cancelled when you confirm the new time.
-          </Text>
+        <View className={styles.rescheduleNoticeWrapper}>
+          <View className={styles.rescheduleNotice}>
+            <Text className={styles.rescheduleNoticeText}>
+              You are rescheduling an existing appointment.
+            </Text>
+          </View>
         </View>
       )}
 
@@ -610,16 +612,6 @@ export default function BookingPage() {
           </Text> */}
 
           <View className={styles.barberGrid}>
-            {/* <View
-              className={styles.barberCard}
-              onClick={() => handleBarberSelect(null, true)}
-            >
-              <Text className={styles.barberName}>Any Available Barber</Text>
-              <Text className={styles.barberBio}>
-                We'll match you with the first available barber
-              </Text>
-            </View> */}
-
             {barbers.map((barber) => (
               <View
                 key={barber.id}
@@ -644,6 +636,15 @@ export default function BookingPage() {
                 )}
               </View>
             ))}
+            <View
+              className={styles.barberCard}
+              onClick={() => handleBarberSelect(null, true)}
+            >
+              <Text className={styles.barberName}>Any Available Barber</Text>
+              <Text className={styles.barberBio}>
+                We'll match you with the first available barber
+              </Text>
+            </View>
           </View>
         </View>
       )}
@@ -776,7 +777,6 @@ export default function BookingPage() {
               )}
 
               <View className={styles.policySection}>
-                {/* <Text className={styles.policyTitle}>Cancellation Policy</Text> */}
                 <Text className={styles.policyText}>
                   Cancellations within 12 hours will incur a 50% cancellation fee.
                 </Text>
@@ -791,15 +791,9 @@ export default function BookingPage() {
                   {bookingInProgress
                     ? (isReschedule ? 'Rescheduling...' : 'Booking...')
                     : user
-                      ? (isReschedule ? 'Confirm Reschedule' : 'Confirm Booking')
+                      ? (isReschedule ? 'Reschedule Booking' : 'Confirm Booking')
                       : 'Login to Book'}
                 </button>
-                {/* <button className={styles.backButton} onClick={() => setStep(3)}>
-                  ← Back to Date & Time
-                </button> */}
-                {/* <button className={styles.cancelButton} onClick={resetBooking}>
-                  Start Over
-                </button> */}
               </View>
             </View>
           </View>
@@ -829,14 +823,14 @@ export default function BookingPage() {
             </View>
 
             <Text className={styles.confirmationTitle}>
-              {isReschedule ? 'Appointment Rescheduled!' : 'Booking Confirmed!'}
+              {isReschedule ? 'Booking Rescheduled!' : 'Booking Confirmed!'}
             </Text>
 
-            <Text className={styles.confirmationMessage}>
+            {/* <Text className={styles.confirmationMessage}>
               {isReschedule
                 ? 'Your appointment has been successfully rescheduled.'
                 : `Your appointment is confirmed. You'll earn ${confirmedBookingDetails.rewardPoints} reward points when your appointment is completed!`}
-            </Text>
+            </Text> */}
 
             <View className={styles.confirmationDetails}>
               <View className={styles.confirmationDetailRow}>
@@ -875,9 +869,9 @@ export default function BookingPage() {
               <Link to="/dashboard" className={styles.confirmationPrimaryButton}>
                 Back to Dashboard
               </Link>
-              <Link to="/" className={styles.confirmationSecondaryButton}>
+              {/* <Link to="/" className={styles.confirmationSecondaryButton}>
                 Back to Home
-              </Link>
+              </Link> */}
             </View>
           </div>
         </div>
