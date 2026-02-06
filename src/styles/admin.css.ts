@@ -1,84 +1,73 @@
 import { style } from '@vanilla-extract/css';
 
+const darker_bg = "#101214";
+const dark_bg = "#222222";
+const button =  "#96cfe0";
+const text_primary = "#f5f5f5";
+const text_secondary = "#b0b0b0";
+const text_muted = "#8a8a8a";
+const border_subtle = "rgba(255,255,255,0.08)";
+
 export const container = style({
   minHeight: '100vh',
-  backgroundColor: '#fafafa',
-  padding: '1rem',
-  paddingTop: 'calc(1rem + 60px)',
+  backgroundColor: darker_bg,
+  padding: 16,
+  paddingTop: 68,
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '2rem',
-      paddingTop: 'calc(2rem + 60px)',
+      padding: 48,
+      paddingTop: 84,
     },
   },
 });
 
-export const header = style({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: '1.5rem',
-  flexWrap: 'wrap',
-  gap: '1rem',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      marginBottom: '2rem',
-    },
-  },
-});
+// export const header = style({
+//   display: 'flex',
+//   justifyContent: 'space-between',
+//   alignItems: 'center',
+//   marginBottom: '1.5rem',
+//   flexWrap: 'wrap',
+//   gap: '1rem',
+//   '@media': {
+//     'screen and (min-width: 768px)': {
+//       marginBottom: '2rem',
+//     },
+//   },
+// });
 
-export const title = style({
-  fontSize: '1.5rem',
-  fontWeight: 300,
-  color: '#1a1a1a',
-  letterSpacing: '-0.01em',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      fontSize: '2rem',
-    },
-  },
-});
-
-export const backLink = style({
-  color: '#1a1a1a',
-  textDecoration: 'none',
-  padding: '0.5rem 0.75rem',
-  background: '#ffffff',
-  border: '1px solid #e5e5e5',
-  borderRadius: '2px',
-  transition: 'all 0.2s',
-  fontSize: '0.875rem',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '0.5rem 1rem',
-      fontSize: '1rem',
-    },
-  },
-  ':hover': {
-    borderColor: '#1a1a1a',
-  },
-});
+// export const title = style({
+//   fontSize: '1.5rem',
+//   fontWeight: 300,
+//   color: '#1a1a1a',
+//   letterSpacing: '-0.01em',
+//   '@media': {
+//     'screen and (min-width: 768px)': {
+//       fontSize: '2rem',
+//     },
+//   },
+// });
 
 export const tabs = style({
   display: 'flex',
-  gap: '0.5rem',
-  marginBottom: '1.5rem',
+  gap: 4,
+  marginBottom: 12,
   borderBottom: '2px solid #e5e5e5',
   overflowX: 'auto',
   '@media': {
     'screen and (min-width: 768px)': {
-      gap: '1rem',
-      marginBottom: '2rem',
+      gap: 16,
+      marginBottom: 20,
     },
   },
 });
 
 export const tab = style({
-  padding: '0.75rem 1rem',
+  paddingTop: 12,
+  paddingBottom: 8,
   background: 'none',
   border: 'none',
-  color: '#666',
-  fontSize: '0.875rem',
+  color: text_primary,
+  fontSize: 14,
   fontWeight: '400',
   cursor: 'pointer',
   borderBottom: '3px solid transparent',
@@ -86,32 +75,30 @@ export const tab = style({
   whiteSpace: 'nowrap',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '1rem 1.5rem',
-      fontSize: '1rem',
+      padding: '12px 24px',
+      fontSize: 20,
     },
   },
   ':hover': {
-    color: '#1a1a1a',
+    color: text_secondary,
   },
 });
 
 export const activeTab = style({
-  color: '#1a1a1a',
-  borderBottomColor: '#1a1a1a',
+  color: button,
+  // borderBottomColor: '#1a1a1a',
   fontWeight: 500,
+  ':hover': {
+    color: button,
+  },
 });
 
 export const section = style({
-  background: '#ffffff',
+  background: '#fff',
   borderRadius: '4px',
-  padding: '1rem',
+  padding: 24,
   border: '1px solid #e5e5e5',
   overflow: 'hidden',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '2rem',
-    },
-  },
 });
 
 export const sectionHeader = style({

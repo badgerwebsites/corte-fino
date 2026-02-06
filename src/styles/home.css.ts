@@ -2,11 +2,9 @@ import { style, keyframes } from "@vanilla-extract/css";
 
 const darker_bg = "#101214";
 const dark_bg = "#222222";
-
 const text_primary = "#f5f5f5";
 const text_secondary = "#b0b0b0";
 const text_muted = "#8a8a8a";
-
 const border_subtle = "rgba(255,255,255,0.08)";
 const border_hover = "rgba(255,255,255,0.18)";
 
@@ -85,7 +83,7 @@ export const heroLogoLarge = style({
   animation: `${fadeInUp} 1s ease-out 0.2s backwards`,
   "@media": {
     "screen and (min-width: 768px)": {
-      maxWidth: 600,
+      maxWidth: 400,
       marginBottom: 80,
     },
   },
@@ -104,7 +102,7 @@ export const heroCarouselContainer = style({
   animation: `${fadeInUp} 1s ease-out 0.2s backwards`,
   "@media": {
     "screen and (min-width: 768px)": {
-      maxWidth: 600,
+      maxWidth: 400,
       marginBottom: 80,
     },
   },

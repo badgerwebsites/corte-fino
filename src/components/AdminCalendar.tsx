@@ -1,11 +1,12 @@
 // components/AdminCalendar.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isSameDay, isSameMonth, addMonths, subMonths, parseISO } from 'date-fns';
 import { supabase } from '../lib/supabase';
 import type { Barber, BookingWithDetails } from '../types/database.types';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/adminCalendar.css';
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface AdminCalendarProps {
   barbers: Barber[];
@@ -17,42 +18,12 @@ type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_s
 
 export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('week');
-  const [previousView, setPreviousView] = useState<'week' | 'month' | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedBarberId, setSelectedBarberId] = useState<string>('all');
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<BookingWithDetails | null>(null);
 
-  useEffect(() => {
-    loadBookings();
-  }, [currentDate, viewMode]);
-
-  // Subscribe to real-time changes on bookings table
-  useEffect(() => {
-    const channel = supabase
-      .channel('admin-calendar-bookings')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'bookings',
-        },
-        () => {
-          // Reload bookings when any change occurs
-          loadBookings();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [currentDate, viewMode]);
-
-  const loadBookings = async () => {
-    setLoading(true);
+  const loadBookings = useCallback(async () => {
     try {
       let startDate: string;
       let endDate: string;
@@ -66,7 +37,6 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
         startDate = format(weekStart, 'yyyy-MM-dd');
         endDate = format(weekEnd, 'yyyy-MM-dd');
       } else {
-        // Month view - get all days visible in the calendar grid
         const monthStart = startOfMonth(currentDate);
         const monthEnd = endOfMonth(currentDate);
         const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
@@ -93,10 +63,30 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
       setBookings(data || []);
     } catch (error) {
       console.error('Error loading bookings:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    } 
+  }, [currentDate, viewMode]);
+
+    useEffect(() => {
+    loadBookings();
+  }, [loadBookings]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-calendar-bookings')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'bookings' },
+        () => {
+          loadBookings();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loadBookings]);
+
 
   const handleStatusUpdate = async (bookingId: string, newStatus: BookingStatus) => {
     try {
@@ -272,25 +262,20 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
       {/* Calendar Header */}
       <View className={styles.header}>
         <View className={styles.navigation}>
-          {viewMode === 'day' && previousView && (
-            <button
-              className={styles.backButton}
-              onClick={() => {
-                setViewMode(previousView);
-                setPreviousView(null);
-              }}
-            >
-              &larr; Back
-            </button>
-          )}
-          <button className={styles.navButton} onClick={() => navigateDate('prev')}>
-            &larr;
+          <button className={styles.navButton} onClick={() => navigateDate('prev')} aria-label="Previous">
+            <ChevronLeft />
           </button>
-          <button className={styles.todayButton} onClick={goToToday}>
+
+          <button
+            className={styles.todayButton}
+            aria-pressed={isSameDay(currentDate, new Date())}
+            onClick={goToToday}
+          >
             Today
           </button>
-          <button className={styles.navButton} onClick={() => navigateDate('next')}>
-            &rarr;
+
+          <button className={styles.navButton} onClick={() => navigateDate('next')} aria-label="Next">
+            <ChevronRight />
           </button>
         </View>
 
@@ -303,45 +288,45 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
         </Text>
 
         <View className={styles.controls}>
-          <select
-            className={styles.barberFilter}
-            value={selectedBarberId}
-            onChange={(e) => setSelectedBarberId(e.target.value)}
-          >
-            <option value="all">All Barbers</option>
-            {barbers.map(barber => (
-              <option key={barber.id} value={barber.id}>{barber.name}</option>
-            ))}
-          </select>
+          <div className={styles.selectWrapper}>
+            <select
+              className={styles.barberFilter}
+              value={selectedBarberId}
+              onChange={(e) => setSelectedBarberId(e.target.value)}
+            >
+              <option value="all">All Barbers</option>
+              {barbers.map(barber => (
+                <option key={barber.id} value={barber.id}>
+                  {barber.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <View className={styles.viewToggle}>
             <button
               className={`${styles.viewButton} ${viewMode === 'day' ? styles.viewButtonActive : ''}`}
-              onClick={() => { setPreviousView(null); setViewMode('day'); }}
+              onClick={() => setViewMode('day')}
             >
               Day
             </button>
+
             <button
               className={`${styles.viewButton} ${viewMode === 'week' ? styles.viewButtonActive : ''}`}
-              onClick={() => { setPreviousView(null); setViewMode('week'); }}
+              onClick={() => setViewMode('week')}
             >
               Week
             </button>
+
             <button
               className={`${styles.viewButton} ${viewMode === 'month' ? styles.viewButtonActive : ''}`}
-              onClick={() => { setPreviousView(null); setViewMode('month'); }}
+              onClick={() => setViewMode('month')}
             >
               Month
             </button>
           </View>
         </View>
       </View>
-
-      {loading ? (
-        <View className={styles.loadingContainer}>
-          <Text>Loading appointments...</Text>
-        </View>
-      ) : (
         <>
           {/* Day View */}
           {viewMode === 'day' && (
@@ -470,7 +455,6 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
                       key={day.toISOString()}
                       className={`${styles.monthCell} ${!isCurrentMonth ? styles.monthCellOther : ''} ${isToday ? styles.monthCellToday : ''}`}
                       onClick={() => {
-                        setPreviousView('month');
                         setCurrentDate(day);
                         setViewMode('day');
                       }}
@@ -506,7 +490,7 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
             </View>
           )}
         </>
-      )}
+      {/* )} */}
 
       {/* Appointment Detail Modal */}
       {selectedBooking && (

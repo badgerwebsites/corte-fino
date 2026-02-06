@@ -1,7 +1,15 @@
-import { style } from '@vanilla-extract/css';
+import { style, globalStyle } from '@vanilla-extract/css';
+
+const darker_bg = "#101214";
+const dark_bg = "#222222";
+const button =  "#96cfe0";
+const text_primary = "#f5f5f5";
+const text_secondary = "#b0b0b0";
+const text_muted = "#8a8a8a";
+const border_subtle = "rgba(255,255,255,0.08)";
 
 export const container = style({
-  backgroundColor: '#ffffff',
+  backgroundColor: dark_bg,
   borderRadius: '0.5rem',
   border: '1px solid #e2e8f0',
   overflow: 'hidden',
@@ -13,7 +21,8 @@ export const header = style({
   gap: '1rem',
   padding: '1rem',
   borderBottom: '1px solid #e2e8f0',
-  backgroundColor: '#f8fafc',
+  backgroundColor: darker_bg,
+  alignItems: 'center',
   '@media': {
     'screen and (min-width: 768px)': {
       flexDirection: 'row',
@@ -31,60 +40,60 @@ export const navigation = style({
 });
 
 export const navButton = style({
-  padding: '0.5rem 0.75rem',
-  fontSize: '1rem',
-  backgroundColor: '#ffffff',
-  color: '#1a1a1a',
-  border: '1px solid #e2e8f0',
-  borderRadius: '0.375rem',
-  cursor: 'pointer',
-  transition: 'all 0.2s',
-  ':hover': {
-    backgroundColor: '#f1f5f9',
-    borderColor: '#cbd5e1',
+  all: "unset",
+  width: 40,
+  height: 40,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  cursor: "pointer",
+  borderRadius: 6,
+  color: "#fff",
+
+  ":hover": {
+    color: button,
   },
+
+  ":disabled": {
+    opacity: 0.35,
+    cursor: "not-allowed",
+  },
+});
+
+globalStyle(`${navButton} svg`, {
+  width: 28,
+  height: 28,
+  strokeWidth: 3.5,
 });
 
 export const todayButton = style({
-  padding: '0.5rem 1rem',
-  fontSize: '0.875rem',
-  fontWeight: '500',
-  backgroundColor: '#1a1a1a',
-  color: '#ffffff',
+  padding: '0px 12px',
+  fontSize: 20,
+  fontWeight: '600',
+  backgroundColor: 'transparent',
+  color: text_primary,
   border: 'none',
-  borderRadius: '0.375rem',
   cursor: 'pointer',
   transition: 'all 0.2s',
+  textAlign: 'center',
   ':hover': {
-    backgroundColor: '#333',
+    color: button,
   },
-});
-
-export const backButton = style({
-  padding: '0.5rem 0.75rem',
-  fontSize: '0.875rem',
-  fontWeight: '500',
-  backgroundColor: '#f1f5f9',
-  color: '#475569',
-  border: '1px solid #e2e8f0',
-  borderRadius: '0.375rem',
-  cursor: 'pointer',
-  transition: 'all 0.2s',
-  marginRight: '0.5rem',
-  ':hover': {
-    backgroundColor: '#e2e8f0',
-    color: '#1a1a1a',
+  selectors: {
+    '&[aria-pressed="true"]': {
+      color: button,
+    },
   },
 });
 
 export const dateTitle = style({
-  fontSize: '1.125rem',
+  fontSize: 18,
   fontWeight: '600',
-  color: '#1a1a1a',
+  color: text_primary,
   textAlign: 'center',
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: '1.25rem',
+      fontSize: 26,
     },
   },
 });
@@ -92,71 +101,82 @@ export const dateTitle = style({
 export const controls = style({
   display: 'flex',
   alignItems: 'center',
-  gap: '0.75rem',
+  gap: 20,
   flexWrap: 'wrap',
 });
 
+export const selectWrapper = style({
+  position: 'relative',
+  display: 'inline-block',
+  margin: '0 auto',
+});
+
+globalStyle(`${selectWrapper}::after`, {
+  content: '""',
+  position: 'absolute',
+  right: 16,
+  top: '50%',
+  transform: 'translateY(-50%)',
+
+  width: 18,
+  height: 18,
+
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: 'contain',
+
+  pointerEvents: 'none',
+  opacity: 0.9,
+});
+
 export const barberFilter = style({
-  padding: '0.5rem 0.75rem',
-  fontSize: '0.875rem',
-  border: '1px solid #e2e8f0',
-  borderRadius: '0.375rem',
-  backgroundColor: '#ffffff',
-  minWidth: '140px',
+  appearance: 'none',
+  WebkitAppearance: 'none',
+  MozAppearance: 'none',
+  minWidth: 240,
+
+  padding: '10px 48px 10px 16px',
+  fontSize: 18,
+  fontWeight: 400,
+
+  borderRadius: 8,
+  backgroundColor: 'transparent',
+  color: text_primary,
+  border: '1px solid #f5f5f5',
+
   cursor: 'pointer',
-  ':focus': {
-    outline: 'none',
-    borderColor: '#0ea5e9',
-  },
 });
 
 export const viewToggle = style({
   display: 'flex',
-  borderRadius: '0.375rem',
+  margin: '0 auto',
+  borderRadius: 8,
   overflow: 'hidden',
-  border: '1px solid #e2e8f0',
+  border: '1px solid #f5f5f5',
 });
 
 export const viewButton = style({
-  padding: '0.5rem 1rem',
-  fontSize: '0.875rem',
-  fontWeight: '500',
-  backgroundColor: '#ffffff',
-  color: '#64748b',
+  padding: '12px 16px',
+  fontSize: 16,
+  fontWeight: '600',
+  backgroundColor: 'transparent',
+  color: text_primary,
   border: 'none',
   cursor: 'pointer',
   transition: 'all 0.2s',
+  minWidth: 80,
   ':hover': {
-    backgroundColor: '#f1f5f9',
+    backgroundColor: button,
+    color: '#1a1a1a',
   },
 });
 
 export const viewButtonActive = style({
-  backgroundColor: '#1a1a1a',
-  color: '#ffffff',
-  ':hover': {
-    backgroundColor: '#333',
-  },
+  backgroundColor: button,
+  color: '#1a1a1a',
 });
 
-export const loadingContainer = style({
-  padding: '3rem',
-  textAlign: 'center',
-  color: '#64748b',
-});
-
-export const emptyState = style({
-  padding: '3rem 1.5rem',
-  textAlign: 'center',
-  backgroundColor: '#f8fafc',
-});
-
-export const emptyStateText = style({
-  fontSize: '0.9375rem',
-  color: '#64748b',
-});
-
-// Day View Styles - Google Calendar style with grey time panel
+// Day View Styles
 export const dayView = style({
   overflow: 'auto',
 });
@@ -167,7 +187,7 @@ export const dayHeader = style({
   borderBottom: '1px solid #e2e8f0',
   position: 'sticky',
   top: 0,
-  backgroundColor: '#ffffff',
+  backgroundColor: dark_bg,
   zIndex: 10,
   '@media': {
     'screen and (min-width: 768px)': {
@@ -178,7 +198,7 @@ export const dayHeader = style({
 
 export const dayTimeColumnHeader = style({
   borderRight: '1px solid #f1f5f9',
-  backgroundColor: '#f8fafc',
+  backgroundColor: dark_bg,
 });
 
 export const dayColumnHeader = style({
@@ -196,25 +216,25 @@ export const dayColumnHeader = style({
 });
 
 export const dayColumnHeaderToday = style({
-  backgroundColor: '#f0f9ff',
+  backgroundColor: dark_bg,
 });
 
 export const dayColumnDayName = style({
-  fontSize: '0.75rem',
+  fontSize: 16,
   fontWeight: '500',
-  color: '#64748b',
+  color: text_primary,
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
 });
 
 export const dayColumnDate = style({
-  fontSize: '1.25rem',
+  fontSize: 20,
   fontWeight: '600',
-  color: '#1a1a1a',
-  marginTop: '0.25rem',
+  color: text_primary,
+  marginTop: 4,
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: '1.5rem',
+      fontSize: 24,
     },
   },
 });
@@ -238,19 +258,20 @@ export const timeRow = style({
 });
 
 export const timeLabel = style({
-  padding: '0.25rem',
-  fontSize: '0.625rem',
+  padding: 4,
+  fontSize: 11,
   fontWeight: '500',
-  color: '#64748b',
-  textAlign: 'right',
-  paddingRight: '0.375rem',
+  color: text_primary,
+  // paddingRight: '0.375rem',
   borderRight: '1px solid #f1f5f9',
-  backgroundColor: '#f8fafc',
+  backgroundColor: dark_bg,
+  textAlign: 'center',
+  alignContent: 'center',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.5rem',
-      fontSize: '0.75rem',
-      paddingRight: '0.75rem',
+      padding: 6,
+      // paddingTop: 12,
+      fontSize: 12,
     },
   },
 });
@@ -309,7 +330,7 @@ export const weekHeader = style({
   borderBottom: '1px solid #e2e8f0',
   position: 'sticky',
   top: 0,
-  backgroundColor: '#ffffff',
+  backgroundColor: dark_bg,
   zIndex: 10,
   '@media': {
     'screen and (min-width: 768px)': {
@@ -320,11 +341,11 @@ export const weekHeader = style({
 
 export const timeColumnHeader = style({
   borderRight: '1px solid #f1f5f9',
-  backgroundColor: '#f8fafc',
+  backgroundColor: dark_bg,
 });
 
 export const weekDayHeader = style({
-  padding: '0.5rem 0.25rem',
+  padding: '8px 4px',
   textAlign: 'center',
   borderRight: '1px solid #f1f5f9',
   display: 'flex',
@@ -334,23 +355,10 @@ export const weekDayHeader = style({
   ':last-child': {
     borderRight: 'none',
   },
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '0.75rem 0.5rem',
-    },
-  },
 });
 
 export const todayHeader = style({
-  backgroundColor: '#f0f9ff',
-});
-
-export const weekDayName = style({
-  fontSize: '0.75rem',
-  fontWeight: '500',
-  color: '#64748b',
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
+  backgroundColor: button,
 });
 
 // Short day name (S, M, T, W...) - shown on mobile
@@ -358,8 +366,13 @@ export const weekDayNameShort = style({
   display: 'block',
   fontSize: '0.875rem',
   fontWeight: '600',
-  color: '#64748b',
+  color: text_primary,
   textTransform: 'uppercase',
+  selectors: {
+    [`${todayHeader} &`]: {
+      color: '#1a1a1a',
+    },
+  },
   '@media': {
     'screen and (min-width: 768px)': {
       display: 'none',
@@ -370,11 +383,16 @@ export const weekDayNameShort = style({
 // Full day name (Sun, Mon, Tue...) - shown on desktop
 export const weekDayNameFull = style({
   display: 'none',
-  fontSize: '0.75rem',
+  fontSize: 16,
   fontWeight: '500',
-  color: '#64748b',
+  color: text_primary,
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
+  selectors: {
+    [`${todayHeader} &`]: {
+      color: '#1a1a1a',
+    },
+  },
   '@media': {
     'screen and (min-width: 768px)': {
       display: 'block',
@@ -383,14 +401,19 @@ export const weekDayNameFull = style({
 });
 
 export const weekDayDate = style({
-  fontSize: '1rem',
+  fontSize: 14,
   fontWeight: '600',
-  color: '#1a1a1a',
+  color: text_primary,
   marginTop: '0.125rem',
+  selectors: {
+    [`${todayHeader} &`]: {
+      color: '#1a1a1a',
+    },
+  },
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: '1.25rem',
-      marginTop: '0.25rem',
+      fontSize: 24,
+      marginTop: 4,
     },
   },
 });

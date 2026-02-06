@@ -543,9 +543,9 @@ export default function AdminPage() {
     <>
       <Navigation />
       <View className={styles.container}>
-      <View className={styles.header}>
+      {/* <View className={styles.header}>
         <Text className={styles.title}>Admin Dashboard</Text>
-      </View>
+      </View> */}
 
       <View className={styles.tabs}>
         <button
@@ -590,9 +590,9 @@ export default function AdminPage() {
       </View>
 
       {activeTab === 'calendar' && (
-        <View className={styles.section}>
+        // <View className={styles.section}>
           <AdminCalendar barbers={barbers} onBookingUpdate={loadData} />
-        </View>
+        // </View>
       )}
 
       {activeTab === 'pricing' && (
