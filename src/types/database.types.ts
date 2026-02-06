@@ -124,6 +124,7 @@ export interface ShopSettings {
   regular_hours_end: string;
   evening_hours_start: string;
   evening_hours_end: string;
+  last_rotation_barber_id?: string;
   created_at: string;
   updated_at: string;
 }

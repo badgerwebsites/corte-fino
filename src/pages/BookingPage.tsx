@@ -5,7 +5,7 @@ import { DayPicker } from 'react-day-picker';
 import { addMonths, format, isBefore, startOfDay, getDay } from 'date-fns';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
-import type { Barber, Service, BarberServicePricing, BarberAvailability, BarberTimeOff, Booking } from '../types/database.types';
+import type { Barber, Service, BarberServicePricing, BarberAvailability, BarberTimeOff, Booking, ShopSettings } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
@@ -50,6 +50,7 @@ export default function BookingPage() {
   const [availability, setAvailability] = useState<BarberAvailability[]>([]);
   const [timeOff, setTimeOff] = useState<BarberTimeOff[]>([]);
   const [existingBookings, setExistingBookings] = useState<Booking[]>([]);
+  const [shopSettings, setShopSettings] = useState<ShopSettings | null>(null);
 
   // Booking selections
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -163,12 +164,13 @@ export default function BookingPage() {
 
   const loadData = async () => {
     try {
-      const [servicesRes, barbersRes, pricingRes, availabilityRes, timeOffRes] = await Promise.all([
+      const [servicesRes, barbersRes, pricingRes, availabilityRes, timeOffRes, shopSettingsRes] = await Promise.all([
         supabase.from('services').select('*').order('name'),
         supabase.from('barbers').select('*').eq('is_active', true).order('name'),
         supabase.from('barber_service_pricing').select('*'),
         supabase.from('barber_availability').select('*'),
         supabase.from('barber_time_off').select('*'),
+        supabase.from('shop_settings').select('*').single(),
       ]);
 
       if (servicesRes.error) throw servicesRes.error;
@@ -180,6 +182,7 @@ export default function BookingPage() {
       setPricing(pricingRes.data || []);
       setAvailability(availabilityRes.data || []);
       setTimeOff(timeOffRes.data || []);
+      setShopSettings(shopSettingsRes.data || null);
     } catch (error) {
       console.error('Error loading booking data:', error);
       alert('Failed to load booking options');
@@ -267,26 +270,81 @@ export default function BookingPage() {
     setBookingInProgress(true);
 
     try {
-      // If "any barber" was selected, pick the first available barber for this time slot
+      // If "any barber" was selected, use round-robin to pick the next available barber
       let bookingBarber = selectedBarber;
       if (anyBarber && !selectedBarber) {
         const dayOfWeek = getDay(selectedDate);
         const dateString = format(selectedDate, 'yyyy-MM-dd');
 
-        // Find first available barber for this date/time
-        bookingBarber = barbers.find(barber => {
+        // Get all barbers who are available for this date/time slot
+        const availableBarbers = barbers.filter(barber => {
+          // Check if barber works on this day
           const hasAvailability = availability.some(
             a => a.barber_id === barber.id &&
                  a.day_of_week === dayOfWeek &&
                  a.is_available
           );
+          // Check if barber has time off
           const hasTimeOff = timeOff.some(
             t => t.barber_id === barber.id &&
                  dateString >= t.start_date &&
                  dateString <= t.end_date
           );
-          return hasAvailability && !hasTimeOff;
-        }) || null;
+          // Check if barber is already booked at this time
+          const isBooked = isSlotBooked(selectedTime, barber.id);
+
+          return hasAvailability && !hasTimeOff && !isBooked;
+        });
+
+        if (availableBarbers.length === 0) {
+          alert('No barber available for this time slot. Please select a different time.');
+          setBookingInProgress(false);
+          return;
+        }
+
+        // Round-robin logic: find the next barber in rotation
+        const lastBarberId = shopSettings?.last_rotation_barber_id;
+
+        if (availableBarbers.length === 1) {
+          // Only one available, use them
+          bookingBarber = availableBarbers[0];
+        } else if (!lastBarberId) {
+          // No previous rotation, start with the first available barber
+          bookingBarber = availableBarbers[0];
+        } else {
+          // Find the index of the last assigned barber in the full barbers list
+          const lastIndex = barbers.findIndex(b => b.id === lastBarberId);
+
+          // Find the next available barber in rotation order
+          let found = false;
+          for (let i = 1; i <= barbers.length; i++) {
+            const nextIndex = (lastIndex + i) % barbers.length;
+            const nextBarber = barbers[nextIndex];
+            if (availableBarbers.some(ab => ab.id === nextBarber.id)) {
+              bookingBarber = nextBarber;
+              found = true;
+              break;
+            }
+          }
+
+          // Fallback to first available if somehow not found
+          if (!found) {
+            bookingBarber = availableBarbers[0];
+          }
+        }
+
+        // Update the rotation tracker in the database AND local state
+        if (bookingBarber && shopSettings?.id) {
+          const { error: rotationError } = await supabase
+            .from('shop_settings')
+            .update({ last_rotation_barber_id: bookingBarber.id })
+            .eq('id', shopSettings.id);
+          if (rotationError) {
+            console.error('Error updating barber rotation:', rotationError);
+          }
+          // Update local state so subsequent bookings in the same session use the new rotation
+          setShopSettings(prev => prev ? { ...prev, last_rotation_barber_id: bookingBarber!.id } : prev);
+        }
       }
 
       if (!bookingBarber) {
@@ -344,9 +402,10 @@ export default function BookingPage() {
       if (bookingError) throw bookingError;
 
       // Store booking details for confirmation screen
+      // Show actual assigned barber name even if "Any Barber" was selected
       setConfirmedBookingDetails({
         serviceName: selectedService.name,
-        barberName: anyBarber ? 'Any Available Barber' : bookingBarber.name,
+        barberName: bookingBarber.name,
         date: formatDate(selectedDate),
         time: formatTimeTo12Hour(selectedTime),
         price: totalPrice,
