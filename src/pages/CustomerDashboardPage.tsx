@@ -39,7 +39,9 @@ export default function CustomerDashboardPage() {
 
     const loadData = async () => {
       try {
-        const today = new Date().toISOString().split('T')[0];
+        // Use local date to avoid UTC timezone issues
+        const currentDate = new Date();
+        const today = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
         const [bookingsRes, settingsRes] = await Promise.all([
           supabase
             .from('bookings')
@@ -80,7 +82,9 @@ export default function CustomerDashboardPage() {
   const loadBookings = async () => {
     if (!user) return;
     try {
-      const today = new Date().toISOString().split('T')[0];
+      // Use local date to avoid UTC timezone issues
+      const currentDate = new Date();
+      const today = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
       const { data, error } = await supabase
         .from('bookings')
         .select(`

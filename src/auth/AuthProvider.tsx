@@ -16,7 +16,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(data.session);
       setUser(data.session?.user ?? null);
       if (data.session?.user) {
-        loadCustomerData(data.session.user.id);
+        loadCustomerData(data.session.user.id, data.session.user.email);
       } else {
         setLoading(false);
       }
@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          loadCustomerData(session.user.id);
+          loadCustomerData(session.user.id, session.user.email);
         } else {
           setCustomer(null);
           setLoading(false);
@@ -37,16 +37,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const loadCustomerData = async (userId: string) => {
+  const loadCustomerData = async (userId: string, userEmail?: string) => {
     try {
       const { data, error } = await supabase
         .from('customers')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      setCustomer(data);
+
+      if (data) {
+        setCustomer(data);
+      } else if (userEmail) {
+        // Customer record doesn't exist, create it
+        const { data: newCustomer, error: insertError } = await supabase
+          .from('customers')
+          .insert({
+            id: userId,
+            email: userEmail,
+            first_name: '',
+            last_name: '',
+            phone: '',
+            reward_points: 0,
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error('Error creating customer record:', insertError);
+        } else {
+          setCustomer(newCustomer);
+        }
+      }
     } catch (error) {
       console.error('Error loading customer data:', error);
     } finally {
@@ -105,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshCustomer = async () => {
     if (user) {
-      await loadCustomerData(user.id);
+      await loadCustomerData(user.id, user.email);
     }
   };
 
