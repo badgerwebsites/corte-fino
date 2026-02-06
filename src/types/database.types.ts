@@ -179,6 +179,8 @@ export interface SiteSettings {
   id: string;
   hero_background_url?: string;
   hero_logo_url?: string;
+  hero_logo_2_url?: string;
+  hero_logo_3_url?: string;
   nav_logo_1_url?: string;
   nav_logo_2_url?: string;
   nav_logo_3_url?: string;

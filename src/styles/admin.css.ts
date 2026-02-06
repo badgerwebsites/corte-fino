@@ -1017,3 +1017,28 @@ export const select = style({
     borderColor: '#1a1a1a',
   },
 });
+
+export const logoGrid = style({
+  display: 'grid',
+  gridTemplateColumns: '1fr',
+  gap: '1.5rem',
+  marginTop: '1rem',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      gridTemplateColumns: 'repeat(3, 1fr)',
+      gap: '2rem',
+    },
+  },
+});
+
+export const logoGridItem = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.5rem',
+});
+
+export const logoLabel = style({
+  fontSize: '0.875rem',
+  fontWeight: 500,
+  color: '#4a5568',
+});

@@ -46,12 +46,22 @@ export function Navigation() {
   // Filter out null logos and rotate through them
   const activeLogos = carouselLogos.filter((logo): logo is string => logo !== null);
 
+  // Use time-based index calculation so all carousels stay in sync
   useEffect(() => {
     if (activeLogos.length <= 1) return;
 
-    const interval = setInterval(() => {
-      setLogoIndex((prev) => (prev + 1) % activeLogos.length);
-    }, 3000);
+    const INTERVAL_MS = 3000;
+
+    const updateIndex = () => {
+      const tick = Math.floor(Date.now() / INTERVAL_MS);
+      setLogoIndex(tick % activeLogos.length);
+    };
+
+    // Initial sync
+    updateIndex();
+
+    // Update on interval
+    const interval = setInterval(updateIndex, 100); // Check frequently for smooth sync
 
     return () => clearInterval(interval);
   }, [activeLogos.length]);

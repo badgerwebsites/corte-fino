@@ -498,7 +498,7 @@ export default function AdminPage() {
   };
 
   // Site Settings Management
-  const handleSiteSettingChange = async (field: 'hero_background_url' | 'hero_logo_url' | 'nav_logo_1_url' | 'nav_logo_2_url' | 'nav_logo_3_url' | 'rewards_enabled', value: string | boolean | null) => {
+  const handleSiteSettingChange = async (field: 'hero_background_url' | 'hero_logo_url' | 'hero_logo_2_url' | 'hero_logo_3_url' | 'nav_logo_1_url' | 'nav_logo_2_url' | 'nav_logo_3_url' | 'rewards_enabled', value: string | boolean | null) => {
     try {
       if (siteSettings) {
         // Update existing settings
@@ -1113,17 +1113,38 @@ export default function AdminPage() {
 
             {/* Hero Section */}
             <View className={styles.formGroup} style={{ marginTop: '2rem' }}>
-              <Text className={styles.subsectionTitle}>Hero Logo</Text>
+              <Text className={styles.subsectionTitle}>Hero Logos (Carousel)</Text>
               <Text className={styles.sectionDescription}>
-                The main logo displayed in the center of the home page hero section.
+                Add multiple logos to create a rotating carousel on the home page hero section. Upload at least 2 logos to enable the carousel.
               </Text>
-              <View style={{ marginTop: '1rem' }}>
-                <ImageUpload
-                  currentImageUrl={siteSettings?.hero_logo_url || undefined}
-                  onImageChange={(url) => handleSiteSettingChange('hero_logo_url', url)}
-                  bucket="site-images"
-                  label="Hero Logo"
-                />
+              <View className={styles.logoGrid}>
+                <View className={styles.logoGridItem}>
+                  <Text className={styles.logoLabel}>Hero Logo 1</Text>
+                  <ImageUpload
+                    currentImageUrl={siteSettings?.hero_logo_url || undefined}
+                    onImageChange={(url) => handleSiteSettingChange('hero_logo_url', url)}
+                    bucket="site-images"
+                    label="Hero Logo 1"
+                  />
+                </View>
+                <View className={styles.logoGridItem}>
+                  <Text className={styles.logoLabel}>Hero Logo 2</Text>
+                  <ImageUpload
+                    currentImageUrl={siteSettings?.hero_logo_2_url || undefined}
+                    onImageChange={(url) => handleSiteSettingChange('hero_logo_2_url', url)}
+                    bucket="site-images"
+                    label="Hero Logo 2"
+                  />
+                </View>
+                <View className={styles.logoGridItem}>
+                  <Text className={styles.logoLabel}>Hero Logo 3</Text>
+                  <ImageUpload
+                    currentImageUrl={siteSettings?.hero_logo_3_url || undefined}
+                    onImageChange={(url) => handleSiteSettingChange('hero_logo_3_url', url)}
+                    bucket="site-images"
+                    label="Hero Logo 3"
+                  />
+                </View>
               </View>
             </View>
 

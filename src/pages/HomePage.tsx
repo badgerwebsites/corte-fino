@@ -22,6 +22,10 @@ export default function HomePage() {
   const [heroLogo, setHeroLogo] = useState<string>(defaultLogo);
   const [isCustomLogo, setIsCustomLogo] = useState(false);
 
+  // Hero carousel state (matches nav carousel)
+  const [heroLogoIndex, setHeroLogoIndex] = useState(0);
+  const [heroCarouselLogos, setHeroCarouselLogos] = useState<(string | null)[]>([defaultLogo, null, null]);
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -48,6 +52,13 @@ export default function HomePage() {
           setHeroLogo(settingsData.hero_logo_url);
           setIsCustomLogo(true);
         }
+
+        // Set up hero carousel with dedicated hero logos
+        setHeroCarouselLogos([
+          settingsData?.hero_logo_url || defaultLogo,
+          settingsData?.hero_logo_2_url || null,
+          settingsData?.hero_logo_3_url || null
+        ]);
       } catch (error) {
         console.error('Error loading data:', error);
       }
@@ -55,6 +66,28 @@ export default function HomePage() {
 
     loadData();
   }, []);
+
+  // Hero carousel rotation - uses time-based sync to match nav carousel exactly
+  const activeHeroLogos = heroCarouselLogos.filter((logo): logo is string => logo !== null);
+
+  useEffect(() => {
+    if (activeHeroLogos.length <= 1) return;
+
+    const INTERVAL_MS = 3000;
+
+    const updateIndex = () => {
+      const tick = Math.floor(Date.now() / INTERVAL_MS);
+      setHeroLogoIndex(tick % activeHeroLogos.length);
+    };
+
+    // Initial sync
+    updateIndex();
+
+    // Update on interval - check frequently for smooth sync
+    const interval = setInterval(updateIndex, 100);
+
+    return () => clearInterval(interval);
+  }, [activeHeroLogos.length]);
 
   return (
     <>
@@ -68,11 +101,30 @@ export default function HomePage() {
           <View className={styles.heroOverlay} />
 
           <View className={styles.heroContent}>
-            <img
-              src={heroLogo}
-              alt="Corte Fino"
-              className={`${styles.heroLogoLarge} ${!isCustomLogo ? styles.heroLogoWhite : ''}`}
-            />
+            {activeHeroLogos.length > 1 ? (
+              <View className={styles.heroCarouselContainer}>
+                <View
+                  className={styles.heroCarouselTrack}
+                  style={{ transform: `translateX(-${heroLogoIndex * 100}%)` }}
+                >
+                  {activeHeroLogos.map((logoSrc, index) => (
+                    <View key={index} className={styles.heroCarouselSlide}>
+                      <img
+                        src={logoSrc}
+                        alt={`Logo ${index + 1}`}
+                        className={`${styles.heroCarouselImage} ${logoSrc === defaultLogo ? styles.heroLogoWhite : ''}`}
+                      />
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ) : (
+              <img
+                src={heroLogo}
+                alt="Corte Fino"
+                className={`${styles.heroLogoLarge} ${!isCustomLogo ? styles.heroLogoWhite : ''}`}
+              />
+            )}
 
             <button
               className={styles.heroBookButton}

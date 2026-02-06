@@ -95,6 +95,39 @@ export const heroLogoWhite = style({
   filter: "brightness(0) invert(1)",
 });
 
+export const heroCarouselContainer = style({
+  width: "100%",
+  maxWidth: 400,
+  overflow: "hidden",
+  position: "relative",
+  marginBottom: 60,
+  animation: `${fadeInUp} 1s ease-out 0.2s backwards`,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      maxWidth: 600,
+      marginBottom: 80,
+    },
+  },
+});
+
+export const heroCarouselTrack = style({
+  display: "flex",
+  transition: "transform 0.6s ease-in-out",
+});
+
+export const heroCarouselSlide = style({
+  flex: "0 0 100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+});
+
+export const heroCarouselImage = style({
+  width: "100%",
+  height: "auto",
+  objectFit: "contain",
+});
+
 export const heroBookButton = style({
   padding: "18px 20px",
   fontSize: 18,
