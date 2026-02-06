@@ -202,7 +202,7 @@ export const dayTimeColumnHeader = style({
 });
 
 export const dayColumnHeader = style({
-  padding: '0.5rem 0.25rem',
+  padding: '4px 0px',
   textAlign: 'center',
   display: 'flex',
   flexDirection: 'column',
@@ -210,7 +210,7 @@ export const dayColumnHeader = style({
   justifyContent: 'center',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.75rem 0.5rem',
+      padding: '8px 0px',
     },
   },
 });
@@ -262,7 +262,6 @@ export const timeLabel = style({
   fontSize: 11,
   fontWeight: '500',
   color: text_primary,
-  // paddingRight: '0.375rem',
   borderRight: '1px solid #f1f5f9',
   backgroundColor: dark_bg,
   textAlign: 'center',
@@ -270,25 +269,32 @@ export const timeLabel = style({
   '@media': {
     'screen and (min-width: 768px)': {
       padding: 6,
-      // paddingTop: 12,
       fontSize: 12,
     },
   },
 });
 
 export const appointmentsColumn = style({
-  padding: '0.25rem',
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.25rem',
+  gap: 2,
+  padding: 2,
+  // width: '100%',
+  alignItems: 'stretch',
 });
 
 export const appointmentCard = style({
-  padding: '0.75rem',
-  borderRadius: '0.375rem',
+  // width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  // gap: 4,
+  padding: 8,
+  paddingLeft: 12,
+  borderRadius: 10,
   cursor: 'pointer',
-  transition: 'all 0.2s',
   border: '1px solid transparent',
+  transition: 'all 0.2s',
+
   ':hover': {
     transform: 'translateY(-1px)',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -296,27 +302,22 @@ export const appointmentCard = style({
 });
 
 export const appointmentTime = style({
-  fontSize: '0.75rem',
-  fontWeight: '600',
-  color: '#1a1a1a',
-  marginBottom: '0.25rem',
+  fontSize: 14,
+  fontWeight: '500',
+  // marginBottom: 4,
+  color: text_primary,
 });
 
 export const appointmentCustomer = style({
-  fontSize: '0.875rem',
-  fontWeight: '600',
-  color: '#1a1a1a',
+  fontSize: 14,
+  fontWeight: '500',
+  color: text_primary,
 });
 
-export const appointmentService = style({
-  fontSize: '0.8125rem',
-  color: '#475569',
-});
-
-export const appointmentBarber = style({
-  fontSize: '0.75rem',
-  color: '#64748b',
-  marginTop: '0.25rem',
+export const appointmentMeta = style({
+  fontSize: 13,
+  color: text_secondary,
+  // lineHeight: 1.4,
 });
 
 // Week View Styles
@@ -326,7 +327,7 @@ export const weekView = style({
 
 export const weekHeader = style({
   display: 'grid',
-  gridTemplateColumns: '50px repeat(7, 1fr)',
+  gridTemplateColumns: '50px repeat(7, minmax(0, 1fr))',
   borderBottom: '1px solid #e2e8f0',
   position: 'sticky',
   top: 0,
@@ -334,7 +335,7 @@ export const weekHeader = style({
   zIndex: 10,
   '@media': {
     'screen and (min-width: 768px)': {
-      gridTemplateColumns: '70px repeat(7, 1fr)',
+      gridTemplateColumns: '70px repeat(7, minmax(0, 1fr))',
     },
   },
 });
@@ -361,7 +362,6 @@ export const todayHeader = style({
   backgroundColor: button,
 });
 
-// Short day name (S, M, T, W...) - shown on mobile
 export const weekDayNameShort = style({
   display: 'block',
   fontSize: '0.875rem',
@@ -404,7 +404,7 @@ export const weekDayDate = style({
   fontSize: 14,
   fontWeight: '600',
   color: text_primary,
-  marginTop: '0.125rem',
+  marginTop: 2,
   selectors: {
     [`${todayHeader} &`]: {
       color: '#1a1a1a',
@@ -425,81 +425,56 @@ export const weekTimeGrid = style({
 
 export const weekTimeRow = style({
   display: 'grid',
-  gridTemplateColumns: '50px repeat(7, 1fr)',
-  minHeight: '50px',
+  gridTemplateColumns: '50px repeat(7, minmax(0, 1fr))',
+  minHeight: '40px',
   borderBottom: '1px solid #f1f5f9',
   '@media': {
     'screen and (min-width: 768px)': {
-      gridTemplateColumns: '70px repeat(7, 1fr)',
-      minHeight: '60px',
+      gridTemplateColumns: '70px repeat(7, minmax(0, 1fr))',
+      minHeight: '50px',
     },
   },
 });
 
 export const weekTimeLabel = style({
-  padding: '0.25rem',
-  fontSize: '0.625rem',
+  padding: 4,
+  fontSize: 11,
   fontWeight: '500',
-  color: '#64748b',
-  textAlign: 'right',
-  paddingRight: '0.375rem',
+  color: text_primary,
   borderRight: '1px solid #f1f5f9',
-  backgroundColor: '#f8fafc',
+  backgroundColor: dark_bg,
+  textAlign: 'center',
+  alignContent: 'center',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.5rem',
-      fontSize: '0.75rem',
-      paddingRight: '0.75rem',
+      padding: 6,
+      fontSize: 12,
     },
   },
 });
 
 export const weekTimeCell = style({
-  padding: '0.25rem',
+  minWidth: 0,
+  padding: 4,
   borderRight: '1px solid #f1f5f9',
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.25rem',
+  gap: 4,
   ':last-child': {
     borderRight: 'none',
   },
 });
 
 export const todayCell = style({
-  backgroundColor: '#f0f9ff',
-});
-
-export const weekBody = style({
-  display: 'grid',
-  gridTemplateColumns: 'repeat(7, 1fr)',
-  minHeight: '400px',
-});
-
-export const weekDayColumn = style({
-  padding: '0.5rem',
-  borderRight: '1px solid #f1f5f9',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.5rem',
-  ':last-child': {
-    borderRight: 'none',
-  },
-});
-
-export const todayColumn = style({
-  backgroundColor: '#f0f9ff',
-});
-
-export const noAppointments = style({
-  fontSize: '0.875rem',
-  color: '#cbd5e1',
-  textAlign: 'center',
-  padding: '1rem 0',
+  backgroundColor: darker_bg,
 });
 
 export const weekAppointment = style({
-  padding: '0.125rem 0.25rem',
-  borderRadius: '0.125rem',
+  minWidth: 0,
+  // width: '100%',
+  padding: '0px 2px',
+  paddingLeft: 8,
+  borderRadius: 4,
   cursor: 'pointer',
   transition: 'all 0.2s',
   overflow: 'hidden',
@@ -509,65 +484,48 @@ export const weekAppointment = style({
   },
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.25rem 0.375rem',
-      borderRadius: '0.25rem',
+      padding: '2px 10px',
     },
   },
 });
 
 export const weekAppointmentName = style({
-  fontSize: '0.625rem',
-  fontWeight: '600',
-  color: '#1a1a1a',
+  display: 'block',
+  fontSize: 11,
+  fontWeight: '500',
+  color: text_primary,
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
-  lineHeight: '1.2',
+  maxWidth: '100%',
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: '0.75rem',
+      fontSize: 12,
     },
   },
 });
 
-export const weekAppointmentTime = style({
-  fontSize: '0.6875rem',
-  fontWeight: '600',
-  color: '#1a1a1a',
-});
-
-export const weekAppointmentCustomer = style({
-  fontSize: '0.75rem',
-  color: '#475569',
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-});
-
 // Status Colors
-export const statusPending = style({
-  backgroundColor: '#fef3c7',
-  borderColor: '#fcd34d',
+export const statusIcon = style({
+  position: 'absolute',
+  top: 4,
+  right: 4,
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 });
 
-export const statusConfirmed = style({
-  backgroundColor: '#dbeafe',
-  borderColor: '#93c5fd',
+export const appointmentTimeRow = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
 });
 
-export const statusCompleted = style({
-  backgroundColor: '#dcfce7',
-  borderColor: '#86efac',
-});
-
-export const statusCancelled = style({
-  backgroundColor: '#fee2e2',
-  borderColor: '#fca5a5',
-});
-
-export const statusNoShow = style({
-  backgroundColor: '#f1f5f9',
-  borderColor: '#cbd5e1',
+export const dayStatusIcon = style({
+  display: 'flex',
+  alignItems: 'center',
+  opacity: 0.9,
 });
 
 // Modal Styles
@@ -582,112 +540,177 @@ export const modal = style({
   alignItems: 'center',
   justifyContent: 'center',
   zIndex: 1000,
-  padding: '1rem',
+  padding: 12,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 20,
+    },
+  },
 });
 
 export const modalContent = style({
-  backgroundColor: '#ffffff',
-  borderRadius: '0.5rem',
-  maxWidth: '500px',
+  backgroundColor: dark_bg,
+  borderRadius: 16,
+  maxWidth: '450px',
   width: '100%',
   maxHeight: '90vh',
   overflow: 'auto',
-  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
+  boxShadow: "0 24px 48px rgba(0, 0, 0, 0.16)",
 });
 
 export const modalHeader = style({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  padding: '1.25rem',
+  padding: 12,
   borderBottom: '1px solid #e2e8f0',
+  "@media": {
+    "screen and (min-width: 768px)": {
+      paddingLeft: 20,
+    },
+  },
 });
 
 export const modalTitle = style({
-  fontSize: '1.25rem',
-  fontWeight: '600',
-  color: '#1a1a1a',
+  fontSize: 18,
+  fontWeight: '500',
+  color: text_primary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 22,
+    },
+  },
 });
 
 export const closeButton = style({
-  padding: '0.25rem 0.5rem',
-  fontSize: '1.5rem',
+  padding: '4px 8px',
+  fontSize: 24,
   lineHeight: 1,
   backgroundColor: 'transparent',
-  color: '#64748b',
+  color: text_primary,
   border: 'none',
-  borderRadius: '0.25rem',
   cursor: 'pointer',
   transition: 'all 0.2s',
   ':hover': {
-    backgroundColor: '#f1f5f9',
-    color: '#1a1a1a',
+    color: '#ef4444',
+  },
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 30,
+    },
   },
 });
 
 export const modalBody = style({
-  padding: '1.25rem',
+  padding: 20,
 });
 
 export const detailRow = style({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'flex-start',
-  padding: '0.75rem 0',
+  padding: '12px 0px',
   borderBottom: '1px solid #f1f5f9',
   ':last-child': {
     borderBottom: 'none',
   },
 });
 
+export const detailDateTime = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 4,
+
+  marginLeft: 'auto',
+  textAlign: 'right',
+
+  '@media': {
+    'screen and (min-width: 768px)': {
+      gap: 6,
+    },
+  },
+});
+
+export const detailDate = style({
+  fontSize: 14,
+  color: text_primary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
+});
+
+export const detailTime = style({
+  fontSize: 14,
+  color: text_primary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
+});
+
 export const detailLabel = style({
-  fontSize: '0.875rem',
+  fontSize: 15,
   fontWeight: '500',
-  color: '#64748b',
+  color: text_secondary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 17,
+    },
+  },
+});
+
+export const detailLabelStack = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 4,
 });
 
 export const detailValue = style({
-  fontSize: '0.9375rem',
+  fontSize: 14,
   fontWeight: '500',
-  color: '#1a1a1a',
+  color: text_primary,
   textAlign: 'right',
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 16,
+    },
+  },
 });
 
 export const statusBadge = style({
-  display: 'inline-block',
-  padding: '0.25rem 0.75rem',
-  borderRadius: '9999px',
-  fontSize: '0.75rem',
+  fontSize: 13,
+  color: text_primary,
   fontWeight: '600',
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
 });
 
 export const modalActions = style({
-  padding: '1.25rem',
+  padding: 12,
   borderTop: '1px solid #e2e8f0',
-  backgroundColor: '#f8fafc',
-});
+  backgroundColor: dark_bg,
 
-export const actionsLabel = style({
-  fontSize: '0.875rem',
-  fontWeight: '500',
-  color: '#64748b',
-  marginBottom: '0.75rem',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: 8,
 });
 
 export const actionButtons = style({
   display: 'flex',
   flexWrap: 'wrap',
-  gap: '0.5rem',
+  gap: 12,
 });
 
 const actionButtonBase = {
-  padding: '0.5rem 1rem',
-  fontSize: '0.875rem',
-  fontWeight: '500',
+  padding: '8px 12px',
+  fontSize: 16,
+  fontWeight: '550',
   border: 'none',
-  borderRadius: '0.375rem',
+  borderRadius: 6,
   cursor: 'pointer',
   transition: 'all 0.2s',
 };
@@ -695,7 +718,7 @@ const actionButtonBase = {
 export const actionConfirm = style({
   ...actionButtonBase,
   backgroundColor: '#0ea5e9',
-  color: '#ffffff',
+  color: dark_bg,
   ':hover': {
     backgroundColor: '#0284c7',
   },
@@ -704,7 +727,7 @@ export const actionConfirm = style({
 export const actionComplete = style({
   ...actionButtonBase,
   backgroundColor: '#10b981',
-  color: '#ffffff',
+  color: dark_bg,
   ':hover': {
     backgroundColor: '#059669',
   },
@@ -712,17 +735,17 @@ export const actionComplete = style({
 
 export const actionNoShow = style({
   ...actionButtonBase,
-  backgroundColor: '#6b7280',
-  color: '#ffffff',
+  backgroundColor: text_muted,
+  color: dark_bg,
   ':hover': {
-    backgroundColor: '#4b5563',
+    backgroundColor: '#6b7280',
   },
 });
 
 export const actionCancel = style({
   ...actionButtonBase,
   backgroundColor: '#ef4444',
-  color: '#ffffff',
+  color: dark_bg,
   ':hover': {
     backgroundColor: '#dc2626',
   },

@@ -12,6 +12,7 @@ export const container = style({
   minHeight: "100vh",
   backgroundColor: darker_bg,
   paddingTop: 72,
+  paddingBottom: 100,
   gap: 20,
 
   "@media": {

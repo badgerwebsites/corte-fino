@@ -6,7 +6,7 @@ import type { Barber, BookingWithDetails } from '../types/database.types';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/adminCalendar.css';
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, Ban, Circle} from "lucide-react";
 
 interface AdminCalendarProps {
   barbers: Barber[];
@@ -22,6 +22,45 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
   const [selectedBarberId, setSelectedBarberId] = useState<string>('all');
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
   const [selectedBooking, setSelectedBooking] = useState<BookingWithDetails | null>(null);
+
+  const BARBER_COLORS: Record<
+  string,
+  { accent: string; bg: string }
+> = {
+  'fb04ef37-1cff-40df-a2ec-dfe9a48cd32b': {
+    accent: "#60a5fa",
+    bg: "#1e293b",
+  },
+  '780ec7e0-4ce1-4212-947f-511b6c9f3a88': {
+    accent: "#4ade80",
+    bg: "#1f2e26",
+  },
+  '3087d11b-1282-4c2f-802f-e5287f61e996': {
+    accent: "#f87171",
+    bg: "#2a1f22",
+  },
+};
+
+const getBarberColors = (booking: BookingWithDetails) =>
+  booking.barber_id && BARBER_COLORS[booking.barber_id]
+    ? BARBER_COLORS[booking.barber_id]
+    : {
+        accent: '#64748b',
+        bg: '#1f2937',
+      };
+
+  const renderStatusIcon = (status: BookingStatus) => {
+    switch (status) {
+      case 'completed':
+        return <Check size={18} color="#22c55e" strokeWidth={4} />;
+      case 'cancelled':
+        return <Ban size={14} color="#ef4444" strokeWidth={2.5} />;
+      case 'no_show':
+        return <Circle size={12} color="#94a3b8" fill="#94a3b8" />;
+      default:
+        return null;
+    }
+  };
 
   const loadBookings = useCallback(async () => {
     try {
@@ -57,7 +96,8 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
         .lte('booking_date', endDate)
         .neq('status', 'cancelled')
         .order('booking_date', { ascending: true })
-        .order('start_time', { ascending: true });
+        .order('start_time', { ascending: true })
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
       setBookings(data || []);
@@ -190,17 +230,6 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
     const period = hours >= 12 ? 'PM' : 'AM';
     const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-  };
-
-  const getStatusColor = (status: BookingStatus): string => {
-    switch (status) {
-      case 'pending': return styles.statusPending;
-      case 'confirmed': return styles.statusConfirmed;
-      case 'completed': return styles.statusCompleted;
-      case 'cancelled': return styles.statusCancelled;
-      case 'no_show': return styles.statusNoShow;
-      default: return '';
-    }
   };
 
   // Generate time slots for the day view (7 AM to 9 PM)
@@ -350,26 +379,52 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
                         <Text>{formatTime(timeSlot)}</Text>
                       </View>
                       <View className={styles.appointmentsColumn}>
-                        {slotBookings.map(booking => (
-                          <View
-                            key={booking.id}
-                            className={`${styles.appointmentCard} ${getStatusColor(booking.status)}`}
-                            onClick={() => setSelectedBooking(booking)}
-                          >
-                            <Text className={styles.appointmentTime}>
-                              {formatTime(booking.start_time)} - {formatTime(booking.end_time)}
-                            </Text>
-                            <Text className={styles.appointmentCustomer}>
-                              {booking.customer?.first_name} {booking.customer?.last_name}
-                            </Text>
-                            <Text className={styles.appointmentService}>
-                              {booking.service?.name}
-                            </Text>
-                            <Text className={styles.appointmentBarber}>
-                              with {booking.barber?.name}
-                            </Text>
-                          </View>
-                        ))}
+                        {slotBookings.map(booking => {
+                          const barberColors = getBarberColors(booking);
+
+                          return (
+                            <View
+                              key={booking.id}
+                              className={styles.appointmentCard}
+                              style={{
+                                position: 'relative',
+                                backgroundColor: barberColors.bg,
+                                boxShadow: `inset 4px 0 0 ${barberColors.accent}`,
+                              }}
+                              onClick={() => setSelectedBooking(booking)}
+                            >
+
+                              {(() => {
+                                const statusIcon = renderStatusIcon(booking.status);
+
+                                return (
+                                  <View className={styles.appointmentTimeRow}>
+                                    <Text className={styles.appointmentTime}>
+                                      {formatTime(booking.start_time)} – {formatTime(booking.end_time)}
+                                    </Text>
+
+                                    {statusIcon && (
+                                      <View className={styles.dayStatusIcon}>
+                                        {statusIcon}
+                                      </View>
+                                    )}
+                                  </View>
+                                );
+                              })()}
+
+                              {/* Row 2: Customer */}
+                              <Text className={styles.appointmentCustomer}>
+                                {booking.customer?.first_name} {booking.customer?.last_name}
+                              </Text>
+
+                              {/* Row 3: Service + Barber */}
+                              <Text className={styles.appointmentMeta}>
+                                {booking.service?.name}
+                                {booking.barber?.name && ` · with ${booking.barber.name}`}
+                              </Text>
+                            </View>
+                          );
+                        })}
                       </View>
                     </View>
                   );
@@ -410,17 +465,25 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
                           key={day.toISOString()}
                           className={`${styles.weekTimeCell} ${isSameDay(day, new Date()) ? styles.todayCell : ''}`}
                         >
-                          {slotBookings.map(booking => (
-                            <View
-                              key={booking.id}
-                              className={`${styles.weekAppointment} ${getStatusColor(booking.status)}`}
-                              onClick={() => setSelectedBooking(booking)}
-                            >
-                              <Text className={styles.weekAppointmentName}>
-                                {booking.customer?.first_name}
-                              </Text>
-                            </View>
-                          ))}
+                          {slotBookings.map(booking => {
+                            const barberColors = getBarberColors(booking);
+
+                            return (
+                              <View
+                                key={booking.id}
+                                className={styles.weekAppointment}
+                                style={{
+                                  backgroundColor: barberColors.bg,
+                                  boxShadow: `inset 4px 0 0 ${barberColors.accent}`,
+                                }}
+                                onClick={() => setSelectedBooking(booking)}
+                              >
+                                <Text className={styles.weekAppointmentName}>
+                                  {booking.customer?.first_name}
+                                </Text>
+                              </View>
+                            );
+                          })}
                         </View>
                       );
                     })}
@@ -465,8 +528,12 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
                           {dayBookings.slice(0, 3).map(booking => (
                             <div
                               key={booking.id}
-                              className={`${styles.monthBookingDot} ${getStatusColor(booking.status)}`}
-                              onClick={(e: React.MouseEvent) => {
+                              className={styles.monthBookingDot}
+                              style={{
+                                backgroundColor: getBarberColors(booking).bg,
+                                boxShadow: `inset 4px 0 0 ${getBarberColors(booking).accent}`,
+                              }}
+                              onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedBooking(booking);
                               }}
@@ -543,12 +610,20 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
               </View>
 
               <View className={styles.detailRow}>
-                <Text className={styles.detailLabel}>Date & Time</Text>
-                <Text className={styles.detailValue}>
-                  {format(new Date(selectedBooking.booking_date), 'MMMM d, yyyy')}
-                  {' at '}
-                  {formatTime(selectedBooking.start_time)} - {formatTime(selectedBooking.end_time)}
-                </Text>
+                <View className={styles.detailLabelStack}>
+                  <Text className={styles.detailLabel}>Date</Text>
+                  <Text className={styles.detailLabel}>Time</Text>
+                </View>
+
+                <View className={styles.detailDateTime}>
+                  <Text className={styles.detailDate}>
+                    {format(new Date(selectedBooking.booking_date), 'MMMM d, yyyy')}
+                  </Text>
+
+                  <Text className={styles.detailTime}>
+                    {formatTime(selectedBooking.start_time)} – {formatTime(selectedBooking.end_time)}
+                  </Text>
+                </View>
               </View>
 
               <View className={styles.detailRow}>
@@ -560,14 +635,14 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
 
               <View className={styles.detailRow}>
                 <Text className={styles.detailLabel}>Status</Text>
-                <Text className={`${styles.statusBadge} ${getStatusColor(selectedBooking.status)}`}>
-                  {selectedBooking.status}
+                <Text className={styles.statusBadge}>
+                  {selectedBooking.status.replace('_', ' ').toUpperCase()}
                 </Text>
               </View>
             </View>
 
             <View className={styles.modalActions}>
-              <Text className={styles.actionsLabel}>Update Status:</Text>
+              {/* <Text className={styles.actionsLabel}>Update Status:</Text> */}
               <View className={styles.actionButtons}>
                 {selectedBooking.status !== 'confirmed' && (
                   <button

@@ -266,7 +266,6 @@ export const rewardsGrid = style({
     "screen and (min-width: 768px)": {
       gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
       gap: 24,
-      marginBottom: 24,
     },
   },
 });
