@@ -11,6 +11,7 @@ const border_hover = "rgba(255,255,255,0.18)";
 export const dateTimeLayout = style({
   display: "flex",
   flexDirection: "column",
+  alignItems: "center",
   "@media": {
     "screen and (min-width: 768px)": {
       flexDirection: "row",
