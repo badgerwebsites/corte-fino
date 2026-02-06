@@ -1,5 +1,5 @@
 // pages/AdminPage.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
@@ -41,6 +41,7 @@ export default function AdminPage() {
     evening_hours_start: '17:00',
     evening_hours_end: '21:00',
   });
+  const barberFormRef = useRef<HTMLDivElement>(null);
 
   // Service form state
   const [editingService, setEditingService] = useState<Service | null>(null);
@@ -51,6 +52,7 @@ export default function AdminPage() {
     reward_points: 10,
     image_url: '',
   });
+  const serviceFormRef = useRef<HTMLDivElement>(null);
 
   // Reward form state
   const [editingReward, setEditingReward] = useState<Reward | null>(null);
@@ -63,6 +65,7 @@ export default function AdminPage() {
     is_active: true,
     sort_order: 0,
   });
+  const rewardFormRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!user) {
@@ -207,6 +210,7 @@ export default function AdminPage() {
       reward_points: service.reward_points,
       image_url: service.image_url || '',
     });
+    serviceFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleDeleteService = async (serviceId: string) => {
@@ -289,6 +293,7 @@ export default function AdminPage() {
       evening_hours_start: barber.evening_hours_start,
       evening_hours_end: barber.evening_hours_end,
     });
+    barberFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleDeleteBarber = async (barberId: string) => {
@@ -450,6 +455,7 @@ export default function AdminPage() {
       is_active: reward.is_active,
       sort_order: reward.sort_order,
     });
+    rewardFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleDeleteReward = async (rewardId: string) => {
@@ -537,15 +543,6 @@ export default function AdminPage() {
       <View className={styles.container}>
       <View className={styles.header}>
         <Text className={styles.title}>Admin Dashboard</Text>
-        <button
-          className={styles.backLink}
-          onClick={async () => {
-            await supabase.auth.signOut();
-            navigate('/login');
-          }}
-        >
-          Log Out →
-        </button>
       </View>
 
       <View className={styles.tabs}>
@@ -661,7 +658,7 @@ export default function AdminPage() {
       )}
 
       {activeTab === 'services' && (
-        <View className={styles.section}>
+        <div ref={serviceFormRef} className={styles.section}>
           <View className={styles.sectionHeader}>
             <Text className={styles.sectionTitle}>
               {editingService ? 'Edit Service' : 'Add New Service'}
@@ -779,7 +776,7 @@ export default function AdminPage() {
               </View>
             ))}
           </View>
-        </View>
+        </div>
       )}
 
       {activeTab === 'barbers' && (
@@ -829,11 +826,11 @@ export default function AdminPage() {
           </View>
 
           {/* Add/Edit Barber Form */}
-          <View className={styles.sectionHeader} style={{ marginTop: '3rem' }}>
+          <div ref={barberFormRef} className={styles.sectionHeader} style={{ marginTop: '3rem' }}>
             <Text className={styles.sectionTitle}>
               {editingBarber ? 'Edit Barber' : 'Add New Barber'}
             </Text>
-          </View>
+          </div>
 
           <form onSubmit={handleBarberSubmit} className={styles.form}>
             <ImageUpload
@@ -1212,11 +1209,11 @@ export default function AdminPage() {
 
           {/* Manage Rewards */}
           <View className={styles.rewardsManagementSection}>
-            <View className={styles.sectionHeader}>
+            <div ref={rewardFormRef} className={styles.sectionHeader}>
               <Text className={styles.sectionTitle}>
                 {editingReward ? 'Edit Reward' : 'Add New Reward'}
               </Text>
-            </View>
+            </div>
 
             <form onSubmit={handleRewardSubmit} className={styles.form}>
               <View className={styles.formGroup}>
