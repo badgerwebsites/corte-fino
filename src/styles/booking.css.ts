@@ -76,13 +76,14 @@ export const rescheduleNotice = style({
   // maxWidth: 850,
   display: "inline-block",
   margin: "0 auto 12px",
-  padding: "16px 20px",
+  padding: "8px 12px",
   backgroundColor: "#fef3c7",
   border: "1px solid #fcd34d",
   borderRadius: 8,
   "@media": {
     "screen and (min-width: 768px)": {
       marginBottom: 32,
+      padding: "12px 20px",
     },
   },
 });

@@ -11,7 +11,6 @@ import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/booking.css';
 import * as calendarStyles from '../styles/calendar.css';
-// import 'react-day-picker/dist/style.css';
 
 type BookingStep = 1 | 2 | 3 | 4;
 
@@ -537,7 +536,7 @@ export default function BookingPage() {
         <View className={styles.rescheduleNoticeWrapper}>
           <View className={styles.rescheduleNotice}>
             <Text className={styles.rescheduleNoticeText}>
-              You are rescheduling an existing appointment.
+              You are rescheduling an appointment
             </Text>
           </View>
         </View>
