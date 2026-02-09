@@ -310,6 +310,13 @@ export const input = style({
   '::placeholder': {
     color: text_muted,
   },
+  '::-webkit-inner-spin-button': {
+    opacity: 1,
+    filter: 'invert(1)',
+  },
+  '::-webkit-outer-spin-button': {
+    opacity: 0.01,
+  },
 });
 
 export const textarea = style({
@@ -470,7 +477,6 @@ export const editButton = style({
   },
   ':hover': {
     background: '#a5d8e6',
-    // borderColor: '#c6ecf4',
     color: '#1a1a1a',
   },
 });
@@ -494,7 +500,6 @@ export const deleteButton = style({
   },
   ':hover': {
     background: '#e5a3a3',
-    // borderColor: '#d4a3a3',
   },
 });
 
