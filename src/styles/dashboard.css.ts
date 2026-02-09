@@ -97,43 +97,6 @@ export const statsRow = style({
   marginBottom: 24,
 });
 
-export const stat = style({
-  display: "flex",
-  flexDirection: "column",
-  gap: 4,
-  padding: "20px",
-  backgroundColor: "#ffffff",
-  borderRadius: 12,
-  border: "1px solid #f0f0f0",
-});
-
-export const statValue = style({
-  fontSize: 28,
-  fontWeight: 600,
-  color: "#0a0a0a",
-  letterSpacing: "-0.02em",
-  lineHeight: 1,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      fontSize: 32,
-    },
-  },
-});
-
-export const statValueMuted = style({
-  fontSize: 14,
-  fontWeight: 500,
-  color: "#a3a3a3",
-  lineHeight: 1.3,
-});
-
-export const statLabel = style({
-  fontSize: 13,
-  color: "#737373",
-  fontWeight: 400,
-  marginTop: 4,
-});
-
 export const section = style({
   marginBottom: 16,
   marginTop: 8,

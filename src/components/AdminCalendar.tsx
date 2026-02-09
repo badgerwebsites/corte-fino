@@ -310,11 +310,18 @@ const getBarberColors = (booking: BookingWithDetails) =>
 
         <Text className={styles.dateTitle}>
           {viewMode === 'day'
-            ? format(currentDate, 'EEEE, MMMM d, yyyy')
+            ? format(currentDate, 'EEE, MMMM d, yyyy')
             : viewMode === 'week'
-            ? `${format(startOfWeek(currentDate, { weekStartsOn: 0 }), 'MMM d')} - ${format(endOfWeek(currentDate, { weekStartsOn: 0 }), 'MMM d, yyyy')}`
+            ? `${format(
+                startOfWeek(currentDate, { weekStartsOn: 0 }),
+                'MMM d'
+              )} – ${format(
+                endOfWeek(currentDate, { weekStartsOn: 0 }),
+                'MMM d, yyyy'
+              )}`
             : format(currentDate, 'MMMM yyyy')}
         </Text>
+
 
         <View className={styles.controls}>
           <div className={styles.selectWrapper}>
@@ -361,11 +368,20 @@ const getBarberColors = (booking: BookingWithDetails) =>
           {viewMode === 'day' && (
             <View className={styles.dayView}>
               {/* Header with day column */}
-              <View className={styles.dayHeader}>
-                <View className={styles.dayTimeColumnHeader}></View>
-                <View className={`${styles.dayColumnHeader} ${isSameDay(currentDate, new Date()) ? styles.dayColumnHeaderToday : ''}`}>
-                  <Text className={styles.dayColumnDayName}>{format(currentDate, 'EEE')}</Text>
-                  <Text className={styles.dayColumnDate}>{format(currentDate, 'd')}</Text>
+              <View
+                className={`${styles.dayHeader} ${
+                  isSameDay(currentDate, new Date()) ? styles.dayHeaderToday : ''
+                }`}
+              >
+                <View className={styles.dayTimeColumnHeader} />
+
+                <View className={styles.dayColumnHeader}>
+                  <Text className={styles.dayColumnDayName}>
+                    {format(currentDate, 'EEE')}
+                  </Text>
+                  <Text className={styles.dayColumnDate}>
+                    {format(currentDate, 'd')}
+                  </Text>
                 </View>
               </View>
 
@@ -525,7 +541,7 @@ const getBarberColors = (booking: BookingWithDetails) =>
                       <Text className={styles.monthCellDate}>{format(day, 'd')}</Text>
                       {dayBookings.length > 0 && (
                         <View className={styles.monthCellBookings}>
-                          {dayBookings.slice(0, 3).map(booking => (
+                          {dayBookings.slice(0, 2).map(booking => (
                             <div
                               key={booking.id}
                               className={styles.monthBookingDot}
@@ -543,9 +559,9 @@ const getBarberColors = (booking: BookingWithDetails) =>
                               </Text>
                             </div>
                           ))}
-                          {dayBookings.length > 3 && (
+                          {dayBookings.length > 2 && (
                             <Text className={styles.monthMoreBookings}>
-                              +{dayBookings.length - 3} more
+                              +{dayBookings.length - 2} more
                             </Text>
                           )}
                         </View>
@@ -673,7 +689,7 @@ const getBarberColors = (booking: BookingWithDetails) =>
                     className={styles.actionCancel}
                     onClick={() => handleStatusUpdate(selectedBooking.id, 'cancelled')}
                   >
-                    Cancel
+                    Delete
                   </button>
                 )}
               </View>

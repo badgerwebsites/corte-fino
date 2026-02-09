@@ -596,8 +596,8 @@ export default function AdminPage() {
       )}
 
       {activeTab === 'pricing' && (
-        <View className={styles.section}>
-          <Text className={styles.sectionTitle}>Set Prices by Barber & Time</Text>
+        <View>
+          {/* <Text className={styles.sectionTitle}>Set Prices by Barber & Time</Text> */}
 
           {services.map((service) => (
             <View key={service.id} className={styles.serviceSection}>
@@ -609,14 +609,13 @@ export default function AdminPage() {
                 {barbers.map((barber) => (
                   <View key={barber.id} className={styles.pricingRow}>
                     <Text className={styles.barberNameCell}>{barber.name}</Text>
-
                     <View className={styles.priceInputWrapper}>
                       <Text className={styles.priceInputLabel}>Regular <span className={styles.priceTimeHint}>{formatTimeShort(barber.regular_hours_start)}–{formatTimeShort(barber.regular_hours_end)}</span></Text>
                       <View className={styles.priceInputCell}>
                         <Text className={styles.dollarSign}>$</Text>
                         <input
                           type="number"
-                          step="0.01"
+                          step="0.25"
                           min="0"
                           className={styles.priceInput}
                           value={getPrice(barber.id, service.id, 'regular') || ''}
@@ -637,7 +636,7 @@ export default function AdminPage() {
                         <Text className={styles.dollarSign}>$</Text>
                         <input
                           type="number"
-                          step="0.01"
+                          step="0.25"
                           min="0"
                           className={styles.priceInput}
                           value={getPrice(barber.id, service.id, 'evening') || ''}
@@ -675,6 +674,7 @@ export default function AdminPage() {
                 className={styles.input}
                 value={serviceForm.name}
                 onChange={(e) => setServiceForm({ ...serviceForm, name: e.target.value })}
+                placeholder="Type here..."
                 required
               />
             </View>
@@ -685,6 +685,7 @@ export default function AdminPage() {
                 className={styles.textarea}
                 value={serviceForm.description}
                 onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
+                placeholder="Type here..."
                 rows={2}
               />
             </View>
@@ -706,6 +707,7 @@ export default function AdminPage() {
                   className={styles.input}
                   value={serviceForm.duration_minutes}
                   onChange={(e) => setServiceForm({ ...serviceForm, duration_minutes: parseInt(e.target.value) })}
+                  placeholder="Type here..."
                   required
                 />
               </View>
@@ -718,6 +720,7 @@ export default function AdminPage() {
                   className={styles.input}
                   value={serviceForm.reward_points}
                   onChange={(e) => setServiceForm({ ...serviceForm, reward_points: parseInt(e.target.value) })}
+                  placeholder="Type here..."
                   required
                 />
               </View>
@@ -749,7 +752,7 @@ export default function AdminPage() {
           </form>
 
           <View className={styles.barbersList}>
-            <Text className={styles.sectionTitle}>Current Services</Text>
+            {/* <Text className={styles.sectionTitle}>Current Services</Text> */}
             {services.map((service) => (
               <View key={service.id} className={styles.barberCard}>
                 <View className={styles.barberInfo}>
@@ -785,7 +788,7 @@ export default function AdminPage() {
         <View className={styles.section}>
           {/* Current Barbers List */}
           <View className={styles.barbersList}>
-            <Text className={styles.sectionTitle}>Current Barbers</Text>
+            {/* <Text className={styles.sectionTitle}>Current Barbers</Text> */}
             {barbers.map((barber) => (
               <View key={barber.id} className={styles.barberCard}>
                 <View className={styles.barberInfo}>

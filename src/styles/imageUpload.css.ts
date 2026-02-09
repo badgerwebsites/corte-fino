@@ -1,5 +1,14 @@
 import { style } from '@vanilla-extract/css';
 
+const darker_bg = "#101214";
+// const dark_bg = "#222222";
+const button =  "#96cfe0";
+const text_primary = "#f5f5f5";
+const text_secondary = "#b0b0b0";
+// const text_muted = "#8a8a8a";
+// const border_subtle = "rgba(255,255,255,0.08)";
+// const border_hover = "rgba(255,255,255,0.18)";
+
 export const container = style({
   marginBottom: '1rem',
 });
@@ -8,7 +17,7 @@ export const label = style({
   display: 'block',
   marginBottom: '0.5rem',
   fontWeight: '500',
-  color: '#2d3748',
+  color: text_secondary,
   fontSize: '0.875rem',
   '@media': {
     'screen and (min-width: 768px)': {
@@ -27,40 +36,40 @@ export const dropzone = style({
   alignItems: 'center',
   justifyContent: 'center',
   padding: '2rem 1rem',
-  border: '2px dashed #e2e8f0',
+  border: '2px dashed #96cfe0',
   borderRadius: '0.5rem',
-  backgroundColor: '#f8fafc',
+  backgroundColor: darker_bg,
   cursor: 'pointer',
   transition: 'all 0.2s',
   ':hover': {
-    borderColor: '#cbd5e1',
-    backgroundColor: '#f1f5f9',
+    borderColor: '#7fbccd',
+    backgroundColor: "#000",
   },
 });
 
 export const dropzoneDragging = style({
-  borderColor: '#0ea5e9',
-  backgroundColor: '#f0f9ff',
+  borderColor: '#7fbccd',
+  backgroundColor: darker_bg,
   borderStyle: 'solid',
   transform: 'scale(1.02)',
   boxShadow: '0 0 0 4px rgba(14, 165, 233, 0.1)',
 });
 
 export const dropzoneIcon = style({
-  color: '#94a3b8',
-  marginBottom: '0.75rem',
+  color: text_primary,
+  marginBottom: 8,
 });
 
 export const dropzoneText = style({
   fontSize: '0.9375rem',
   fontWeight: '500',
-  color: '#475569',
-  marginBottom: '0.25rem',
+  color: text_primary,
+  marginBottom: 8,
 });
 
 export const dropzoneHint = style({
   fontSize: '0.8125rem',
-  color: '#94a3b8',
+  color: text_secondary,
 });
 
 export const previewContainer = style({
@@ -69,9 +78,9 @@ export const previewContainer = style({
   alignItems: 'center',
   gap: '0.75rem',
   padding: '1rem',
-  border: '2px solid #e2e8f0',
+  border: `1px solid ${text_secondary}`,
   borderRadius: '0.5rem',
-  backgroundColor: '#f8fafc',
+  backgroundColor: darker_bg,
 });
 
 export const preview = style({
@@ -91,17 +100,17 @@ export const previewActions = style({
 
 export const changeButton = style({
   padding: '0.5rem 1rem',
-  fontSize: '0.875rem',
+  fontSize: 16,
   fontWeight: '500',
-  backgroundColor: '#ffffff',
-  color: '#475569',
-  border: '1px solid #e2e8f0',
-  borderRadius: '0.375rem',
+  backgroundColor: button,
+  color: darker_bg,
+  border: "none",
+  borderRadius: 4,
   cursor: 'pointer',
   transition: 'all 0.2s',
+  letterSpacing: '0.02em',
   ':hover': {
-    backgroundColor: '#f1f5f9',
-    borderColor: '#cbd5e1',
+    backgroundColor: '#7fbccd',
   },
   ':disabled': {
     opacity: 0.5,
@@ -111,17 +120,17 @@ export const changeButton = style({
 
 export const removeButton = style({
   padding: '0.5rem 1rem',
-  fontSize: '0.875rem',
+  fontSize: 16,
   fontWeight: '500',
-  backgroundColor: '#ffffff',
-  color: '#ef4444',
-  border: '1px solid #fecaca',
-  borderRadius: '0.375rem',
+  backgroundColor: '#fecaca',
+  color: '#dc2626',
+  border: "none",
+  borderRadius: 4,
   cursor: 'pointer',
   transition: 'all 0.2s',
+  letterSpacing: '0.02em',
   ':hover': {
-    backgroundColor: '#fef2f2',
-    borderColor: '#fca5a5',
+    backgroundColor: '#fcb3b3',
   },
   ':disabled': {
     opacity: 0.5,

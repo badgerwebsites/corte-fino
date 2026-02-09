@@ -6,7 +6,6 @@ const button =  "#96cfe0";
 const text_primary = "#f5f5f5";
 const text_secondary = "#b0b0b0";
 const text_muted = "#8a8a8a";
-const border_subtle = "rgba(255,255,255,0.08)";
 
 export const container = style({
   backgroundColor: dark_bg,
@@ -18,8 +17,8 @@ export const container = style({
 export const header = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1rem',
-  padding: '1rem',
+  gap: 8,
+  padding: 16,
   borderBottom: '1px solid #e2e8f0',
   backgroundColor: darker_bg,
   alignItems: 'center',
@@ -28,7 +27,7 @@ export const header = style({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '1.25rem',
+      padding: 20,
     },
   },
 });
@@ -36,13 +35,13 @@ export const header = style({
 export const navigation = style({
   display: 'flex',
   alignItems: 'center',
-  gap: '0.5rem',
+  gap: 8,
 });
 
 export const navButton = style({
   all: "unset",
-  width: 40,
-  height: 40,
+  width: 32,
+  height: 32,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -67,8 +66,7 @@ globalStyle(`${navButton} svg`, {
 });
 
 export const todayButton = style({
-  padding: '0px 12px',
-  fontSize: 20,
+  fontSize: 22,
   fontWeight: '600',
   backgroundColor: 'transparent',
   color: text_primary,
@@ -87,7 +85,7 @@ export const todayButton = style({
 });
 
 export const dateTitle = style({
-  fontSize: 18,
+  fontSize: 22,
   fontWeight: '600',
   color: text_primary,
   textAlign: 'center',
@@ -101,8 +99,13 @@ export const dateTitle = style({
 export const controls = style({
   display: 'flex',
   alignItems: 'center',
-  gap: 20,
+  gap: 12,
   flexWrap: 'wrap',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      gap: 16,
+    },
+  },
 });
 
 export const selectWrapper = style({
@@ -135,7 +138,7 @@ export const barberFilter = style({
   MozAppearance: 'none',
   minWidth: 240,
 
-  padding: '10px 48px 10px 16px',
+  padding: '8px 0px 8px 10px',
   fontSize: 18,
   fontWeight: 400,
 
@@ -145,6 +148,11 @@ export const barberFilter = style({
   border: '1px solid #f5f5f5',
 
   cursor: 'pointer',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '10px 48px 10px 16px',
+    },
+  },
 });
 
 export const viewToggle = style({
@@ -156,7 +164,7 @@ export const viewToggle = style({
 });
 
 export const viewButton = style({
-  padding: '12px 16px',
+  padding: '10px 16px',
   fontSize: 16,
   fontWeight: '600',
   backgroundColor: 'transparent',
@@ -168,6 +176,11 @@ export const viewButton = style({
   ':hover': {
     backgroundColor: button,
     color: '#1a1a1a',
+  },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '12px 16px',
+    },
   },
 });
 
@@ -194,6 +207,10 @@ export const dayHeader = style({
       gridTemplateColumns: '70px 1fr',
     },
   },
+});
+
+export const dayHeaderToday = style({
+  backgroundColor: button,
 });
 
 export const dayTimeColumnHeader = style({
@@ -225,6 +242,11 @@ export const dayColumnDayName = style({
   color: text_primary,
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
+  selectors: {
+    [`${dayHeaderToday} &`]: {
+      color: darker_bg,
+    },
+  },
 });
 
 export const dayColumnDate = style({
@@ -235,6 +257,11 @@ export const dayColumnDate = style({
   '@media': {
     'screen and (min-width: 768px)': {
       fontSize: 24,
+    },
+  },
+  selectors: {
+    [`${dayHeaderToday} &`]: {
+      color: darker_bg,
     },
   },
 });
@@ -279,15 +306,12 @@ export const appointmentsColumn = style({
   flexDirection: 'column',
   gap: 2,
   padding: 2,
-  // width: '100%',
   alignItems: 'stretch',
 });
 
 export const appointmentCard = style({
-  // width: '100%',
   display: 'flex',
   flexDirection: 'column',
-  // gap: 4,
   padding: 8,
   paddingLeft: 12,
   borderRadius: 10,
@@ -304,7 +328,6 @@ export const appointmentCard = style({
 export const appointmentTime = style({
   fontSize: 14,
   fontWeight: '500',
-  // marginBottom: 4,
   color: text_primary,
 });
 
@@ -317,7 +340,6 @@ export const appointmentCustomer = style({
 export const appointmentMeta = style({
   fontSize: 13,
   color: text_secondary,
-  // lineHeight: 1.4,
 });
 
 // Week View Styles
@@ -471,7 +493,6 @@ export const todayCell = style({
 
 export const weekAppointment = style({
   minWidth: 0,
-  // width: '100%',
   padding: '0px 2px',
   paddingLeft: 8,
   borderRadius: 4,
@@ -753,10 +774,10 @@ export const actionCancel = style({
 
 // Month View Styles
 export const monthView = style({
-  padding: '0.5rem',
+  padding: 8,
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '1rem',
+      padding: 16,
     },
   },
 });
@@ -764,25 +785,23 @@ export const monthView = style({
 export const monthHeader = style({
   display: 'grid',
   gridTemplateColumns: 'repeat(7, 1fr)',
-  borderBottom: '1px solid #e2e8f0',
-  marginBottom: '0.5rem',
 });
 
 export const monthDayHeader = style({
-  padding: '0.5rem 0.25rem',
+  paddingBottom: 8,
   textAlign: 'center',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.75rem 0.5rem',
+      paddingBottom: 16,
     },
   },
 });
 
 export const monthDayNameShort = style({
   display: 'block',
-  fontSize: '0.75rem',
+  fontSize: 16,
   fontWeight: '600',
-  color: '#64748b',
+  color: text_primary,
   textTransform: 'uppercase',
   '@media': {
     'screen and (min-width: 768px)': {
@@ -793,9 +812,9 @@ export const monthDayNameShort = style({
 
 export const monthDayNameFull = style({
   display: 'none',
-  fontSize: '0.75rem',
+  fontSize: 16,
   fontWeight: '500',
-  color: '#64748b',
+  color: text_primary,
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
   '@media': {
@@ -816,13 +835,18 @@ export const monthGrid = style({
 });
 
 export const monthCell = style({
-  backgroundColor: '#ffffff',
+  minWidth: 0,
+  borderRight: '1px solid #f1f5f9',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 4,
+  backgroundColor: dark_bg,
   minHeight: '60px',
-  padding: '0.25rem',
+  padding: 4,
   cursor: 'pointer',
   transition: 'background-color 0.2s',
   ':hover': {
-    backgroundColor: '#f8fafc',
+    backgroundColor: darker_bg,
   },
   '@media': {
     'screen and (min-width: 768px)': {
@@ -833,27 +857,33 @@ export const monthCell = style({
 });
 
 export const monthCellOther = style({
-  backgroundColor: '#f8fafc',
+  opacity: 0.9,
+  cursor: "not-allowed",
   ':hover': {
-    backgroundColor: '#f1f5f9',
+    backgroundColor: dark_bg,
+    opacity: 0.9,
   },
 });
 
 export const monthCellToday = style({
-  backgroundColor: '#f0f9ff',
+  backgroundColor: button,
   ':hover': {
-    backgroundColor: '#e0f2fe',
+    backgroundColor: '#7fbccd',
   },
 });
 
 export const monthCellDate = style({
-  fontSize: '0.75rem',
+  fontSize: 12,
   fontWeight: '600',
-  color: '#1a1a1a',
-  marginBottom: '0.25rem',
+  color: text_primary,
+  selectors: {
+    [`${monthCellToday} &`]: {
+      color: dark_bg,
+    },
+  },
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: '0.875rem',
+      fontSize: 16,
     },
   },
 });
@@ -861,46 +891,52 @@ export const monthCellDate = style({
 export const monthCellBookings = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.125rem',
+  gap: 4,
 });
 
 export const monthBookingDot = style({
-  padding: '0.125rem 0.25rem',
-  borderRadius: '0.125rem',
+  minWidth: 0,
+  padding: '0px 2px',
+  paddingLeft: 8,
+  borderRadius: 4,
   cursor: 'pointer',
-  transition: 'transform 0.2s',
+  transition: 'all 0.2s',
+  overflow: 'hidden',
   ':hover': {
     transform: 'scale(1.02)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
   },
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.25rem 0.375rem',
-      borderRadius: '0.25rem',
+      padding: '2px 10px',
     },
   },
 });
 
 export const monthBookingText = style({
-  fontSize: '0.625rem',
+  display: 'block',
+  fontSize: 10,
   fontWeight: '500',
-  color: '#1a1a1a',
+  color: text_primary,
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
+  maxWidth: '100%',
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: '0.75rem',
+      fontSize: 13,
     },
   },
 });
 
 export const monthMoreBookings = style({
-  fontSize: '0.625rem',
-  color: '#64748b',
+  fontSize: 8,
+  color: text_primary,
   fontWeight: '500',
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: '0.75rem',
+      fontSize: 13,
+      paddingLeft: 8,
     },
   },
 });

@@ -5,7 +5,6 @@ const dark_bg = "#222222";
 const text_primary = "#f5f5f5";
 const text_muted = "#8a8a8a";
 const accent = "#96cfe0";
-// const border_subtle = "rgba(255,255,255,0.08)";
 const border_hover = "rgba(255,255,255,0.18)";
 
 export const dateTimeLayout = style({
