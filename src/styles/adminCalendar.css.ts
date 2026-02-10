@@ -858,7 +858,8 @@ export const monthCell = style({
 
 export const monthCellOther = style({
   opacity: 0.9,
-  cursor: "not-allowed",
+  cursor: "default",
+  pointerEvents: 'none',
   ':hover': {
     backgroundColor: dark_bg,
     opacity: 0.9,

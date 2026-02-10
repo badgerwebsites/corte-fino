@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Barber, BarberAvailability, BarberTimeOff } from '../types/database.types';
 import { View } from '../ui/View';
-import { Text } from '../ui/Text';
+// import { Text } from '../ui/Text';
 import * as styles from '../styles/admin.css';
+import * as scheduleStyles from '../styles/barberScheduleManager.css';
 
 interface Props {
   barbers: Barber[];
@@ -339,360 +340,221 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
   };
 
   return (
-    <View className={styles.section}>
-      <View className={styles.sectionHeader}>
-        <View>
-          <Text className={styles.sectionTitle}>Manage Schedule</Text>
-          <Text className={styles.sectionDescription}>
-            Set working hours and breaks for each day of the week
-          </Text>
-        </View>
-      </View>
-
-      {barbers.length > 1 && (
-        <View className={styles.formGroup}>
-          <label className={styles.label}>Select Barber</label>
-          <select
-            className={styles.input}
-            value={selectedBarber?.id || ''}
-            onChange={(e) => {
-              const barber = barbers.find(b => b.id === e.target.value);
-              setSelectedBarber(barber || null);
-            }}
-          >
-            <option value="">-- Select a barber --</option>
-            {barbers.map((barber) => (
-              <option key={barber.id} value={barber.id}>
-                {barber.name}
-              </option>
-            ))}
-          </select>
-        </View>
-      )}
-
+    <View>
+      {/* Schedule */}
       {selectedBarber && !loading && (
         <>
-          <div style={{ marginTop: '1.5rem' }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', color: '#1a1a1a' }}>
-              Weekly Schedule for {selectedBarber.name}
-            </h3>
+          <h3 className={scheduleStyles.headerTitle}>
+            {selectedBarber.name}'s Schedule
+          </h3>
+          <div className={scheduleStyles.scheduleList}>
+            {DAYS_OF_WEEK.map((day) => {
+              const schedule = schedules[day.value] || {
+                isWorking: false,
+                startTime: DEFAULT_START,
+                endTime: DEFAULT_END,
+                breaks: [],
+              };
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {DAYS_OF_WEEK.map((day) => {
-                const schedule = schedules[day.value] || {
-                  isWorking: false,
-                  startTime: DEFAULT_START,
-                  endTime: DEFAULT_END,
-                  breaks: [],
-                };
+              return (
+                <div
+                  key={day.value}
+                  className={`${scheduleStyles.dayCard} ${
+                    schedule.isWorking ? scheduleStyles.dayCardActive : ''
+                  }`}
+                >
+                  {/* Day Header */}
+                  <div className={scheduleStyles.dayHeader}>
+                    <div className={scheduleStyles.dayHeaderLeft}>
+                      <input
+                        type="checkbox"
+                        checked={schedule.isWorking}
+                        onChange={(e) =>
+                          updateSchedule(day.value, {
+                            isWorking: e.target.checked,
+                          })
+                        }
+                        className={scheduleStyles.dayCheckbox}
+                      />
 
-                return (
-                  <div
-                    key={day.value}
-                    style={{
-                      backgroundColor: schedule.isWorking ? '#ffffff' : '#f9fafb',
-                      border: schedule.isWorking ? '2px solid #10b981' : '2px solid #e5e7eb',
-                      borderRadius: '0.75rem',
-                      padding: '1rem',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    {/* Day Header */}
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginBottom: schedule.isWorking ? '1rem' : 0,
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <input
-                          type="checkbox"
-                          checked={schedule.isWorking}
-                          onChange={(e) => {
-                            updateSchedule(day.value, { isWorking: e.target.checked });
-                          }}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            cursor: 'pointer',
-                            accentColor: '#10b981',
-                          }}
-                        />
-                        <span style={{
-                          fontSize: '1rem',
-                          fontWeight: 600,
-                          color: schedule.isWorking ? '#1a1a1a' : '#6b7280',
-                        }}>
-                          {day.label}
+                      <span
+                        className={`${scheduleStyles.dayLabel} ${
+                          !schedule.isWorking
+                            ? scheduleStyles.dayLabelInactive
+                            : ''
+                        }`}
+                      >
+                        {day.label}
+                      </span>
+
+                      {!schedule.isWorking && (
+                        <span className={scheduleStyles.notWorkingText}>
+                          — Not working
                         </span>
-                        {!schedule.isWorking && (
-                          <span style={{
-                            fontSize: '0.875rem',
-                            color: '#9ca3af',
-                            fontStyle: 'italic',
-                          }}>
-                            — Not working
-                          </span>
-                        )}
-                      </div>
-
-                      {schedule.isWorking && (
-                        <button
-                          onClick={() => saveSchedule(day.value)}
-                          disabled={saving}
-                          style={{
-                            padding: '0.375rem 0.75rem',
-                            backgroundColor: '#10b981',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '0.375rem',
-                            fontSize: '0.875rem',
-                            fontWeight: 500,
-                            cursor: saving ? 'not-allowed' : 'pointer',
-                            opacity: saving ? 0.7 : 1,
-                          }}
-                        >
-                          {saving ? 'Saving...' : 'Save'}
-                        </button>
                       )}
                     </div>
 
                     {schedule.isWorking && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {/* Working Hours */}
-                        <div style={{
-                          display: 'grid',
-                          gridTemplateColumns: '1fr 1fr',
-                          gap: '1rem',
-                          padding: '1rem',
-                          backgroundColor: '#f0fdf4',
-                          borderRadius: '0.5rem',
-                          border: '1px solid #bbf7d0',
-                        }}>
-                          <div>
-                            <label style={{
-                              display: 'block',
-                              fontSize: '0.75rem',
-                              fontWeight: 600,
-                              color: '#166534',
-                              marginBottom: '0.375rem',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.05em',
-                            }}>
-                              Start Time
-                            </label>
-                            <input
-                              type="time"
-                              value={schedule.startTime}
-                              onChange={(e) => updateSchedule(day.value, { startTime: e.target.value })}
-                              style={{
-                                width: '100%',
-                                padding: '0.5rem',
-                                border: '1px solid #d1d5db',
-                                borderRadius: '0.375rem',
-                                fontSize: '1rem',
-                              }}
-                            />
-                          </div>
-                          <div>
-                            <label style={{
-                              display: 'block',
-                              fontSize: '0.75rem',
-                              fontWeight: 600,
-                              color: '#166534',
-                              marginBottom: '0.375rem',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.05em',
-                            }}>
-                              End Time
-                            </label>
-                            <input
-                              type="time"
-                              value={schedule.endTime}
-                              onChange={(e) => updateSchedule(day.value, { endTime: e.target.value })}
-                              style={{
-                                width: '100%',
-                                padding: '0.5rem',
-                                border: '1px solid #d1d5db',
-                                borderRadius: '0.375rem',
-                                fontSize: '1rem',
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Breaks Section */}
-                        <div style={{
-                          padding: '1rem',
-                          backgroundColor: '#fef3c7',
-                          borderRadius: '0.5rem',
-                          border: '1px solid #fde68a',
-                        }}>
-                          <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginBottom: schedule.breaks.length > 0 ? '0.75rem' : 0,
-                          }}>
-                            <label style={{
-                              fontSize: '0.75rem',
-                              fontWeight: 600,
-                              color: '#92400e',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.05em',
-                            }}>
-                              Breaks {schedule.breaks.length > 0 && `(${schedule.breaks.length})`}
-                            </label>
-                            <button
-                              type="button"
-                              onClick={() => addBreak(day.value)}
-                              style={{
-                                padding: '0.25rem 0.5rem',
-                                backgroundColor: '#f59e0b',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '0.25rem',
-                                fontSize: '0.75rem',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                              }}
-                            >
-                              + Add Break
-                            </button>
-                          </div>
-
-                          {schedule.breaks.length === 0 ? (
-                            <p style={{
-                              fontSize: '0.875rem',
-                              color: '#92400e',
-                              margin: 0,
-                              marginTop: '0.5rem',
-                            }}>
-                              No breaks scheduled. Click "Add Break" to add one.
-                            </p>
-                          ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                              {schedule.breaks.map((brk, index) => (
-                                <div
-                                  key={index}
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    padding: '0.5rem',
-                                    backgroundColor: 'white',
-                                    borderRadius: '0.375rem',
-                                    border: '1px solid #fde68a',
-                                  }}
-                                >
-                                  <span style={{
-                                    fontSize: '0.75rem',
-                                    fontWeight: 500,
-                                    color: '#78716c',
-                                    minWidth: '3rem',
-                                  }}>
-                                    Break {index + 1}
-                                  </span>
-                                  <input
-                                    type="time"
-                                    value={brk.startTime}
-                                    onChange={(e) => updateBreak(day.value, index, 'startTime', e.target.value)}
-                                    style={{
-                                      flex: 1,
-                                      padding: '0.375rem',
-                                      border: '1px solid #d1d5db',
-                                      borderRadius: '0.25rem',
-                                      fontSize: '0.875rem',
-                                    }}
-                                  />
-                                  <span style={{ color: '#9ca3af' }}>to</span>
-                                  <input
-                                    type="time"
-                                    value={brk.endTime}
-                                    onChange={(e) => updateBreak(day.value, index, 'endTime', e.target.value)}
-                                    style={{
-                                      flex: 1,
-                                      padding: '0.375rem',
-                                      border: '1px solid #d1d5db',
-                                      borderRadius: '0.25rem',
-                                      fontSize: '0.875rem',
-                                    }}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => removeBreak(day.value, index)}
-                                    style={{
-                                      padding: '0.375rem',
-                                      backgroundColor: '#fecaca',
-                                      color: '#dc2626',
-                                      border: 'none',
-                                      borderRadius: '0.25rem',
-                                      cursor: 'pointer',
-                                      fontSize: '0.75rem',
-                                      fontWeight: 600,
-                                    }}
-                                  >
-                                    ✕
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Schedule Summary */}
-                        <div style={{
-                          padding: '0.75rem',
-                          backgroundColor: '#f3f4f6',
-                          borderRadius: '0.375rem',
-                          fontSize: '0.875rem',
-                          color: '#4b5563',
-                        }}>
-                          <strong>Available:</strong>{' '}
-                          {formatTime(schedule.startTime)} - {formatTime(schedule.endTime)}
-                          {schedule.breaks.length > 0 && (
-                            <span>
-                              {' '}(excluding {schedule.breaks.length} break{schedule.breaks.length > 1 ? 's' : ''})
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {!schedule.isWorking && (
                       <button
                         onClick={() => saveSchedule(day.value)}
                         disabled={saving}
-                        style={{
-                          marginTop: '0.75rem',
-                          padding: '0.375rem 0.75rem',
-                          backgroundColor: '#6b7280',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '0.375rem',
-                          fontSize: '0.75rem',
-                          fontWeight: 500,
-                          cursor: saving ? 'not-allowed' : 'pointer',
-                          opacity: saving ? 0.7 : 1,
-                        }}
+                        className={`${scheduleStyles.saveButton} ${
+                          saving ? scheduleStyles.saveButtonDisabled : ''
+                        }`}
                       >
-                        {saving ? 'Saving...' : 'Save as Day Off'}
+                        {saving ? 'Saving…' : 'Save'}
                       </button>
                     )}
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* Working Content */}
+                  {schedule.isWorking && (
+                    <>
+                      {/* Working Hours */}
+                      <div className={scheduleStyles.workingHoursCard}>
+                        <div>
+                          <label className={scheduleStyles.timeLabel}>
+                            Start Time
+                          </label>
+                          <input
+                            type="time"
+                            value={schedule.startTime}
+                            onChange={(e) =>
+                              updateSchedule(day.value, {
+                                startTime: e.target.value,
+                              })
+                            }
+                            className={scheduleStyles.timeInput}
+                          />
+                        </div>
+
+                        <div>
+                          <label className={scheduleStyles.timeLabel}>
+                            End Time
+                          </label>
+                          <input
+                            type="time"
+                            value={schedule.endTime}
+                            onChange={(e) =>
+                              updateSchedule(day.value, {
+                                endTime: e.target.value,
+                              })
+                            }
+                            className={scheduleStyles.timeInput}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Breaks */}
+                      <div className={scheduleStyles.breaksCard}>
+                        <div className={scheduleStyles.breaksHeader}>
+                          <label className={scheduleStyles.breaksLabel}>
+                            Breaks
+                            {schedule.breaks.length > 0 &&
+                              ` (${schedule.breaks.length})`}
+                          </label>
+
+                          <button
+                            type="button"
+                            onClick={() => addBreak(day.value)}
+                            className={scheduleStyles.addBreakButton}
+                          >
+                            + Add Break
+                          </button>
+                        </div>
+
+                        {schedule.breaks.length === 0 ? (
+                          <p className={scheduleStyles.notWorkingText}>
+                            No breaks scheduled. Click “Add Break” to add one.
+                          </p>
+                        ) : (
+                          <div className={scheduleStyles.scheduleList}>
+                            {schedule.breaks.map((brk, index) => (
+                              <div
+                                key={index}
+                                className={scheduleStyles.breakRow}
+                              >
+
+                                <input
+                                  type="time"
+                                  value={brk.startTime}
+                                  onChange={(e) =>
+                                    updateBreak(
+                                      day.value,
+                                      index,
+                                      'startTime',
+                                      e.target.value
+                                    )
+                                  }
+                                  className={scheduleStyles.breakInput}
+                                />
+
+                                <span className={scheduleStyles.breakSeparator}>-</span>
+
+                                <input
+                                  type="time"
+                                  value={brk.endTime}
+                                  onChange={(e) =>
+                                    updateBreak(
+                                      day.value,
+                                      index,
+                                      'endTime',
+                                      e.target.value
+                                    )
+                                  }
+                                  className={scheduleStyles.breakInput}
+                                />
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeBreak(day.value, index)
+                                  }
+                                  className={scheduleStyles.removeBreakButton}
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Summary */}
+                      <div className={scheduleStyles.scheduleSummary}>
+                        <strong>Available:</strong>{' '}
+                        {formatTime(schedule.startTime)} –{' '}
+                        {formatTime(schedule.endTime)}
+                        {schedule.breaks.length > 0 && (
+                          <span>
+                            {' '}
+                            (excluding {schedule.breaks.length} break
+                            {schedule.breaks.length > 1 ? 's' : ''})
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {!schedule.isWorking && (
+                    <button
+                      onClick={() => saveSchedule(day.value)}
+                      disabled={saving}
+                      className={scheduleStyles.saveDayOffButton}
+                    >
+                      {saving ? 'Saving…' : 'Save as Day Off'}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           {/* Time Off Section */}
-          <div style={{ marginTop: '3rem' }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem', color: '#1a1a1a' }}>
+          <div>
+            <h3 className={scheduleStyles.headerTitle}>
               Time Off / Vacation Days
             </h3>
-            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem' }}>
-              Block specific dates when {selectedBarber.name} is unavailable
-            </p>
 
             <form onSubmit={handleAddTimeOff} className={styles.form}>
               <View className={styles.formRow}>
@@ -702,7 +564,12 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                     type="date"
                     className={styles.input}
                     value={timeOffForm.start_date}
-                    onChange={(e) => setTimeOffForm({ ...timeOffForm, start_date: e.target.value })}
+                    onChange={(e) =>
+                      setTimeOffForm({
+                        ...timeOffForm,
+                        start_date: e.target.value,
+                      })
+                    }
                     required
                   />
                 </View>
@@ -713,7 +580,12 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                     type="date"
                     className={styles.input}
                     value={timeOffForm.end_date}
-                    onChange={(e) => setTimeOffForm({ ...timeOffForm, end_date: e.target.value })}
+                    onChange={(e) =>
+                      setTimeOffForm({
+                        ...timeOffForm,
+                        end_date: e.target.value,
+                      })
+                    }
                     required
                   />
                 </View>
@@ -724,9 +596,14 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                 <input
                   type="text"
                   className={styles.input}
-                  placeholder="e.g., Vacation, Personal, Sick Leave"
+                  placeholder="Vacation, Personal, Sick Leave"
                   value={timeOffForm.reason}
-                  onChange={(e) => setTimeOffForm({ ...timeOffForm, reason: e.target.value })}
+                  onChange={(e) =>
+                    setTimeOffForm({
+                      ...timeOffForm,
+                      reason: e.target.value,
+                    })
+                  }
                 />
               </View>
 
@@ -736,80 +613,47 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
             </form>
 
             {timeOff.length > 0 && (
-              <div style={{ marginTop: '1.5rem' }}>
-                <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: '#374151' }}>
-                  Scheduled Time Off
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  {timeOff.map((period) => (
-                    <div
-                      key={period.id}
-                      style={{
-                        padding: '0.75rem 1rem',
-                        backgroundColor: '#fef3c7',
-                        border: '1px solid #fde68a',
-                        borderRadius: '0.5rem',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                        gap: '0.5rem',
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontWeight: 500, color: '#92400e' }}>
-                          {new Date(period.start_date + 'T00:00:00').toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                          {period.start_date !== period.end_date && (
-                            <> — {new Date(period.end_date + 'T00:00:00').toLocaleDateString('en-US', {
-                              weekday: 'short',
-                              month: 'short',
-                              day: 'numeric'
-                            })}</>
-                          )}
-                        </div>
-                        {period.reason && (
-                          <div style={{ fontSize: '0.875rem', color: '#a16207', marginTop: '0.25rem' }}>
-                            {period.reason}
-                          </div>
+              <div className={scheduleStyles.scheduleList}>
+                {timeOff.map((period) => (
+                  <div
+                    key={period.id}
+                    className={scheduleStyles.timeOffCard}
+                  >
+                    <div>
+                      <div className={scheduleStyles.timeOffDate}>
+                        {new Date(period.start_date).toLocaleDateString()}
+                        {period.start_date !== period.end_date && (
+                          <> — {new Date(period.end_date).toLocaleDateString()}</>
                         )}
                       </div>
-                      <button
-                        onClick={() => handleDeleteTimeOff(period.id)}
-                        style={{
-                          padding: '0.375rem 0.75rem',
-                          backgroundColor: '#dc2626',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '0.375rem',
-                          fontSize: '0.75rem',
-                          fontWeight: 500,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Delete
-                      </button>
+
+                      {period.reason && (
+                        <div className={scheduleStyles.timeOffReason}>
+                          {period.reason}
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleDeleteTimeOff(period.id)
+                      }
+                      className={scheduleStyles.deleteTimeOffButton}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </div>
         </>
       )}
 
-      {selectedBarber && loading && (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <Text>Loading schedule...</Text>
-        </div>
-      )}
-
       {!selectedBarber && (
-        <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
-          <Text>Select a barber to manage their schedule</Text>
+        <div className={scheduleStyles.scheduleSummary}>
+          Select a barber to manage their schedule
         </div>
       )}
     </View>

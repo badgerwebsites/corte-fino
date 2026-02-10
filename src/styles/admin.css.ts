@@ -10,10 +10,12 @@ export const container = style({
   backgroundColor: darker_bg,
   padding: 16,
   paddingTop: 68,
+  paddingBottom: 100,
   '@media': {
     'screen and (min-width: 768px)': {
       padding: 48,
       paddingTop: 84,
+      paddingBottom: 100,
     },
   },
 });
@@ -99,12 +101,21 @@ export const section = style({
 });
 
 export const sectionHeader = style({
+<<<<<<< HEAD
   marginBottom: '1rem',
   '@media': {
     'screen and (min-width: 768px)': {
       marginBottom: '1.5rem',
     },
   },
+=======
+  marginBottom: 8,
+  // '@media': {
+  //   'screen and (min-width: 768px)': {
+  //     marginBottom: 8,
+  //   },
+  // },
+>>>>>>> 6dec6c9 (more styles)
 });
 
 export const sectionTitle = style({
@@ -120,7 +131,7 @@ export const sectionTitle = style({
 });
 
 export const sectionDescription = style({
-  color: '#718096',
+  color: text_secondary,
   marginBottom: '1rem',
   fontSize: '0.875rem',
   '@media': {
@@ -275,7 +286,6 @@ export const cancelButton = style({
     'screen and (min-width: 768px)': {
       padding: '0.75rem 1.5rem',
       fontSize: '1rem',
-      borderRadius: '0.5rem',
     },
   },
   ':hover': {
@@ -294,7 +304,7 @@ export const barberCard = style({
   padding: '1rem',
   background: '#f7fafc',
   borderRadius: '0.5rem',
-  marginBottom: '1rem',
+  marginBottom: 12,
   '@media': {
     'screen and (min-width: 768px)': {
       flexDirection: 'row',
@@ -314,13 +324,17 @@ export const barberInfo = style({
 });
 
 export const barberName = style({
-  fontSize: '1.125rem',
+  fontSize: 18,
   fontWeight: 600,
+<<<<<<< HEAD
   color: '#1a202c',
   marginBottom: '0.5rem',
+=======
+  color: text_primary,
+>>>>>>> 6dec6c9 (more styles)
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: '1.25rem',
+      fontSize: 20,
     },
   },
 });
@@ -336,9 +350,64 @@ export const barberDetail = style({
   },
 });
 
+<<<<<<< HEAD
+=======
+export const barberActions = style({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 12,
+});
+
+export const editButton = style({
+  padding: '0.5rem 0.875rem',
+  background: 'transparent',
+  color: '#0e7490',
+  border: '1px solid #a5d8e6',
+  borderRadius: 4,
+  fontSize: 14,
+  fontWeight: '500',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  whiteSpace: 'nowrap',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.625rem 1.25rem',
+      fontSize: 16,
+    },
+  },
+  ':hover': {
+    background: dark_bg,
+  },
+});
+
+export const deleteButton = style({
+  padding: '0.5rem 0.875rem',
+  background: 'transparent',
+  color: '#b91c1c',
+  border: '1px solid #e5a3a3',
+  borderRadius: '4px',
+  fontSize: 14,
+  fontWeight: '500',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+  transition: 'all 0.2s',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.625rem 1.25rem',
+      fontSize: 16,
+    },
+  },
+  ':hover': {
+    background: dark_bg,
+  },
+});
+
+// barbers
+>>>>>>> 6dec6c9 (more styles)
 export const barberNameRow = style({
   display: 'flex',
   alignItems: 'center',
+  // alignContent: 'center',
   gap: '0.75rem',
   flexWrap: 'wrap',
 });
@@ -346,21 +415,31 @@ export const barberNameRow = style({
 export const statusBadge = style({
   display: 'inline-block',
   padding: '0.2rem 0.6rem',
-  background: '#c6ecf4',
-  color: '#1a1a1a',
-  borderRadius: '1rem',
-  fontSize: '0.75rem',
+  background: button,
+  color: darker_bg,
+  borderRadius: 16,
+  fontSize: 12,
   fontWeight: '500',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 14,
+    },
+  },
 });
 
 export const statusBadgeInactive = style({
   display: 'inline-block',
   padding: '0.2rem 0.6rem',
-  background: '#f0f0f0',
-  color: '#666',
-  borderRadius: '1rem',
-  fontSize: '0.75rem',
+  background: text_muted,
+  color: darker_bg,
+  borderRadius: 16,
+  fontSize: 12,
   fontWeight: '500',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 14,
+    },
+  },
 });
 
 export const barberActions = style({
@@ -396,8 +475,8 @@ export const editButton = style({
 export const toggleButton = style({
   padding: '0.5rem 0.875rem',
   background: 'transparent',
-  color: '#1a1a1a',
-  border: '1px solid #1a1a1a',
+  color: text_secondary,
+  border: '1px solid #b0b0b0',
   borderRadius: '4px',
   fontSize: '0.8125rem',
   fontWeight: '500',
@@ -411,8 +490,8 @@ export const toggleButton = style({
     },
   },
   ':hover': {
-    background: '#1a1a1a',
-    color: '#ffffff',
+    background: dark_bg,
+    color: text_primary,
   },
 });
 
@@ -672,32 +751,19 @@ export const scheduleDayHeader = style({
 });
 
 // Pricing Time Periods styles
-export const pricingPeriodsCard = style({
-  background: '#f8fafc',
-  border: '1px solid #e2e8f0',
-  borderRadius: '0.5rem',
-  padding: '1rem',
-  marginTop: '0.5rem',
-  overflow: 'hidden',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '1.25rem',
-    },
-  },
-});
-
 export const pricingPeriodsTitle = style({
   display: 'block',
-  fontSize: '0.9rem',
+  fontSize: 16,
   fontWeight: '600',
-  color: '#1a1a1a',
-  marginBottom: '0.5rem',
-});
-
-export const pricingPeriodsHint = style({
-  fontSize: '0.8rem',
-  color: '#64748b',
-  marginBottom: '1rem',
+  color: text_primary,
+  marginBottom: 12,
+  paddingTop: 8,
+  '@media': {
+    'screen and (min-width: 768px)': {
+        paddingTop: 0,
+        marginBottom: 16,
+    },
+  },
 });
 
 export const pricingTimeline = style({
@@ -717,17 +783,46 @@ export const pricingTimeBlock = style({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.375rem',
+  gap: 4,
 });
 
 export const pricingTimeLabel = style({
-  fontSize: '0.75rem',
+  fontSize: 14,
   fontWeight: '500',
-  color: '#475569',
+  color: text_secondary,
   textTransform: 'uppercase',
   letterSpacing: '0.03em',
 });
 
+<<<<<<< HEAD
+=======
+export const timeInput = style({
+  width: '100%',
+  backgroundColor: darker_bg,
+  color: text_primary,
+  border: '1px solid #1a1a1a',
+  boxSizing: 'border-box',
+  padding: '0.625rem',
+  borderRadius: 4,
+  fontSize: '0.875rem',
+  colorScheme: 'dark',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.75rem',
+      borderRadius: '0.5rem',
+      fontSize: '1rem',
+    },
+  },
+  ':focus': {
+    outline: 'none',
+    border: '1px solid #96cfe0',
+  },
+  '::placeholder': {
+    color: text_muted,
+  },
+});
+
+>>>>>>> 6dec6c9 (more styles)
 export const pricingTimeArrow = style({
   display: 'none',
   '@media': {
@@ -735,33 +830,35 @@ export const pricingTimeArrow = style({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      color: '#94a3b8',
-      fontSize: '1.25rem',
+      color: text_secondary,
+      fontSize: 20,
       paddingBottom: '0.5rem',
     },
   },
 });
 
-export const pricingPeriodBadge = style({
-  display: 'inline-block',
-  padding: '0.25rem 0.625rem',
-  borderRadius: '0.25rem',
-  fontSize: '0.7rem',
-  fontWeight: '500',
-  marginTop: '0.25rem',
-  borderLeft: '3px solid transparent',
+export const checkboxLabel = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12,
+  cursor: 'pointer',
+  paddingTop: 16,
+  paddingBottom: 8,
+  color: text_primary,
+  fontSize: 16,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      paddingBottom: 0,
+      paddingTop: 20,
+    },
+  },
 });
 
-export const regularBadge = style({
-  background: '#f0f9ff',
-  color: '#0369a1',
-  borderLeftColor: '#0ea5e9',
-});
-
-export const eveningBadge = style({
-  background: '#f1f5f9',
-  color: '#0369a1',
-  borderLeftColor: '#0ea5e9',
+export const checkbox = style({
+  transform: 'scale(1.3)',
+  transformOrigin: 'left center',
+  cursor: 'pointer',
+  accentColor: button,
 });
 
 // Tab badge for notifications

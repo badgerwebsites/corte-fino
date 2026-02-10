@@ -801,7 +801,7 @@ export default function AdminPage() {
                     )}
                     {!barber.is_active && (
                       <View className={styles.statusBadgeInactive}>
-                        <Text>✗ Inactive</Text>
+                        <Text>Inactive</Text>
                       </View>
                     )}
                   </View>
@@ -831,7 +831,7 @@ export default function AdminPage() {
           </View>
 
           {/* Add/Edit Barber Form */}
-          <div ref={barberFormRef} className={styles.sectionHeader} style={{ marginTop: '3rem' }}>
+          <div ref={barberFormRef} className={styles.sectionHeader}>
             <Text className={styles.sectionTitle}>
               {editingBarber ? 'Edit Barber' : 'Add New Barber'}
             </Text>
@@ -842,7 +842,7 @@ export default function AdminPage() {
               currentImageUrl={barberForm.image_url || undefined}
               onImageChange={(url) => setBarberForm({ ...barberForm, image_url: url || '' })}
               bucket="barber-images"
-              label="Profile Photo"
+              label="Profile Picture"
             />
 
             <View className={styles.formGroup}>
@@ -852,6 +852,7 @@ export default function AdminPage() {
                 className={styles.input}
                 value={barberForm.name}
                 onChange={(e) => setBarberForm({ ...barberForm, name: e.target.value })}
+                placeholder="Type here..."
                 required
               />
             </View>
@@ -873,13 +874,14 @@ export default function AdminPage() {
                 className={styles.textarea}
                 value={barberForm.bio}
                 onChange={(e) => setBarberForm({ ...barberForm, bio: e.target.value })}
+                placeholder="Type here..."
                 rows={3}
               />
             </View>
 
             <View className={styles.formRow}>
               <View className={styles.formGroup}>
-                <label className={styles.label}>Instagram Handle</label>
+                <label className={styles.label}>Instagram</label>
                 <input
                   type="text"
                   className={styles.input}
@@ -890,7 +892,7 @@ export default function AdminPage() {
               </View>
 
               <View className={styles.formGroup}>
-                <label className={styles.label}>TikTok Handle</label>
+                <label className={styles.label}>TikTok</label>
                 <input
                   type="text"
                   className={styles.input}
@@ -912,10 +914,9 @@ export default function AdminPage() {
               />
             </View>
 
-            <View className={styles.pricingPeriodsCard}>
-              <Text className={styles.pricingPeriodsTitle}>Pricing Time Periods</Text>
-              <Text className={styles.pricingPeriodsHint}>
-                Set when regular and evening pricing applies
+            <View>
+              <Text className={styles.pricingPeriodsTitle}>
+                Set Regular and Evening Pricing
               </Text>
 
               <View className={styles.pricingTimeline}>
@@ -923,11 +924,10 @@ export default function AdminPage() {
                   <label className={styles.pricingTimeLabel}>Regular Starts</label>
                   <input
                     type="time"
-                    className={styles.input}
+                    className={styles.timeInput}
                     value={barberForm.regular_hours_start}
                     onChange={(e) => setBarberForm({ ...barberForm, regular_hours_start: e.target.value })}
                   />
-                  <span className={`${styles.pricingPeriodBadge} ${styles.regularBadge}`}>Regular pricing</span>
                 </View>
 
                 <View className={styles.pricingTimeArrow}>→</View>
@@ -936,7 +936,7 @@ export default function AdminPage() {
                   <label className={styles.pricingTimeLabel}>Evening Starts</label>
                   <input
                     type="time"
-                    className={styles.input}
+                    className={styles.timeInput}
                     value={barberForm.regular_hours_end}
                     onChange={(e) => setBarberForm({
                       ...barberForm,
@@ -944,7 +944,6 @@ export default function AdminPage() {
                       evening_hours_start: e.target.value
                     })}
                   />
-                  <span className={`${styles.pricingPeriodBadge} ${styles.eveningBadge}`}>Evening pricing</span>
                 </View>
 
                 <View className={styles.pricingTimeArrow}>→</View>
@@ -953,7 +952,7 @@ export default function AdminPage() {
                   <label className={styles.pricingTimeLabel}>Evening Ends</label>
                   <input
                     type="time"
-                    className={styles.input}
+                    className={styles.timeInput}
                     value={barberForm.evening_hours_end}
                     onChange={(e) => setBarberForm({ ...barberForm, evening_hours_end: e.target.value })}
                   />
@@ -965,6 +964,7 @@ export default function AdminPage() {
               <label className={styles.checkboxLabel}>
                 <input
                   type="checkbox"
+                  className={styles.checkbox}
                   checked={barberForm.is_active}
                   onChange={(e) => setBarberForm({ ...barberForm, is_active: e.target.checked })}
                 />
@@ -1006,7 +1006,7 @@ export default function AdminPage() {
 
           {/* Schedule Management - only show when editing a barber */}
           {editingBarber && (
-            <View style={{ marginTop: '3rem' }}>
+            <View>
               <BarberScheduleManager barbers={[editingBarber]} onUpdate={loadData} />
             </View>
           )}
