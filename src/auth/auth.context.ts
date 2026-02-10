@@ -13,7 +13,8 @@ export interface AuthContextType {
     password: string,
     firstName: string,
     lastName: string,
-    phone: string
+    phone: string,
+    redirectTo?: string
   ) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;

@@ -1,6 +1,6 @@
 // pages/SignUpPage.tsx
 import { useState } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
@@ -17,13 +17,16 @@ export default function SignUpPage() {
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
 
   const { signUp } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
 
   const redirectTo =
     new URLSearchParams(location.search).get('redirect') || '/dashboard';
+
+  // Check if user is coming from booking flow
+  const isFromBooking = redirectTo === '/book';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,8 +40,8 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      await signUp(email, password, firstName, lastName, phone);
-      navigate(redirectTo);
+      await signUp(email, password, firstName, lastName, phone, redirectTo);
+      setShowEmailConfirmation(true);
     } catch {
       setError('Failed to create account');
     } finally {
@@ -153,9 +156,44 @@ export default function SignUpPage() {
               Login
             </Link>
           </View>
-          
+
         </View>
       </View>
+
+      {showEmailConfirmation && (
+        <View className={styles.modalOverlay}>
+          <View className={styles.modal}>
+            <View className={styles.modalIcon}>
+              <svg
+                className={styles.modalIconSvg}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+            </View>
+            <Text className={styles.modalTitle}>Check Your Email</Text>
+            <Text className={styles.modalMessage}>
+              We've sent a confirmation link to <strong>{email}</strong>.
+              {isFromBooking
+                ? ' Click the link to verify your account and complete your booking.'
+                : ' Click the link to verify your account.'}
+            </Text>
+            <button
+              className={styles.modalButton}
+              onClick={() => setShowEmailConfirmation(false)}
+            >
+              Got it
+            </button>
+          </View>
+        </View>
+      )}
     </>
   );
 }
