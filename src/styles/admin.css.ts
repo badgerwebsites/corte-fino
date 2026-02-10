@@ -1,9 +1,11 @@
 import { style } from '@vanilla-extract/css';
 
 const darker_bg = "#101214";
+const dark_bg = "#222222";
 const button =  "#96cfe0";
 const text_primary = "#f5f5f5";
 const text_secondary = "#b0b0b0";
+const text_muted = "#8a8a8a";
 
 export const container = style({
   minHeight: '100vh',
@@ -101,21 +103,12 @@ export const section = style({
 });
 
 export const sectionHeader = style({
-<<<<<<< HEAD
   marginBottom: '1rem',
   '@media': {
     'screen and (min-width: 768px)': {
       marginBottom: '1.5rem',
     },
   },
-=======
-  marginBottom: 8,
-  // '@media': {
-  //   'screen and (min-width: 768px)': {
-  //     marginBottom: 8,
-  //   },
-  // },
->>>>>>> 6dec6c9 (more styles)
 });
 
 export const sectionTitle = style({
@@ -229,13 +222,6 @@ export const textarea = style({
   },
 });
 
-export const checkboxLabel = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-  cursor: 'pointer',
-});
-
 export const formActions = style({
   display: 'flex',
   flexDirection: 'column',
@@ -326,12 +312,8 @@ export const barberInfo = style({
 export const barberName = style({
   fontSize: 18,
   fontWeight: 600,
-<<<<<<< HEAD
   color: '#1a202c',
   marginBottom: '0.5rem',
-=======
-  color: text_primary,
->>>>>>> 6dec6c9 (more styles)
   '@media': {
     'screen and (min-width: 768px)': {
       fontSize: 20,
@@ -350,60 +332,6 @@ export const barberDetail = style({
   },
 });
 
-<<<<<<< HEAD
-=======
-export const barberActions = style({
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: 12,
-});
-
-export const editButton = style({
-  padding: '0.5rem 0.875rem',
-  background: 'transparent',
-  color: '#0e7490',
-  border: '1px solid #a5d8e6',
-  borderRadius: 4,
-  fontSize: 14,
-  fontWeight: '500',
-  cursor: 'pointer',
-  transition: 'all 0.2s',
-  whiteSpace: 'nowrap',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '0.625rem 1.25rem',
-      fontSize: 16,
-    },
-  },
-  ':hover': {
-    background: dark_bg,
-  },
-});
-
-export const deleteButton = style({
-  padding: '0.5rem 0.875rem',
-  background: 'transparent',
-  color: '#b91c1c',
-  border: '1px solid #e5a3a3',
-  borderRadius: '4px',
-  fontSize: 14,
-  fontWeight: '500',
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-  transition: 'all 0.2s',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '0.625rem 1.25rem',
-      fontSize: 16,
-    },
-  },
-  ':hover': {
-    background: dark_bg,
-  },
-});
-
-// barbers
->>>>>>> 6dec6c9 (more styles)
 export const barberNameRow = style({
   display: 'flex',
   alignItems: 'center',
@@ -701,6 +629,32 @@ export const timeInputGroup = style({
   flexDirection: 'column',
 });
 
+export const timeInput = style({
+  backgroundColor: darker_bg,
+  color: text_primary,
+  border: '1px solid #1a1a1a',
+  boxSizing: 'border-box',
+  padding: '0.625rem',
+  borderRadius: 4,
+  fontSize: '0.875rem',
+  colorScheme: 'dark',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.75rem',
+      borderRadius: '0.5rem',
+      fontSize: '1rem',
+      width: '100%',
+    },
+  },
+  ':focus': {
+    outline: 'none',
+    border: '1px solid #96cfe0',
+  },
+  '::placeholder': {
+    color: text_muted,
+  },
+});
+
 // Schedule manager styles
 export const scheduleTimeRow = style({
   display: 'flex',
@@ -794,35 +748,6 @@ export const pricingTimeLabel = style({
   letterSpacing: '0.03em',
 });
 
-<<<<<<< HEAD
-=======
-export const timeInput = style({
-  width: '100%',
-  backgroundColor: darker_bg,
-  color: text_primary,
-  border: '1px solid #1a1a1a',
-  boxSizing: 'border-box',
-  padding: '0.625rem',
-  borderRadius: 4,
-  fontSize: '0.875rem',
-  colorScheme: 'dark',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '0.75rem',
-      borderRadius: '0.5rem',
-      fontSize: '1rem',
-    },
-  },
-  ':focus': {
-    outline: 'none',
-    border: '1px solid #96cfe0',
-  },
-  '::placeholder': {
-    color: text_muted,
-  },
-});
-
->>>>>>> 6dec6c9 (more styles)
 export const pricingTimeArrow = style({
   display: 'none',
   '@media': {
