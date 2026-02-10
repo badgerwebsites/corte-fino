@@ -1,13 +1,9 @@
 import { style } from '@vanilla-extract/css';
 
 const darker_bg = "#101214";
-const dark_bg = "#222222";
 const button =  "#96cfe0";
 const text_primary = "#f5f5f5";
 const text_secondary = "#b0b0b0";
-const text_muted = "#8a8a8a";
-const border_subtle = "rgba(255,255,255,0.08)";
-const border_hover = "rgba(255,255,255,0.18)";
 
 export const container = style({
   minHeight: '100vh',
@@ -21,6 +17,32 @@ export const container = style({
     },
   },
 });
+
+// export const header = style({
+//   display: 'flex',
+//   justifyContent: 'space-between',
+//   alignItems: 'center',
+//   marginBottom: '1.5rem',
+//   flexWrap: 'wrap',
+//   gap: '1rem',
+//   '@media': {
+//     'screen and (min-width: 768px)': {
+//       marginBottom: '2rem',
+//     },
+//   },
+// });
+
+// export const title = style({
+//   fontSize: '1.5rem',
+//   fontWeight: 300,
+//   color: '#1a1a1a',
+//   letterSpacing: '-0.01em',
+//   '@media': {
+//     'screen and (min-width: 768px)': {
+//       fontSize: '2rem',
+//     },
+//   },
+// });
 
 export const tabs = style({
   display: 'flex',
@@ -61,6 +83,7 @@ export const tab = style({
 
 export const activeTab = style({
   color: button,
+  // borderBottomColor: '#1a1a1a',
   fontWeight: 500,
   ':hover': {
     color: button,
@@ -68,38 +91,30 @@ export const activeTab = style({
 });
 
 export const section = style({
-  background: dark_bg,
-  borderRadius: 8,
-  padding: 12,
-  border: `1px solid ${border_subtle}`,
+  background: '#fff',
+  borderRadius: '4px',
+  padding: 24,
+  border: '1px solid #e5e5e5',
   overflow: 'hidden',
-  ":hover": {
-    boxShadow: "0 12px 32px rgba(0,0,0,0.6)",
-    borderColor: border_hover,
-  },
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: 24,
-    },
-  },
 });
 
 export const sectionHeader = style({
-  marginBottom: 8,
+  marginBottom: '1rem',
   '@media': {
     'screen and (min-width: 768px)': {
-      marginBottom: 16,
+      marginBottom: '1.5rem',
     },
   },
 });
 
 export const sectionTitle = style({
-  fontSize: 18,
+  fontSize: '1.25rem',
   fontWeight: 500,
-  color: text_primary,
+  color: '#1a202c',
+  marginBottom: '0.5rem',
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: 22,
+      fontSize: '1.5rem',
     },
   },
 });
@@ -116,132 +131,6 @@ export const sectionDescription = style({
   },
 });
 
-// pricing
-export const serviceSection = style({
-  marginBottom: 12,
-  padding: 12,
-  background: dark_bg,
-  borderRadius: '0.5rem',
-  border: `1px solid ${border_subtle}`,
-  ":hover": {
-    boxShadow: "0 12px 32px rgba(0,0,0,0.6)",
-    borderColor: border_hover,
-  },
-  '@media': {
-    'screen and (min-width: 768px)': {
-      marginBottom: 20,
-      padding: 20,
-    },
-  },
-});
-
-export const serviceSectionTitle = style({
-  fontSize: 18,
-  fontWeight: 600,
-  color: text_primary,
-  '@media': {
-    'screen and (min-width: 768px)': {
-      fontSize: 22,
-    },
-  },
-});
-
-export const pricingGrid = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 12,
-  marginTop: 8,
-  '@media': {
-    'screen and (min-width: 768px)': {
-      marginTop: 20,
-      gap: 32,
-      flexDirection: 'row',
-    },
-  },
-});
-
-export const pricingRow = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.625rem',
-  padding: '0.75rem',
-  background: dark_bg,
-  borderRadius: '4px',
-  border: '1px solid #e5e5e5',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: 16,
-      gap: '0.75rem',
-    },
-  },
-});
-
-export const barberNameCell = style({
-  fontSize: 20,
-  fontWeight: '500',
-  color: text_primary,
-});
-
-export const barberTimeInfo = style({
-  display: 'none',
-});
-
-export const priceInputWrapper = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 6,
-});
-
-export const priceInputLabel = style({
-  fontSize: 16,
-  fontWeight: '500',
-  color: text_primary,
-  letterSpacing: '0.02em',
-});
-
-export const priceInputCell = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 4,
-});
-
-export const priceInput = style({
-  width: '70px',
-  backgroundColor: darker_bg,
-  color: text_primary,
-  padding: '0.375rem 0.5rem',
-  border: '1px solid #1a1a1a',
-  letterSpacing: '0.05em',
-  borderRadius: '4px',
-  fontSize: 18,
-  fontWeight: '500',
-  textAlign: 'right',
-  transition: 'border-color 0.2s',
-  ':focus': {
-    outline: 'none',
-    border: '1px solid #96cfe0',
-  },
-  '::-webkit-inner-spin-button': {
-    opacity: 1,
-    filter: 'invert(1)',
-  },
-  '::-webkit-outer-spin-button': {
-    opacity: 0.01,
-  },
-});
-
-export const priceTimeHint = style({
-  fontWeight: '400',
-  color: text_secondary,
-});
-
-export const dollarSign = style({
-  fontSize: 16,
-  fontWeight: '400',
-  color: text_secondary,
-});
-
-// services
 export const form = style({
   marginBottom: '1.5rem',
   paddingBottom: '1.5rem',
@@ -255,7 +144,7 @@ export const form = style({
 });
 
 export const formGroup = style({
-  marginBottom: 12,
+  marginBottom: '1rem',
   '@media': {
     'screen and (min-width: 768px)': {
       marginBottom: '1.5rem',
@@ -266,10 +155,10 @@ export const formGroup = style({
 export const formRow = style({
   display: 'grid',
   gridTemplateColumns: '1fr',
+  gap: '1rem',
   '@media': {
     'screen and (min-width: 768px)': {
       gridTemplateColumns: '1fr 1fr',
-      gap: 16,
     },
   },
 });
@@ -278,7 +167,7 @@ export const label = style({
   display: 'block',
   marginBottom: '0.5rem',
   fontWeight: '500',
-  color: text_secondary,
+  color: '#2d3748',
   fontSize: '0.875rem',
   '@media': {
     'screen and (min-width: 768px)': {
@@ -289,12 +178,10 @@ export const label = style({
 
 export const input = style({
   width: '100%',
-  backgroundColor: darker_bg,
-  color: text_primary,
-  border: '1px solid #1a1a1a',
   boxSizing: 'border-box',
   padding: '0.625rem',
-  borderRadius: 4,
+  border: '2px solid #e2e8f0',
+  borderRadius: '0.25rem',
   fontSize: '0.875rem',
   '@media': {
     'screen and (min-width: 768px)': {
@@ -305,28 +192,16 @@ export const input = style({
   },
   ':focus': {
     outline: 'none',
-    border: '1px solid #96cfe0',
-  },
-  '::placeholder': {
-    color: text_muted,
-  },
-  '::-webkit-inner-spin-button': {
-    opacity: 1,
-    filter: 'invert(1)',
-  },
-  '::-webkit-outer-spin-button': {
-    opacity: 0.01,
+    borderColor: '#1a1a1a',
   },
 });
 
 export const textarea = style({
   width: '100%',
-  backgroundColor: darker_bg,
-  color: text_primary,
-  border: '1px solid #1a1a1a',
   boxSizing: 'border-box',
   padding: '0.625rem',
-  borderRadius: 4,
+  border: '2px solid #e2e8f0',
+  borderRadius: '0.25rem',
   fontSize: '0.875rem',
   fontFamily: 'inherit',
   resize: 'vertical',
@@ -339,33 +214,40 @@ export const textarea = style({
   },
   ':focus': {
     outline: 'none',
-    border: '1px solid #96cfe0',
+    borderColor: '#1a1a1a',
   },
+});
+
+export const checkboxLabel = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  cursor: 'pointer',
 });
 
 export const formActions = style({
   display: 'flex',
-  flexDirection: 'row',
-  marginTop: 4,
-  gap: 12,
+  flexDirection: 'column',
+  gap: '0.75rem',
   '@media': {
     'screen and (min-width: 768px)': {
-      gap: 16,
+      flexDirection: 'row',
+      gap: '1rem',
     },
   },
 });
 
 export const submitButton = style({
   padding: '0.625rem 1.25rem',
-  background: button,
-  color: darker_bg,
+  background: '#1a1a1a',
+  color: '#ffffff',
   border: 'none',
-  borderRadius: 4,
-  fontSize: 16,
+  borderRadius: '2px',
+  fontSize: '0.875rem',
   fontWeight: '500',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
-  letterSpacing: '0.02em',
+  letterSpacing: '0.05em',
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '0.75rem 1.5rem',
@@ -373,20 +255,22 @@ export const submitButton = style({
     },
   },
   ':hover': {
-    backgroundColor: '#7fbccd',
+    background: '#333',
+  },
+  ':active': {
+    transform: 'scale(0.98)',
   },
 });
 
 export const cancelButton = style({
   padding: '0.625rem 1.25rem',
-  backgroundColor: '#fecaca',
-  color: '#dc2626',
+  background: '#718096',
+  color: 'white',
   border: 'none',
-  borderRadius: 4,
-  fontSize: 16,
+  borderRadius: '2px',
+  fontSize: '0.875rem',
   fontWeight: '500',
   cursor: 'pointer',
-  letterSpacing: '0.02em',
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '0.75rem 1.5rem',
@@ -395,12 +279,12 @@ export const cancelButton = style({
     },
   },
   ':hover': {
-    backgroundColor: '#fcb3b3',
+    background: '#4a5568',
   },
 });
 
 export const barbersList = style({
-  marginTop: 4,
+  marginTop: '2rem',
 });
 
 export const barberCard = style({
@@ -408,7 +292,7 @@ export const barberCard = style({
   flexDirection: 'column',
   gap: '1rem',
   padding: '1rem',
-  background: darker_bg,
+  background: '#f7fafc',
   borderRadius: '0.5rem',
   marginBottom: '1rem',
   '@media': {
@@ -432,7 +316,7 @@ export const barberInfo = style({
 export const barberName = style({
   fontSize: '1.125rem',
   fontWeight: 600,
-  color: text_primary,
+  color: '#1a202c',
   marginBottom: '0.5rem',
   '@media': {
     'screen and (min-width: 768px)': {
@@ -442,64 +326,13 @@ export const barberName = style({
 });
 
 export const barberDetail = style({
-  color: text_secondary,
+  color: '#4a5568',
   fontSize: '0.8125rem',
   marginBottom: '0.25rem',
   '@media': {
     'screen and (min-width: 768px)': {
       fontSize: '0.9rem',
     },
-  },
-});
-
-export const barberActions = style({
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: 12,
-});
-
-export const editButton = style({
-  padding: '0.5rem 0.875rem',
-  background: 'transparent',
-  color: '#0e7490',
-  border: '1px solid #a5d8e6',
-  borderRadius: 4,
-  fontSize: 14,
-  fontWeight: '500',
-  cursor: 'pointer',
-  transition: 'all 0.2s',
-  whiteSpace: 'nowrap',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '0.625rem 1.25rem',
-      fontSize: 16,
-    },
-  },
-  ':hover': {
-    background: '#a5d8e6',
-    color: '#1a1a1a',
-  },
-});
-
-export const deleteButton = style({
-  padding: '0.5rem 0.875rem',
-  background: 'transparent',
-  color: '#b91c1c',
-  border: '1px solid #e5a3a3',
-  borderRadius: '4px',
-  fontSize: 14,
-  fontWeight: '500',
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-  transition: 'all 0.2s',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '0.625rem 1.25rem',
-      fontSize: 16,
-    },
-  },
-  ':hover': {
-    background: '#e5a3a3',
   },
 });
 
@@ -530,6 +363,36 @@ export const statusBadgeInactive = style({
   fontWeight: '500',
 });
 
+export const barberActions = style({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '0.5rem',
+});
+
+export const editButton = style({
+  padding: '0.5rem 0.875rem',
+  background: 'transparent',
+  color: '#0e7490',
+  border: '1px solid #a5d8e6',
+  borderRadius: '4px',
+  fontSize: '0.8125rem',
+  fontWeight: '500',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  whiteSpace: 'nowrap',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.625rem 1.25rem',
+      fontSize: '0.9375rem',
+    },
+  },
+  ':hover': {
+    background: '#c6ecf4',
+    borderColor: '#c6ecf4',
+    color: '#1a1a1a',
+  },
+});
+
 export const toggleButton = style({
   padding: '0.5rem 0.875rem',
   background: 'transparent',
@@ -550,6 +413,29 @@ export const toggleButton = style({
   ':hover': {
     background: '#1a1a1a',
     color: '#ffffff',
+  },
+});
+
+export const deleteButton = style({
+  padding: '0.5rem 0.875rem',
+  background: 'transparent',
+  color: '#b91c1c',
+  border: '1px solid #e5a3a3',
+  borderRadius: '4px',
+  fontSize: '0.8125rem',
+  fontWeight: '500',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+  transition: 'all 0.2s',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0.625rem 1.25rem',
+      fontSize: '0.9375rem',
+    },
+  },
+  ':hover': {
+    background: '#fef2f2',
+    borderColor: '#d4a3a3',
   },
 });
 
@@ -597,6 +483,143 @@ export const priceControl = style({
   display: 'flex',
   alignItems: 'center',
   gap: '0.5rem',
+});
+
+export const priceInput = style({
+  width: '70px',
+  padding: '0.375rem 0.5rem',
+  border: '1px solid #e5e5e5',
+  borderRadius: '4px',
+  fontSize: '0.9rem',
+  fontWeight: '500',
+  textAlign: 'right',
+  transition: 'border-color 0.2s',
+  ':focus': {
+    outline: 'none',
+    borderColor: '#1a1a1a',
+  },
+});
+
+export const serviceSection = style({
+  marginBottom: '1rem',
+  padding: '0.75rem',
+  background: '#fafafa',
+  borderRadius: '0.5rem',
+  border: '1px solid #e5e5e5',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      marginBottom: '1.25rem',
+      padding: '1rem',
+    },
+  },
+});
+
+export const serviceSectionTitle = style({
+  fontSize: '1rem',
+  fontWeight: 600,
+  color: '#1a1a1a',
+  marginBottom: '0.75rem',
+  paddingBottom: '0.5rem',
+  borderBottom: '1px solid #e5e5e5',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: '1.1rem',
+    },
+  },
+});
+
+export const pricingGrid = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.5rem',
+});
+
+export const pricingRow = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.625rem',
+  padding: '0.75rem',
+  background: 'white',
+  borderRadius: '4px',
+  border: '1px solid #e5e5e5',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '1rem',
+      gap: '0.75rem',
+    },
+  },
+});
+
+export const barberNameCell = style({
+  fontSize: '0.9rem',
+  fontWeight: '500',
+  color: '#1a1a1a',
+});
+
+export const barberTimeInfo = style({
+  display: 'none',
+});
+
+export const priceInputCell = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.25rem',
+});
+
+export const priceInputWrapper = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
+});
+
+export const priceInputLabel = style({
+  fontSize: '0.7rem',
+  fontWeight: '500',
+  color: '#1a1a1a',
+  letterSpacing: '0.02em',
+});
+
+export const priceTimeHint = style({
+  fontWeight: '400',
+  color: '#999',
+});
+
+export const dollarSign = style({
+  fontSize: '0.85rem',
+  fontWeight: '500',
+  color: '#666',
+});
+
+export const timeSettingsGrid = style({
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: '1.5rem',
+  marginTop: '1.5rem',
+});
+
+export const timeSettingCard = style({
+  padding: '1.5rem',
+  background: '#f7fafc',
+  borderRadius: '0.75rem',
+  border: '2px solid #e2e8f0',
+});
+
+export const timeSettingTitle = style({
+  fontSize: '1.125rem',
+  fontWeight: 'bold',
+  color: '#1a202c',
+  marginBottom: '1rem',
+});
+
+export const timeInputRow = style({
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: '1rem',
+});
+
+export const timeInputGroup = style({
+  display: 'flex',
+  flexDirection: 'column',
 });
 
 // Schedule manager styles
@@ -703,13 +726,6 @@ export const pricingTimeLabel = style({
   color: '#475569',
   textTransform: 'uppercase',
   letterSpacing: '0.03em',
-});
-
-export const checkboxLabel = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-  cursor: 'pointer',
 });
 
 export const pricingTimeArrow = style({
