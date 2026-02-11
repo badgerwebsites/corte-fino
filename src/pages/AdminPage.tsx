@@ -1079,7 +1079,7 @@ export default function AdminPage() {
               <View style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 <View>
                   <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <Text className={styles.label}>Logo 1 (default: Corte Fino)</Text>
+                    <Text className={styles.label}>Logo 1</Text>
                     <label className={styles.checkboxLabel} style={{ marginBottom: 0 }}>
                       <input
                         type="checkbox"
@@ -1101,7 +1101,7 @@ export default function AdminPage() {
 
                 <View>
                   <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <Text className={styles.label}>Logo 2 (default: J Studios)</Text>
+                    <Text className={styles.label}>Logo 2</Text>
                     <label className={styles.checkboxLabel} style={{ marginBottom: 0 }}>
                       <input
                         type="checkbox"

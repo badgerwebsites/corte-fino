@@ -4,8 +4,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { View } from '../ui/View';
 import * as styles from '../styles/navigation.css';
-import defaultLogo1 from '../assets/BlackLogo.svg';
-import defaultLogo2 from '../assets/jstudios.svg';
 
 export function Navigation() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,7 +12,7 @@ export function Navigation() {
   );
 
   const [logoIndex, setLogoIndex] = useState(0);
-  const [carouselLogos, setCarouselLogos] = useState<(string | null)[]>([defaultLogo1, defaultLogo2, null]);
+  const [carouselLogos, setCarouselLogos] = useState<(string | null)[]>([null, null, null]);
 
   // Helper to determine logo value: empty string means hidden, null means use default, URL means use that
   const getLogoValue = (dbValue: string | null | undefined, defaultValue: string | null): string | null => {
@@ -33,8 +31,8 @@ export function Navigation() {
 
       if (data) {
         setCarouselLogos([
-          getLogoValue(data.nav_logo_1_url, defaultLogo1),
-          getLogoValue(data.nav_logo_2_url, defaultLogo2),
+          getLogoValue(data.nav_logo_1_url, null),
+          getLogoValue(data.nav_logo_2_url, null),
           getLogoValue(data.nav_logo_3_url, null)
         ]);
       }

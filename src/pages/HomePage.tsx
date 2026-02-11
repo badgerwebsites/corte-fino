@@ -7,7 +7,6 @@ import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/home.css';
-import defaultLogo from '../assets/BigLogo.svg';
 import scissorsIcon from '../assets/scissors.svg';
 import calendarCheckIcon from '../assets/calendar-check.svg';
 import crownIcon from '../assets/crown.svg';
@@ -19,12 +18,10 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [heroBackground, setHeroBackground] = useState<string>(DEFAULT_HERO_BACKGROUND);
-  const [heroLogo, setHeroLogo] = useState<string>(defaultLogo);
-  const [isCustomLogo, setIsCustomLogo] = useState(false);
 
   // Hero carousel state (matches nav carousel)
   const [heroLogoIndex, setHeroLogoIndex] = useState(0);
-  const [heroCarouselLogos, setHeroCarouselLogos] = useState<(string | null)[]>([defaultLogo, null, null]);
+  const [heroCarouselLogos, setHeroCarouselLogos] = useState<(string | null)[]>([null, null, null]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -48,14 +45,10 @@ export default function HomePage() {
         if (settingsData?.hero_background_url) {
           setHeroBackground(settingsData.hero_background_url);
         }
-        if (settingsData?.hero_logo_url) {
-          setHeroLogo(settingsData.hero_logo_url);
-          setIsCustomLogo(true);
-        }
 
         // Set up hero carousel with dedicated hero logos
         setHeroCarouselLogos([
-          settingsData?.hero_logo_url || defaultLogo,
+          settingsData?.hero_logo_url || null,
           settingsData?.hero_logo_2_url || null,
           settingsData?.hero_logo_3_url || null
         ]);
@@ -112,19 +105,19 @@ export default function HomePage() {
                       <img
                         src={logoSrc}
                         alt={`Logo ${index + 1}`}
-                        className={`${styles.heroCarouselImage} ${logoSrc === defaultLogo ? styles.heroLogoWhite : ''}`}
+                        className={styles.heroCarouselImage}
                       />
                     </View>
                   ))}
                 </View>
               </View>
-            ) : (
+            ) : activeHeroLogos.length === 1 ? (
               <img
-                src={heroLogo}
+                src={activeHeroLogos[0]}
                 alt="Corte Fino"
-                className={`${styles.heroLogoLarge} ${!isCustomLogo ? styles.heroLogoWhite : ''}`}
+                className={styles.heroLogoLarge}
               />
-            )}
+            ) : null}
 
             <button
               className={styles.heroBookButton}

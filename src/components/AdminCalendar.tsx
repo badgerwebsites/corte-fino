@@ -41,13 +41,22 @@ export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) 
   },
 };
 
-const getBarberColors = (booking: BookingWithDetails) =>
-  booking.barber_id && BARBER_COLORS[booking.barber_id]
+const getBarberColors = (booking: BookingWithDetails) => {
+  // Show grey for completed appointments so barbers can easily see what's done
+  if (booking.status === 'completed') {
+    return {
+      accent: '#6b7280',
+      bg: '#374151',
+    };
+  }
+
+  return booking.barber_id && BARBER_COLORS[booking.barber_id]
     ? BARBER_COLORS[booking.barber_id]
     : {
         accent: '#64748b',
         bg: '#1f2937',
       };
+};
 
   const renderStatusIcon = (status: BookingStatus) => {
     switch (status) {

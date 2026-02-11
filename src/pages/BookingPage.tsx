@@ -499,9 +499,11 @@ export default function BookingPage() {
   };
 
   // Check if a time slot overlaps with any existing booking for a specific barber
-  const isSlotBooked = (time: string, barberId: string): boolean => {
+  // Takes into account the full duration of the service being booked
+  const isSlotBooked = (time: string, barberId: string, serviceDuration: number): boolean => {
     const [slotHours, slotMins] = time.split(':').map(Number);
-    const slotMinutes = slotHours * 60 + slotMins;
+    const newStart = slotHours * 60 + slotMins;
+    const newEnd = newStart + serviceDuration;
 
     return existingBookings.some(booking => {
       if (booking.barber_id !== barberId) return false;
@@ -511,8 +513,8 @@ export default function BookingPage() {
       const bookingStart = startHours * 60 + startMins;
       const bookingEnd = endHours * 60 + endMins;
 
-      // Check if the slot falls within an existing booking's time range
-      return slotMinutes >= bookingStart && slotMinutes < bookingEnd;
+      // Check for interval overlap: two ranges overlap if newStart < bookingEnd AND newEnd > bookingStart
+      return newStart < bookingEnd && newEnd > bookingStart;
     });
   };
 
@@ -555,15 +557,17 @@ export default function BookingPage() {
 
             const startMinutes = startHour * 60 + startMin;
             const endMinutes = endHour * 60 + endMin;
+            const serviceDuration = selectedService?.duration_minutes || 0;
 
-            // Generate 15-minute slots
-            for (let minutes = startMinutes; minutes < endMinutes; minutes += 15) {
+            // Generate 15-minute slots, but stop where service would extend past availability
+            for (let minutes = startMinutes; minutes + serviceDuration <= endMinutes; minutes += 15) {
               const hours = Math.floor(minutes / 60);
               const mins = minutes % 60;
               const timeSlot = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
 
               // Check if this barber is available for this slot (not already booked)
-              if (!isSlotBooked(timeSlot, barber.id)) {
+              // Must account for the full service duration to avoid overlaps
+              if (selectedService && !isSlotBooked(timeSlot, barber.id, selectedService.duration_minutes)) {
                 slotAvailability.set(timeSlot, true);
               }
             }
@@ -593,15 +597,16 @@ export default function BookingPage() {
 
       const startMinutes = startHour * 60 + startMin;
       const endMinutes = endHour * 60 + endMin;
+      const serviceDuration = selectedService?.duration_minutes || 0;
 
-      // Generate 15-minute slots
-      for (let minutes = startMinutes; minutes < endMinutes; minutes += 15) {
+      // Generate 15-minute slots, but stop where service would extend past availability
+      for (let minutes = startMinutes; minutes + serviceDuration <= endMinutes; minutes += 15) {
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
         const timeSlot = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
 
-        // Only add if not already booked
-        if (!isSlotBooked(timeSlot, selectedBarber.id)) {
+        // Only add if not already booked (accounting for full service duration)
+        if (selectedService && !isSlotBooked(timeSlot, selectedBarber.id, selectedService.duration_minutes)) {
           slots.push(timeSlot);
         }
       }
