@@ -133,26 +133,26 @@ export function ImageUpload({
         {previewUrl ? (
           <View className={styles.previewContainer}>
             <img src={previewUrl} alt="Preview" className={styles.preview} />
-            <View className={styles.previewActions}>
               <button
                 type="button"
-                className={styles.changeButton}
+                className={styles.removeOverlay}
+                onClick={handleRemove}
+                disabled={uploading}
+                aria-label="Remove image"
+              >
+                ✕
+              </button>
+
+              <button
+                type="button"
+                className={styles.changeButtonOverlay}
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
               >
                 Change
               </button>
-              <button
-                type="button"
-                className={styles.removeButton}
-                onClick={handleRemove}
-                disabled={uploading}
-              >
-                Remove
-              </button>
             </View>
-          </View>
-        ) : (
+          ) : (
           <div
             className={`${styles.dropzone} ${isDragging ? styles.dropzoneDragging : ''}`}
             onClick={() => fileInputRef.current?.click()}

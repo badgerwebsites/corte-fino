@@ -6,6 +6,7 @@ import { View } from '../ui/View';
 // import { Text } from '../ui/Text';
 import * as styles from '../styles/admin.css';
 import * as scheduleStyles from '../styles/barberScheduleManager.css';
+import { MinusCircle } from "lucide-react";
 
 interface Props {
   barbers: Barber[];
@@ -507,13 +508,12 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
 
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    removeBreak(day.value, index)
-                                  }
+                                  onClick={() => removeBreak(day.value, index)}
                                   className={scheduleStyles.removeBreakButton}
                                 >
-                                  ✕
+                                  <MinusCircle size={22} strokeWidth={2.5} />
                                 </button>
+
                               </div>
                             ))}
                           </div>
@@ -562,7 +562,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                   <label className={styles.label}>Start Date</label>
                   <input
                     type="date"
-                    className={styles.input}
+                    className={scheduleStyles.timeInput}
                     value={timeOffForm.start_date}
                     onChange={(e) =>
                       setTimeOffForm({
@@ -578,7 +578,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                   <label className={styles.label}>End Date</label>
                   <input
                     type="date"
-                    className={styles.input}
+                    className={scheduleStyles.timeInput}
                     value={timeOffForm.end_date}
                     onChange={(e) =>
                       setTimeOffForm({

@@ -10,12 +10,12 @@ const text_secondary = "#b0b0b0";
 // const border_hover = "rgba(255,255,255,0.18)";
 
 export const container = style({
-  marginBottom: '1rem',
+  marginBottom: 16,
 });
 
 export const label = style({
   display: 'block',
-  marginBottom: '0.5rem',
+  marginBottom: 12,
   fontWeight: '500',
   color: text_secondary,
   fontSize: '0.875rem',
@@ -73,7 +73,8 @@ export const dropzoneHint = style({
 });
 
 export const previewContainer = style({
-  display: 'flex',
+  position: 'relative',
+  display: 'inline-block',
   flexDirection: 'column',
   alignItems: 'center',
   gap: '0.75rem',
@@ -93,48 +94,45 @@ export const preview = style({
   boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
 });
 
-export const previewActions = style({
+export const removeOverlay = style({
+  position: 'absolute',
+  top: 8,
+  right: 8,
+  width: 32,
+  height: 32,
+  borderRadius: '50%',
+  backgroundColor: '#dc2626',
+  color: darker_bg,
+  border: 'none',
+  fontSize: 16,
+  fontWeight: 1000,
+  cursor: 'pointer',
   display: 'flex',
-  gap: '0.5rem',
+  alignItems: 'center',
+  justifyContent: 'center',
+  transition: 'all 0.2s',
+
+  ':hover': {
+    backgroundColor: '#b91c1c',
+    transform: 'scale(1.05)',
+  },
 });
 
-export const changeButton = style({
-  padding: '0.5rem 1rem',
-  fontSize: 16,
-  fontWeight: '500',
+export const changeButtonOverlay = style({
+  position: 'absolute',
+  bottom: 8,
+  left: 8,
+  padding: '0.35rem 0.75rem',
   backgroundColor: button,
   color: darker_bg,
-  border: "none",
+  border: `none`,
   borderRadius: 4,
+  fontSize: 14,
   cursor: 'pointer',
   transition: 'all 0.2s',
-  letterSpacing: '0.02em',
+
   ':hover': {
     backgroundColor: '#7fbccd',
-  },
-  ':disabled': {
-    opacity: 0.5,
-    cursor: 'not-allowed',
-  },
-});
-
-export const removeButton = style({
-  padding: '0.5rem 1rem',
-  fontSize: 16,
-  fontWeight: '500',
-  backgroundColor: '#fecaca',
-  color: '#dc2626',
-  border: "none",
-  borderRadius: 4,
-  cursor: 'pointer',
-  transition: 'all 0.2s',
-  letterSpacing: '0.02em',
-  ':hover': {
-    backgroundColor: '#fcb3b3',
-  },
-  ':disabled': {
-    opacity: 0.5,
-    cursor: 'not-allowed',
   },
 });
 

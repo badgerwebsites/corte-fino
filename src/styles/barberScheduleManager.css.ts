@@ -6,7 +6,7 @@ const button =  "#96cfe0";
 const text_primary = "#f5f5f5";
 const text_secondary = "#b0b0b0";
 const text_muted = "#8a8a8a";
-const border_subtle = "rgba(255,255,255,0.08)";
+// const border_subtle = "rgba(255,255,255,0.08)";
 // const border_hover = "rgba(255,255,255,0.18)";
 
 export const headerTitle = style({
@@ -73,9 +73,9 @@ export const notWorkingText = style({
 export const saveButton = style({
   padding: '0.375rem 0.75rem',
   backgroundColor: button,
-  color: '#1a1a1a',
+  color: dark_bg,
   border: 'none',
-  borderRadius: 6,
+  borderRadius: 4,
   fontSize: 14,
   fontWeight: 500,
   cursor: 'pointer',
@@ -140,53 +140,62 @@ export const timeInput = style({
 });
 
 export const breaksCard = style({
-//   padding: '1rem',
+//   padding: 12,
 //   backgroundColor: darker_bg,
 //   borderRadius: '0.5rem',
 //   border: `1px solid ${border_subtle}`,
+  marginTop: 12,
+  marginBottom: 12,
 });
 
 export const breaksHeader = style({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  marginTop: 12,
-  marginBottom: 4,
+  marginTop: 16,
+  marginBottom: 12,
 });
 
 export const breaksLabel = style({
-  fontSize: '0.75rem',
+  fontSize: 14,
   fontWeight: 600,
-  color: '#92400e',
+  color: '#dc2626',
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
 });
 
 export const addBreakButton = style({
-  padding: '0.25rem 0.5rem',
-  backgroundColor: '#f59e0b',
-  color: '#ffffff',
+  padding: '8px',
+  backgroundColor: '#fecaca',
+  color: '#dc2626',
   border: 'none',
-  borderRadius: '0.25rem',
-  fontSize: '0.75rem',
-  fontWeight: 600,
+  borderRadius: 4,
+  fontSize: 14,
+  fontWeight: 500,
   cursor: 'pointer',
+  ':hover': {
+    backgroundColor: '#fcb3b3',
+  },
 });
 
 export const breakRow = style({
   display: 'grid',
-  gridTemplateColumns: 'auto 1fr auto 1fr auto', // 📱 mobile (stack-friendly)
-  gap: '0.5rem',
+  gridTemplateColumns: '1fr auto 1fr auto',
   alignItems: 'center',
+  width: '100%',
+  minWidth: 0,
 
   '@media': {
     'screen and (min-width: 768px)': {
-      gridTemplateColumns: 'auto auto auto auto auto', // 🖥️ web (tight)
+      gridTemplateColumns: '1fr auto 1fr auto',
+      gap: 4,
     },
   },
 });
 
 export const breakInput = style({
+  width: '100%',
+  minWidth: 0,
   backgroundColor: darker_bg,
   color: text_primary,
   border: '1px solid #1a1a1a',
@@ -195,6 +204,7 @@ export const breakInput = style({
   borderRadius: 4,
   fontSize: '0.875rem',
   colorScheme: 'dark',
+
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '0.75rem',
@@ -202,72 +212,81 @@ export const breakInput = style({
       fontSize: '1rem',
     },
   },
+
   ':focus': {
     outline: 'none',
     border: '1px solid #96cfe0',
   },
-  '::placeholder': {
-    color: text_muted,
-  },
 });
 
 export const breakSeparator = style({
-  textAlign: 'center',
+  display: 'flex',
+  padding: 4,
+  justifyContent: 'center',
+  alignItems: 'center',
   color: text_secondary,
-  fontStyle: 'bold',
-  fontSize: 12,
+  fontSize: 16,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: 8,
+    },
+  },
 });
 
 export const removeBreakButton = style({
-  padding: '0.375rem',
-//   backgroundColor: ,
-  color: '#b91c1c',
+  backgroundColor: 'transparent',
+  color: '#dc2626',
   border: 'none',
-  borderRadius: '0.25rem',
   cursor: 'pointer',
-  fontSize: '0.75rem',
-  fontWeight: 600,
 });
 
 export const scheduleSummary = style({
-  padding: '0.75rem',
-  backgroundColor: '#f3f4f6',
+  padding: 12,
   borderRadius: '0.375rem',
-  fontSize: '0.875rem',
-  color: '#4b5563',
+  border: `1px solid ${text_secondary}`,
+  fontSize: 16,
+  color: text_primary,
 });
 
-
 export const timeOffCard = style({
-  padding: '0.75rem 1rem',
+  padding: 12,
   backgroundColor: dark_bg,
-  border: `1px solid ${border_subtle}`,
+  border: `1px solid ${text_secondary}`,
   borderRadius: '0.5rem',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
   flexWrap: 'wrap',
   gap: '0.5rem',
+  marginTop: 8,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: 16,
+    },
+  },
 });
 
 export const timeOffDate = style({
   fontWeight: 500,
-  color: '#92400e',
+  color: text_primary,
 });
 
 export const timeOffReason = style({
-  fontSize: '0.875rem',
-  color: '#a16207',
+  fontSize: 15,
+  color: text_secondary,
   marginTop: '0.25rem',
 });
 
 export const deleteTimeOffButton = style({
   padding: '0.375rem 0.75rem',
-  backgroundColor: '#e5a3a3',
-  color: '#ffffff',
+  backgroundColor: '#fecaca',
+  color: '#dc2626',
   border: 'none',
-  borderRadius: '0.375rem',
-  fontSize: '0.75rem',
+  borderRadius: 4,
+  fontSize: 14,
   fontWeight: 500,
   cursor: 'pointer',
+  ':hover': {
+    backgroundColor: '#fcb3b3',
+  },
 });

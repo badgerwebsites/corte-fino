@@ -658,137 +658,163 @@ export default function AdminPage() {
         </View>
       )}
 
-      {activeTab === 'services' && (
-        <div ref={serviceFormRef} className={styles.section}>
-          <View className={styles.sectionHeader}>
-            <Text className={styles.sectionTitle}>
-              {editingService ? 'Edit Service' : 'Add New Service'}
-            </Text>
-          </View>
+        {activeTab === 'services' && (
+          <View className={styles.section}>
+            <div className={styles.adminSplitLayout}>
+              <div className={styles.adminLeftColumn}>
+              {/* CURRENT SERVICES LIST */}
+                {services.map((service) => (
+                  <View key={service.id} className={styles.barberCard}>
+                    <View className={styles.barberInfo}>
+                      <Text className={styles.barberName}>{service.name}</Text>
+                      <Text className={styles.barberDetail}>
+                        {service.duration_minutes} minutes • {service.reward_points} points
+                      </Text>
+                      {service.description && (
+                        <Text className={styles.barberDetail}>
+                          {service.description}
+                        </Text>
+                      )}
+                    </View>
 
-          <form onSubmit={handleServiceSubmit} className={styles.form}>
-            <View className={styles.formGroup}>
-              <label className={styles.label}>Service Name *</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={serviceForm.name}
-                onChange={(e) => setServiceForm({ ...serviceForm, name: e.target.value })}
-                placeholder="Type here..."
-                required
-              />
-            </View>
+                    <View className={styles.barberActions}>
+                      <button
+                        className={styles.editButton}
+                        onClick={() => handleEditService(service)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className={styles.deleteButton}
+                        onClick={() => handleDeleteService(service.id)}
+                      >
+                        Delete
+                      </button>
+                    </View>
+                  </View>
+                ))}
+              </div>
 
-            <View className={styles.formGroup}>
-              <label className={styles.label}>Description</label>
-              <textarea
-                className={styles.textarea}
-                value={serviceForm.description}
-                onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
-                placeholder="Type here..."
-                rows={2}
-              />
-            </View>
-
-            <ImageUpload
-              currentImageUrl={serviceForm.image_url || undefined}
-              onImageChange={(url) => setServiceForm({ ...serviceForm, image_url: url || '' })}
-              bucket="service-images"
-              label="Service Image"
-            />
-
-            <View className={styles.formRow}>
-              <View className={styles.formGroup}>
-                <label className={styles.label}>Duration (minutes) *</label>
-                <input
-                  type="number"
-                  min="5"
-                  step="5"
-                  className={styles.input}
-                  value={serviceForm.duration_minutes}
-                  onChange={(e) => setServiceForm({ ...serviceForm, duration_minutes: parseInt(e.target.value) })}
-                  placeholder="Type here..."
-                  required
-                />
+            {/* ADD / EDIT SERVICE FORM */}
+            <div ref={serviceFormRef} className={styles.adminRightColumn}>
+              <View className={styles.sectionHeader}>
+                <Text className={styles.sectionTitle}>
+                  {editingService ? 'Edit Service' : '+ Add Service'}
+                </Text>
               </View>
 
-              <View className={styles.formGroup}>
-                <label className={styles.label}>Reward Points *</label>
-                <input
-                  type="number"
-                  min="0"
-                  className={styles.input}
-                  value={serviceForm.reward_points}
-                  onChange={(e) => setServiceForm({ ...serviceForm, reward_points: parseInt(e.target.value) })}
-                  placeholder="Type here..."
-                  required
+              <form onSubmit={handleServiceSubmit} className={styles.form}>
+                <View className={styles.formGroup}>
+                  <label className={styles.label}>Service Name *</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    value={serviceForm.name}
+                    onChange={(e) =>
+                      setServiceForm({ ...serviceForm, name: e.target.value })
+                    }
+                    placeholder="Type here..."
+                    required
+                  />
+                </View>
+
+                <View className={styles.formGroup}>
+                  <label className={styles.label}>Description</label>
+                  <textarea
+                    className={styles.textarea}
+                    value={serviceForm.description}
+                    onChange={(e) =>
+                      setServiceForm({
+                        ...serviceForm,
+                        description: e.target.value,
+                      })
+                    }
+                    placeholder="Type here..."
+                    rows={2}
+                  />
+                </View>
+
+                <ImageUpload
+                  currentImageUrl={serviceForm.image_url || undefined}
+                  onImageChange={(url) =>
+                    setServiceForm({ ...serviceForm, image_url: url || '' })
+                  }
+                  bucket="service-images"
+                  label="Service Image"
                 />
-              </View>
-            </View>
 
-            <View className={styles.formActions}>
-              <button type="submit" className={styles.submitButton}>
-                {editingService ? 'Update Service' : 'Add Service'}
-              </button>
-              {editingService && (
-                <button
-                  type="button"
-                  className={styles.cancelButton}
-                  onClick={() => {
-                    setEditingService(null);
-                    setServiceForm({
-                      name: '',
-                      description: '',
-                      duration_minutes: 45,
-                      reward_points: 10,
-                      image_url: '',
-                    });
-                  }}
-                >
-                  Cancel
-                </button>
-              )}
-            </View>
-          </form>
+                <View className={styles.formRow}>
+                  <View className={styles.formGroup}>
+                    <label className={styles.label}>Duration (minutes) *</label>
+                    <input
+                      type="number"
+                      min="5"
+                      step="5"
+                      className={styles.input}
+                      value={serviceForm.duration_minutes}
+                      onChange={(e) =>
+                        setServiceForm({
+                          ...serviceForm,
+                          duration_minutes: parseInt(e.target.value),
+                        })
+                      }
+                      required
+                    />
+                  </View>
 
-          <View className={styles.barbersList}>
-            {/* <Text className={styles.sectionTitle}>Current Services</Text> */}
-            {services.map((service) => (
-              <View key={service.id} className={styles.barberCard}>
-                <View className={styles.barberInfo}>
-                  <Text className={styles.barberName}>{service.name}</Text>
-                  <Text className={styles.barberDetail}>
-                    {service.duration_minutes} minutes • {service.reward_points} points
-                  </Text>
-                  {service.description && (
-                    <Text className={styles.barberDetail}>{service.description}</Text>
+                  <View className={styles.formGroup}>
+                    <label className={styles.label}>Reward Points *</label>
+                    <input
+                      type="number"
+                      min="0"
+                      className={styles.input}
+                      value={serviceForm.reward_points}
+                      onChange={(e) =>
+                        setServiceForm({
+                          ...serviceForm,
+                          reward_points: parseInt(e.target.value),
+                        })
+                      }
+                      required
+                    />
+                  </View>
+                </View>
+
+                <View className={styles.formActions}>
+                  <button type="submit" className={styles.submitButton}>
+                    {editingService ? 'Update' : 'Add Service'}
+                  </button>
+
+                  {editingService && (
+                    <button
+                      type="button"
+                      className={styles.cancelButton}
+                      onClick={() => {
+                        setEditingService(null);
+                        setServiceForm({
+                          name: '',
+                          description: '',
+                          duration_minutes: 45,
+                          reward_points: 10,
+                          image_url: '',
+                        });
+                      }}
+                    >
+                      Cancel
+                    </button>
                   )}
                 </View>
-                <View className={styles.barberActions}>
-                  <button
-                    className={styles.editButton}
-                    onClick={() => handleEditService(service)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className={styles.deleteButton}
-                    onClick={() => handleDeleteService(service.id)}
-                  >
-                    Delete
-                  </button>
-                </View>
-              </View>
-            ))}
+              </form>
+            </div>
+            </div>
           </View>
-        </div>
-      )}
+        )}
+
 
       {activeTab === 'barbers' && (
         <View className={styles.section}>
-          {/* Current Barbers List */}
-          <View className={styles.barbersList}>
-            {/* <Text className={styles.sectionTitle}>Current Barbers</Text> */}
+          <div className={styles.adminSplitLayout}>
+            <div className={styles.adminLeftColumn}>
             {barbers.map((barber) => (
               <View key={barber.id} className={styles.barberCard}>
                 <View className={styles.barberInfo}>
@@ -828,14 +854,15 @@ export default function AdminPage() {
                 </View>
               </View>
             ))}
-          </View>
+          </div>
 
           {/* Add/Edit Barber Form */}
-          <div ref={barberFormRef} className={styles.sectionHeader}>
-            <Text className={styles.sectionTitle}>
-              {editingBarber ? 'Edit Barber' : 'Add New Barber'}
-            </Text>
-          </div>
+          <div ref={barberFormRef} className={styles.adminRightColumn}>
+            <View className={styles.sectionHeader}>
+              <Text className={styles.sectionTitle}>
+                {editingBarber ? 'Edit Barber' : '+ Add Barber'}
+              </Text>
+            </View>
 
           <form onSubmit={handleBarberSubmit} className={styles.form}>
             <ImageUpload
@@ -974,7 +1001,7 @@ export default function AdminPage() {
 
             <View className={styles.formActions}>
               <button type="submit" className={styles.submitButton}>
-                {editingBarber ? 'Update Barber' : 'Add Barber'}
+                {editingBarber ? 'Update' : 'Add Barber'}
               </button>
               {editingBarber && (
                 <button
@@ -1003,13 +1030,17 @@ export default function AdminPage() {
               )}
             </View>
           </form>
-
-          {/* Schedule Management - only show when editing a barber */}
+          
           {editingBarber && (
-            <View>
-              <BarberScheduleManager barbers={[editingBarber]} onUpdate={loadData} />
+            <View className={styles.adminDivider}>
+              <BarberScheduleManager
+                barbers={[editingBarber]}
+                onUpdate={loadData}
+              />
             </View>
           )}
+          </div>
+          </div>
         </View>
       )}
 
@@ -1374,7 +1405,7 @@ export default function AdminPage() {
               </View>
             </form>
 
-            <View className={styles.barbersList}>
+            {/* <View className={styles.barbersList}> */}
               <Text className={styles.sectionTitle}>Current Rewards</Text>
               {rewards.length === 0 ? (
                 <View className={styles.emptyState}>
@@ -1428,7 +1459,7 @@ export default function AdminPage() {
               )}
             </View>
           </View>
-        </View>
+        // </View>
       )}
     </View>
     </>
