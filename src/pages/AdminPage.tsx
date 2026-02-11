@@ -1123,7 +1123,7 @@ export default function AdminPage() {
 
                 <View>
                   <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <Text className={styles.label}>Logo 3 (optional)</Text>
+                    <Text className={styles.label}>Logo 3</Text>
                     <label className={styles.checkboxLabel} style={{ marginBottom: 0 }}>
                       <input
                         type="checkbox"
