@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
-import type { Barber, Service, BarberServicePricing, RewardRedemptionWithDetails, Reward, RewardType, SiteSettings } from '../types/database.types';
+import type { Barber, Service, BarberServicePricing, BarberAvailability, BarberTimeOff, RewardRedemptionWithDetails, Reward, RewardType, SiteSettings } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { BarberScheduleManager } from '../components/BarberScheduleManager';
 import { AdminCalendar } from '../components/AdminCalendar';
@@ -18,6 +18,8 @@ export default function AdminPage() {
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
+  const [availability, setAvailability] = useState<BarberAvailability[]>([]);
+  const [timeOff, setTimeOff] = useState<BarberTimeOff[]>([]);
   const [pendingRedemptions, setPendingRedemptions] = useState<RewardRedemptionWithDetails[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
@@ -83,10 +85,12 @@ export default function AdminPage() {
 
   const loadData = async () => {
     try {
-      const [barbersRes, servicesRes, pricingRes, redemptionsRes, rewardsRes, settingsRes] = await Promise.all([
+      const [barbersRes, servicesRes, pricingRes, availabilityRes, timeOffRes, redemptionsRes, rewardsRes, settingsRes] = await Promise.all([
         supabase.from('barbers').select('*').order('name'),
         supabase.from('services').select('*').order('name'),
         supabase.from('barber_service_pricing').select('*'),
+        supabase.from('barber_availability').select('*'),
+        supabase.from('barber_time_off').select('*'),
         supabase.from('reward_redemptions').select(`
           *,
           customer:customers(*),
@@ -105,6 +109,8 @@ export default function AdminPage() {
       setBarbers(barbersRes.data || []);
       setServices(servicesRes.data || []);
       setPricing(pricingRes.data || []);
+      setAvailability(availabilityRes.data || []);
+      setTimeOff(timeOffRes.data || []);
       setPendingRedemptions(redemptionsRes.data || []);
       setRewards(rewardsRes.data || []);
       setSiteSettings(settingsRes.data || null);
@@ -591,7 +597,14 @@ export default function AdminPage() {
 
       {activeTab === 'calendar' && (
         // <View className={styles.section}>
-          <AdminCalendar barbers={barbers} onBookingUpdate={loadData} />
+          <AdminCalendar
+            barbers={barbers}
+            services={services}
+            pricing={pricing}
+            availability={availability}
+            timeOff={timeOff}
+            onBookingUpdate={loadData}
+          />
         // </View>
       )}
 

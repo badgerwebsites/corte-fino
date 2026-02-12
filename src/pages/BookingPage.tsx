@@ -60,7 +60,6 @@ export default function BookingPage() {
   const [selectedTime, setSelectedTime] = useState('');
 
   // Guest booking state
-  const [isGuestBooking, setIsGuestBooking] = useState(false);
   const [showGuestForm, setShowGuestForm] = useState(false);
   const [guestInfo, setGuestInfo] = useState({
     firstName: '',
@@ -397,7 +396,6 @@ export default function BookingPage() {
       });
 
       setShowConfirmation(true);
-      setIsGuestBooking(false);
       setShowGuestForm(false);
 
     } catch (error) {
@@ -1123,12 +1121,12 @@ export default function BookingPage() {
                     >
                       {bookingInProgress ? 'Booking...' : 'Confirm Booking'}
                     </button>
-                    <Text
+                    <span
                       className={styles.guestBackLink}
                       onClick={() => setShowGuestForm(false)}
                     >
                       ← Back to booking options
-                    </Text>
+                    </span>
                   </View>
                 </View>
               ) : (
@@ -1149,7 +1147,6 @@ export default function BookingPage() {
                   <button
                     className={styles.guestButton}
                     onClick={() => {
-                      setIsGuestBooking(true);
                       setShowGuestForm(true);
                     }}
                   >

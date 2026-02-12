@@ -1,13 +1,23 @@
 // pages/DashboardPage.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase.ts';
 import type { BookingWithDetails, SiteSettings } from '../types/database.types.ts';
+import { RECURRENCE_LABELS } from '../types/database.types.ts';
 import { Navigation } from '../components/Navigation.tsx';
 import { View } from '../ui/View.tsx';
 import { Text } from '../ui/Text.tsx';
 import * as styles from '../styles/dashboard.css.ts';
+
+// Grouped recurring booking type
+interface RecurringBookingGroup {
+  groupId: string;
+  pattern: string;
+  nextBooking: BookingWithDetails;
+  allBookings: BookingWithDetails[];
+  remainingCount: number;
+}
 
 export default function CustomerDashboardPage() {
   const { user, customer, refreshCustomer } = useAuth();

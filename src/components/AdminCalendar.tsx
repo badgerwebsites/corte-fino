@@ -2,26 +2,35 @@
 import { useState, useEffect, useCallback } from 'react';
 import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isSameDay, isSameMonth, addMonths, subMonths, parseISO } from 'date-fns';
 import { supabase } from '../lib/supabase';
-import type { Barber, BookingWithDetails } from '../types/database.types';
+import type { Barber, BookingWithDetails, Service, BarberServicePricing, BarberAvailability, BarberTimeOff } from '../types/database.types';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/adminCalendar.css';
+import * as bookingStyles from '../styles/adminBooking.css';
 import { ChevronLeft, ChevronRight, Check, Ban, Circle} from "lucide-react";
+import { AdminBookingModal } from './AdminBookingModal';
 
 interface AdminCalendarProps {
   barbers: Barber[];
+  services: Service[];
+  pricing: BarberServicePricing[];
+  availability: BarberAvailability[];
+  timeOff: BarberTimeOff[];
   onBookingUpdate?: () => void;
 }
 
 type ViewMode = 'day' | 'week' | 'month';
 type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
 
-export function AdminCalendar({ barbers, onBookingUpdate }: AdminCalendarProps) {
+export function AdminCalendar({ barbers, services, pricing, availability, timeOff, onBookingUpdate }: AdminCalendarProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedBarberId, setSelectedBarberId] = useState<string>('all');
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
   const [selectedBooking, setSelectedBooking] = useState<BookingWithDetails | null>(null);
+
+  // Admin booking modal state
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   const BARBER_COLORS: Record<
   string,
@@ -338,6 +347,14 @@ const getBarberColors = (booking: BookingWithDetails) => {
 
 
         <View className={styles.controls}>
+          <button
+            className={bookingStyles.bookAppointmentButton}
+            onClick={() => setShowBookingModal(true)}
+          >
+            <span className={bookingStyles.plusIcon}>+</span>
+            Book Appointment
+          </button>
+
           <div className={styles.selectWrapper}>
             <select
               className={styles.barberFilter}
@@ -719,6 +736,21 @@ const getBarberColors = (booking: BookingWithDetails) => {
           </div>
         </div>
       )}
+
+      {/* Admin Booking Modal */}
+      <AdminBookingModal
+        isOpen={showBookingModal}
+        onClose={() => setShowBookingModal(false)}
+        onSuccess={() => {
+          loadBookings();
+          onBookingUpdate?.();
+        }}
+        barbers={barbers}
+        services={services}
+        pricing={pricing}
+        availability={availability}
+        timeOff={timeOff}
+      />
     </View>
   );
 }

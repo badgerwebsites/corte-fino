@@ -55,6 +55,32 @@ export interface PricingRule {
 
 export type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
 
+export type RecurrencePattern =
+  | 'weekly'
+  | 'biweekly'
+  | 'every_3_weeks'
+  | 'monthly'
+  | 'every_5_weeks'
+  | 'every_6_weeks';
+
+export const RECURRENCE_DAYS: Record<RecurrencePattern, number> = {
+  'weekly': 7,
+  'biweekly': 14,
+  'every_3_weeks': 21,
+  'monthly': 28,
+  'every_5_weeks': 35,
+  'every_6_weeks': 42,
+};
+
+export const RECURRENCE_LABELS: Record<RecurrencePattern, string> = {
+  'weekly': 'Weekly',
+  'biweekly': 'Bi-weekly',
+  'every_3_weeks': 'Every 3 weeks',
+  'monthly': 'Monthly',
+  'every_5_weeks': 'Every 5 weeks',
+  'every_6_weeks': 'Every 6 weeks',
+};
+
 export interface Booking {
   id: string;
   customer_id?: string;
@@ -77,6 +103,11 @@ export interface Booking {
   guest_last_name?: string;
   guest_phone?: string;
   is_guest: boolean;
+  // Recurring booking fields
+  recurrence_group_id?: string;
+  recurrence_pattern?: RecurrencePattern;
+  recurrence_index?: number;
+  created_by_admin?: boolean;
   created_at: string;
   updated_at: string;
 }
