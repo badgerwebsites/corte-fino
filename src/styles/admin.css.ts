@@ -766,7 +766,7 @@ export const checkboxLabel = style({
   alignItems: 'center',
   gap: 12,
   cursor: 'pointer',
-  paddingTop: 20,
+  paddingTop: 16,
   marginBottom: 20,
   color: text_primary,
   fontSize: 16,
@@ -786,28 +786,22 @@ export const tabBadge = style({
   justifyContent: 'center',
   marginLeft: '0.5rem',
   minWidth: '1.25rem',
-  height: '1.25rem',
-  padding: '0 0.375rem',
-  fontSize: '0.7rem',
+  height: '1.25 rem',
+  padding: '2px 8px',
+  fontSize: 14,
   fontWeight: '600',
   backgroundColor: '#0ea5e9',
   color: '#ffffff',
   borderRadius: '9999px',
+  lineHeight: 1.5,
 });
 
 // Rewards tab styles
-export const verifyCodeSection = style({
-  marginBottom: '2rem',
-  padding: '1.5rem',
-  backgroundColor: '#f0f9ff',
-  borderRadius: '0.5rem',
-  border: '1px solid #bae6fd',
-});
-
 export const verifyCodeForm = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '1rem',
+  marginBottom: 16,
   '@media': {
     'screen and (min-width: 768px)': {
       flexDirection: 'row',
@@ -818,7 +812,6 @@ export const verifyCodeForm = style({
 
 export const verifyCodeInput = style({
   flex: 1,
-  maxWidth: '200px',
   padding: '0.75rem 1rem',
   fontSize: '1.25rem',
   fontWeight: '600',
@@ -828,10 +821,10 @@ export const verifyCodeInput = style({
   textTransform: 'uppercase',
   border: '2px solid #0ea5e9',
   borderRadius: '0.5rem',
-  backgroundColor: '#ffffff',
+  backgroundColor: '#f0f9ff',
   ':focus': {
     outline: 'none',
-    borderColor: '#0369a1',
+    border: '2px solid #0284c7',
   },
   '::placeholder': {
     fontSize: '0.875rem',
@@ -839,14 +832,19 @@ export const verifyCodeInput = style({
     letterSpacing: '0',
     textTransform: 'none',
   },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      maxWidth: '200px',
+    },
+  },
 });
 
 export const verifyCodeButton = style({
-  padding: '0.75rem 1.5rem',
-  fontSize: '0.9375rem',
+  padding: '16px 16px',
+  fontSize: 16,
   fontWeight: '500',
   backgroundColor: '#0ea5e9',
-  color: '#ffffff',
+  color: text_primary,
   border: 'none',
   borderRadius: '0.5rem',
   cursor: 'pointer',
@@ -857,28 +855,10 @@ export const verifyCodeButton = style({
   },
 });
 
-export const pendingRedemptionsSection = style({
-  marginTop: '1.5rem',
-});
-
 export const subsectionTitle = style({
-  fontSize: '1rem',
+  fontSize: 20,
   fontWeight: '600',
-  color: '#1a1a1a',
-  marginBottom: '1rem',
-});
-
-export const emptyState = style({
-  padding: '2rem',
-  textAlign: 'center',
-  backgroundColor: '#f8fafc',
-  borderRadius: '0.5rem',
-  border: '1px solid #e2e8f0',
-});
-
-export const emptyStateText = style({
-  fontSize: '0.9375rem',
-  color: '#64748b',
+  color: text_primary,
 });
 
 export const redemptionsList = style({
@@ -892,9 +872,9 @@ export const redemptionCard = style({
   flexDirection: 'column',
   gap: '1rem',
   padding: '1rem',
-  backgroundColor: '#ffffff',
-  borderRadius: '0.5rem',
-  border: '1px solid #e2e8f0',
+  borderRadius: 8,
+  border: `1px solid ${text_primary}`,
+  marginTop: 12,
   '@media': {
     'screen and (min-width: 768px)': {
       flexDirection: 'row',
@@ -908,30 +888,30 @@ export const redemptionCard = style({
 export const redemptionInfo = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.25rem',
+  // gap: '0.25rem',
   flex: 1,
 });
 
 export const redemptionCustomer = style({
-  fontSize: '1rem',
+  fontSize: 20,
   fontWeight: '600',
-  color: '#1a1a1a',
+  color: text_primary,
 });
 
 export const redemptionReward = style({
-  fontSize: '0.9375rem',
+  fontSize: 18,
   fontWeight: '500',
-  color: '#0369a1',
+  color: '#0ea5e9',
 });
 
 export const redemptionPoints = style({
-  fontSize: '0.8125rem',
-  color: '#64748b',
+  fontSize: 16,
+  color: text_secondary,
 });
 
 export const redemptionDate = style({
-  fontSize: '0.75rem',
-  color: '#94a3b8',
+  fontSize: 14,
+  color: text_secondary,
 });
 
 export const redemptionCodeDisplay = style({
@@ -940,7 +920,7 @@ export const redemptionCodeDisplay = style({
   justifyContent: 'center',
   padding: '0.625rem 1rem',
   backgroundColor: '#f0f9ff',
-  border: '1px solid #0ea5e9',
+  border: '2px solid #0ea5e9',
   borderRadius: '0.375rem',
 });
 
@@ -948,12 +928,13 @@ export const redemptionCode = style({
   fontSize: '1.125rem',
   fontWeight: '700',
   letterSpacing: '0.15em',
-  color: '#0369a1',
+  color: '#0284c7',
   fontFamily: 'monospace',
 });
 
 export const redemptionActions = style({
   display: 'flex',
+  justifyContent: 'center',
   gap: '0.5rem',
 });
 
@@ -961,14 +942,14 @@ export const confirmButton = style({
   padding: '0.5rem 1rem',
   fontSize: '0.875rem',
   fontWeight: '500',
-  backgroundColor: '#10b981',
-  color: '#ffffff',
-  border: 'none',
+  backgroundColor: 'transparent',
+  color: button,
+  border: `1px solid ${button}`,
   borderRadius: '0.375rem',
   cursor: 'pointer',
   transition: 'all 0.2s',
   ':hover': {
-    backgroundColor: '#059669',
+    backgroundColor: darker_bg,
   },
 });
 
@@ -977,32 +958,43 @@ export const rejectButton = style({
   fontSize: '0.875rem',
   fontWeight: '500',
   backgroundColor: 'transparent',
-  color: '#64748b',
-  border: '1px solid #e2e8f0',
+  color: '#ef4444',
+  border: '1px solid #ef4444',
   borderRadius: '0.375rem',
   cursor: 'pointer',
   transition: 'all 0.2s',
   ':hover': {
     borderColor: '#ef4444',
     color: '#ef4444',
+    backgroundColor: darker_bg,
   },
 });
 
 // Rewards Management styles
-export const rewardsManagementSection = style({
-  marginTop: '2.5rem',
-  paddingTop: '2rem',
+export const rewardsBorder = style({
+  marginTop: 24,
+  paddingTop: 24,
   borderTop: '2px solid #e2e8f0',
+});
+
+export const selectWrapper = style({
+  position: 'relative',
+  width: '100%',
 });
 
 export const select = style({
   width: '100%',
+  backgroundColor: darker_bg,
+  color: text_primary,
+  border: '1px solid #1a1a1a',
   boxSizing: 'border-box',
   padding: '0.625rem',
-  border: '2px solid #e2e8f0',
-  borderRadius: '0.25rem',
+  paddingRight: '2.5rem',
+  borderRadius: 4,
   fontSize: '0.875rem',
-  backgroundColor: '#ffffff',
+  appearance: 'none',
+  WebkitAppearance: 'none',
+  MozAppearance: 'none',
   cursor: 'pointer',
   '@media': {
     'screen and (min-width: 768px)': {
@@ -1013,8 +1005,20 @@ export const select = style({
   },
   ':focus': {
     outline: 'none',
-    borderColor: '#1a1a1a',
+    border: '1px solid #96cfe0',
   },
+  '::placeholder': {
+    color: text_muted,
+  },
+});
+
+export const selectIcon = style({
+  position: 'absolute',
+  right: 12,
+  top: '50%',
+  transform: 'translateY(-50%)',
+  pointerEvents: 'none',
+  color: text_primary,
 });
 
 export const logoGrid = style({

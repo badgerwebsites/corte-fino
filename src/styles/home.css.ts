@@ -129,7 +129,7 @@ export const heroCarouselImage = style({
 export const heroBookButton = style({
   padding: "18px 20px",
   fontSize: 18,
-  fontWeight: 700,  
+  fontWeight: 700,
   letterSpacing: '0.05em',
   textTransform: 'uppercase',
   backgroundColor: '#96cfe0',

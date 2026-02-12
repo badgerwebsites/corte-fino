@@ -11,6 +11,7 @@ import { ImageUpload } from '../components/ImageUpload';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/admin.css';
+import { ChevronDown } from "lucide-react";
 
 export default function AdminPage() {
   const { user, customer } = useAuth();
@@ -1215,17 +1216,12 @@ export default function AdminPage() {
 
       {activeTab === 'rewards' && (
         <View className={styles.section}>
-          <View className={styles.sectionHeader}>
-            <View>
-              <Text className={styles.sectionTitle}>Verify Reward Redemptions</Text>
-              <Text className={styles.sectionDescription}>
-                Enter a customer's redemption code or select from pending redemptions below
-              </Text>
-            </View>
-          </View>
+          <View className={styles.adminSplitLayout}>
+
+            {/* LEFT COLUMN */}
+            <View className={styles.adminLeftColumn}>
 
           {/* Code Entry */}
-          <View className={styles.verifyCodeSection}>
             <View className={styles.verifyCodeForm}>
               <input
                 type="text"
@@ -1242,19 +1238,13 @@ export default function AdminPage() {
                 Verify & Confirm
               </button>
             </View>
-          </View>
 
           {/* Pending Redemptions */}
-          <View className={styles.pendingRedemptionsSection}>
             <Text className={styles.subsectionTitle}>
               Pending Redemptions ({pendingRedemptions.length})
             </Text>
 
-            {pendingRedemptions.length === 0 ? (
-              <View className={styles.emptyState}>
-                <Text className={styles.emptyStateText}>No pending redemptions</Text>
-              </View>
-            ) : (
+            {pendingRedemptions.length > 0 && (
               <View className={styles.redemptionsList}>
                 {pendingRedemptions.map((redemption) => (
                   <View key={redemption.id} className={styles.redemptionCard}>
@@ -1293,138 +1283,9 @@ export default function AdminPage() {
                 ))}
               </View>
             )}
-          </View>
 
-          {/* Manage Rewards */}
-          <View className={styles.rewardsManagementSection}>
-            <div ref={rewardFormRef} className={styles.sectionHeader}>
-              <Text className={styles.sectionTitle}>
-                {editingReward ? 'Edit Reward' : 'Add New Reward'}
-              </Text>
-            </div>
-
-            <form onSubmit={handleRewardSubmit} className={styles.form}>
-              <View className={styles.formGroup}>
-                <label className={styles.label}>Reward Name *</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  value={rewardForm.name}
-                  onChange={(e) => setRewardForm({ ...rewardForm, name: e.target.value })}
-                  placeholder="e.g., Free Haircut"
-                  required
-                />
-              </View>
-
-              <View className={styles.formGroup}>
-                <label className={styles.label}>Description</label>
-                <textarea
-                  className={styles.textarea}
-                  value={rewardForm.description}
-                  onChange={(e) => setRewardForm({ ...rewardForm, description: e.target.value })}
-                  placeholder="Brief description of the reward"
-                  rows={2}
-                />
-              </View>
-
-              <View className={styles.formRow}>
-                <View className={styles.formGroup}>
-                  <label className={styles.label}>Points Required *</label>
-                  <input
-                    type="number"
-                    min="1"
-                    className={styles.input}
-                    value={rewardForm.points_required}
-                    onChange={(e) => setRewardForm({ ...rewardForm, points_required: parseInt(e.target.value) || 0 })}
-                    required
-                  />
-                </View>
-
-                <View className={styles.formGroup}>
-                  <label className={styles.label}>Reward Type *</label>
-                  <select
-                    className={styles.select}
-                    value={rewardForm.reward_type}
-                    onChange={(e) => setRewardForm({ ...rewardForm, reward_type: e.target.value as RewardType })}
-                    required
-                  >
-                    <option value="product">Product</option>
-                    <option value="service">Service</option>
-                    <option value="merchandise">Merchandise</option>
-                  </select>
-                </View>
-              </View>
-
-              <View className={styles.formRow}>
-                <View className={styles.formGroup}>
-                  <label className={styles.label}>Item Name *</label>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    value={rewardForm.item_name}
-                    onChange={(e) => setRewardForm({ ...rewardForm, item_name: e.target.value })}
-                    placeholder="e.g., Corte Fino Hoodie"
-                    required
-                  />
-                </View>
-
-                <View className={styles.formGroup}>
-                  <label className={styles.label}>Sort Order</label>
-                  <input
-                    type="number"
-                    min="0"
-                    className={styles.input}
-                    value={rewardForm.sort_order}
-                    onChange={(e) => setRewardForm({ ...rewardForm, sort_order: parseInt(e.target.value) || 0 })}
-                  />
-                </View>
-              </View>
-
-              <View className={styles.formGroup}>
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={rewardForm.is_active}
-                    onChange={(e) => setRewardForm({ ...rewardForm, is_active: e.target.checked })}
-                  />
-                  <Text>Active (visible to customers)</Text>
-                </label>
-              </View>
-
-              <View className={styles.formActions}>
-                <button type="submit" className={styles.submitButton}>
-                  {editingReward ? 'Update Reward' : 'Add Reward'}
-                </button>
-                {editingReward && (
-                  <button
-                    type="button"
-                    className={styles.cancelButton}
-                    onClick={() => {
-                      setEditingReward(null);
-                      setRewardForm({
-                        name: '',
-                        description: '',
-                        points_required: 100,
-                        reward_type: 'product',
-                        item_name: '',
-                        is_active: true,
-                        sort_order: 0,
-                      });
-                    }}
-                  >
-                    Cancel
-                  </button>
-                )}
-              </View>
-            </form>
-
-            {/* <View className={styles.barbersList}> */}
-              <Text className={styles.sectionTitle}>Current Rewards</Text>
-              {rewards.length === 0 ? (
-                <View className={styles.emptyState}>
-                  <Text className={styles.emptyStateText}>No rewards configured yet</Text>
-                </View>
-              ) : (
+          <View className={styles.rewardsBorder} />
+            {rewards.length > 0 && (
                 rewards.map((reward) => (
                   <View key={reward.id} className={styles.barberCard}>
                     <View className={styles.barberInfo}>
@@ -1471,8 +1332,144 @@ export default function AdminPage() {
                 ))
               )}
             </View>
+
+          {/* Manage Rewards */}
+          <View className={styles.adminRightColumn}>
+            <div ref={rewardFormRef} className={styles.sectionHeader}>
+              <Text className={styles.sectionTitle}>
+                {editingReward ? 'Edit Reward' : 'Add New Reward'}
+              </Text>
+            </div>
+
+            <form onSubmit={handleRewardSubmit} className={styles.form}>
+              <View className={styles.formGroup}>
+                <label className={styles.label}>Reward Name *</label>
+                <input
+                  type="text"
+                  className={styles.input}
+                  value={rewardForm.name}
+                  onChange={(e) => setRewardForm({ ...rewardForm, name: e.target.value })}
+                  placeholder="e.g., Free Haircut"
+                  required
+                />
+              </View>
+
+              <View className={styles.formGroup}>
+                <label className={styles.label}>Description</label>
+                <textarea
+                  className={styles.textarea}
+                  value={rewardForm.description}
+                  onChange={(e) => setRewardForm({ ...rewardForm, description: e.target.value })}
+                  placeholder="Brief description of the reward"
+                  rows={2}
+                />
+              </View>
+
+              <View className={styles.formRow}>
+                <View className={styles.formGroup}>
+                  <label className={styles.label}>Points Required *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    className={styles.input}
+                    value={rewardForm.points_required}
+                    onChange={(e) => setRewardForm({ ...rewardForm, points_required: parseInt(e.target.value) || 0 })}
+                    required
+                  />
+                </View>
+
+                <View className={styles.formGroup}>
+                  <label className={styles.label}>Reward Type *</label>
+
+                  <div className={styles.selectWrapper}>
+                    <select
+                      className={styles.select}
+                      value={rewardForm.reward_type}
+                      onChange={(e) =>
+                        setRewardForm({
+                          ...rewardForm,
+                          reward_type: e.target.value as RewardType,
+                        })
+                      }
+                      required
+                    >
+                      <option value="product">Product</option>
+                      <option value="service">Service</option>
+                      <option value="merchandise">Merchandise</option>
+                    </select>
+
+                    <ChevronDown size={18} className={styles.selectIcon} />
+                  </div>
+                </View>
+              </View>
+
+              <View className={styles.formRow}>
+                <View className={styles.formGroup}>
+                  <label className={styles.label}>Item Name *</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    value={rewardForm.item_name}
+                    onChange={(e) => setRewardForm({ ...rewardForm, item_name: e.target.value })}
+                    placeholder="e.g., Corte Fino Hoodie"
+                    required
+                  />
+                </View>
+
+                <View>
+                  <label className={styles.label}>Sort Order</label>
+                  <input
+                    type="number"
+                    min="0"
+                    className={styles.input}
+                    value={rewardForm.sort_order}
+                    onChange={(e) => setRewardForm({ ...rewardForm, sort_order: parseInt(e.target.value) || 0 })}
+                  />
+                </View>
+              </View>
+
+              <View className={styles.formGroup}>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    className={styles.checkbox}
+                    checked={rewardForm.is_active}
+                    onChange={(e) => setRewardForm({ ...rewardForm, is_active: e.target.checked })}
+                  />
+                  <Text>Active (visible to customers)</Text>
+                </label>
+              </View>
+
+              <View className={styles.formActions}>
+                <button type="submit" className={styles.submitButton}>
+                  {editingReward ? 'Update Reward' : 'Add Reward'}
+                </button>
+                {editingReward && (
+                  <button
+                    type="button"
+                    className={styles.cancelButton}
+                    onClick={() => {
+                      setEditingReward(null);
+                      setRewardForm({
+                        name: '',
+                        description: '',
+                        points_required: 100,
+                        reward_type: 'product',
+                        item_name: '',
+                        is_active: true,
+                        sort_order: 0,
+                      });
+                    }}
+                  >
+                    Cancel
+                  </button>
+                )}
+              </View>
+            </form>
+
+            </View>
           </View>
-        // </View>
+        </View>
       )}
     </View>
     </>
