@@ -17,3 +17,5 @@ export const isSupabaseConfigured = () => {
          !supabaseUrl.includes('placeholder') &&
          !supabaseAnonKey.includes('placeholder');
 };
+
+console.log("PROD URL:", import.meta.env.VITE_SUPABASE_URL);
