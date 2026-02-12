@@ -869,7 +869,7 @@ export const monthCellOther = style({
 export const monthCellToday = style({
   backgroundColor: button,
   ':hover': {
-    backgroundColor: '#7fbccd',
+    backgroundColor: button,
   },
 });
 
