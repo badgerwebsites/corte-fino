@@ -285,3 +285,37 @@ export function formatDate(date: Date): string {
     day: 'numeric',
   });
 }
+
+/**
+ * Check if an appointment can be rescheduled to a specific slot
+ * Returns true if the slot is available, false otherwise
+ */
+export function canRescheduleToSlot(
+  bookingId: string,
+  barberId: string,
+  targetDate: Date,
+  targetTime: string,
+  serviceDuration: number,
+  availability: BarberAvailability[],
+  timeOff: BarberTimeOff[],
+  existingBookings: Booking[]
+): { canReschedule: boolean; reason?: string } {
+  const dateString = format(targetDate, 'yyyy-MM-dd');
+
+  // Check if barber is available on target date
+  if (!isBarberAvailableOnDate(barberId, targetDate, availability, timeOff)) {
+    return { canReschedule: false, reason: 'Barber not available on this date' };
+  }
+
+  // Filter out the booking being rescheduled from conflict check
+  const otherBookings = existingBookings.filter(
+    b => b.id !== bookingId && b.booking_date === dateString && b.status !== 'cancelled'
+  );
+
+  // Check for conflicts with other bookings
+  if (isSlotBooked(targetTime, barberId, serviceDuration, otherBookings)) {
+    return { canReschedule: false, reason: 'Time slot conflicts with another booking' };
+  }
+
+  return { canReschedule: true };
+}

@@ -1,14 +1,17 @@
 // components/AdminCalendar.tsx
 import { useState, useEffect, useCallback } from 'react';
 import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isSameDay, isSameMonth, addMonths, subMonths, parseISO } from 'date-fns';
+import { DndContext, DragOverlay, useDraggable, useDroppable, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent, DragOverEvent } from '@dnd-kit/core';
 import { supabase } from '../lib/supabase';
-import type { Barber, BookingWithDetails, Service, BarberServicePricing, BarberAvailability, BarberTimeOff } from '../types/database.types';
+import type { Barber, BookingWithDetails, Service, BarberServicePricing, BarberAvailability, BarberTimeOff, Booking } from '../types/database.types';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/adminCalendar.css';
 import * as bookingStyles from '../styles/adminBooking.css';
-import { ChevronLeft, ChevronRight, Check, Ban, Circle} from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, Ban, Circle } from "lucide-react";
 import { AdminBookingModal } from './AdminBookingModal';
+import { canRescheduleToSlot, calculateEndTime } from '../utils/bookingHelpers';
 
 interface AdminCalendarProps {
   barbers: Barber[];
@@ -31,6 +34,25 @@ export function AdminCalendar({ barbers, services, pricing, availability, timeOf
 
   // Admin booking modal state
   const [showBookingModal, setShowBookingModal] = useState(false);
+
+  // Drag and drop state
+  const [draggedBooking, setDraggedBooking] = useState<BookingWithDetails | null>(null);
+  const [rescheduleTarget, setRescheduleTarget] = useState<{
+    booking: BookingWithDetails;
+    newDate: Date;
+    newTime: string;
+  } | null>(null);
+  const [allBookingsForValidation, setAllBookingsForValidation] = useState<Booking[]>([]);
+  const [activeDropTarget, setActiveDropTarget] = useState<{ dateStr: string; time: string } | null>(null);
+
+  // Configure drag sensor with distance constraint (allows clicks to work)
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Drag only starts after moving 8px
+      },
+    })
+  );
 
   const BARBER_COLORS: Record<
   string,
@@ -145,6 +167,149 @@ const getBarberColors = (booking: BookingWithDetails) => {
     };
   }, [loadBookings]);
 
+  // Load all bookings for validation when dragging (need more than visible range)
+  useEffect(() => {
+    const loadAllBookingsForValidation = async () => {
+      const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
+      const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
+      const { data } = await supabase
+        .from('bookings')
+        .select('*')
+        .gte('booking_date', format(weekStart, 'yyyy-MM-dd'))
+        .lte('booking_date', format(weekEnd, 'yyyy-MM-dd'))
+        .neq('status', 'cancelled');
+      setAllBookingsForValidation(data || []);
+    };
+    loadAllBookingsForValidation();
+  }, [currentDate, bookings]);
+
+  // Drag and drop handlers
+  const handleDragStart = (event: DragStartEvent) => {
+    const bookingId = event.active.id as string;
+    const booking = bookings.find(b => b.id === bookingId);
+    if (booking) {
+      setDraggedBooking(booking);
+    }
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { over } = event;
+    if (over && over.id.toString().startsWith('slot-')) {
+      const dropId = over.id as string;
+      const parts = dropId.split('-');
+      const dateStr = parts.slice(1, 4).join('-');
+      const timeStr = parts.slice(4).join(':');
+      setActiveDropTarget({ dateStr, time: timeStr });
+    } else {
+      setActiveDropTarget(null);
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setDraggedBooking(null);
+    setActiveDropTarget(null);
+
+    if (!over || !active) return;
+
+    const bookingId = active.id as string;
+    const booking = bookings.find(b => b.id === bookingId);
+    if (!booking) return;
+
+    // Parse the drop target ID (format: "slot-{date}-{time}")
+    const dropId = over.id as string;
+    if (!dropId.startsWith('slot-')) return;
+
+    const parts = dropId.split('-');
+    const dateStr = parts.slice(1, 4).join('-'); // yyyy-MM-dd
+    const timeStr = parts.slice(4).join(':'); // HH:MM
+
+    const newDate = parseISO(dateStr);
+    const serviceDuration = booking.service?.duration_minutes || 30;
+
+    // Validate the reschedule
+    const { canReschedule } = canRescheduleToSlot(
+      booking.id,
+      booking.barber_id || '',
+      newDate,
+      timeStr,
+      serviceDuration,
+      availability,
+      timeOff,
+      allBookingsForValidation
+    );
+
+    // Check if time actually changed (not dropping on same slot)
+    const originalDate = booking.booking_date;
+    const originalTime = booking.start_time.substring(0, 5);
+    const isSameSlot = dateStr === originalDate && timeStr === originalTime;
+
+    if (canReschedule && !isSameSlot) {
+      // Show confirmation modal
+      setRescheduleTarget({
+        booking,
+        newDate,
+        newTime: timeStr,
+      });
+    }
+  };
+
+  const handleReschedule = async () => {
+    if (!rescheduleTarget) return;
+
+    const { booking, newDate, newTime } = rescheduleTarget;
+    const serviceDuration = booking.service?.duration_minutes || 30;
+    const newEndTime = calculateEndTime(newTime, serviceDuration);
+
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .update({
+          booking_date: format(newDate, 'yyyy-MM-dd'),
+          start_time: newTime,
+          end_time: newEndTime,
+        })
+        .eq('id', booking.id);
+
+      if (error) throw error;
+
+      // TODO: Send Twilio SMS notification to customer about reschedule
+      // The notification should include:
+      // - Customer name
+      // - New date and time
+      // - Barber name
+      // - Service name
+      console.log('TODO: Send Twilio notification for reschedule', {
+        customerId: booking.customer_id,
+        customerPhone: booking.customer?.phone || booking.guest_phone,
+        newDate: format(newDate, 'MMMM d, yyyy'),
+        newTime: newTime,
+      });
+
+      loadBookings();
+      onBookingUpdate?.();
+      setRescheduleTarget(null);
+    } catch (error) {
+      console.error('Error rescheduling booking:', error);
+      alert('Failed to reschedule appointment');
+    }
+  };
+
+  // Check if a slot falls within the appointment duration range during drag
+  const isSlotInDragRange = (slotDateStr: string, slotTime: string): boolean => {
+    if (!activeDropTarget || !draggedBooking) return false;
+    if (slotDateStr !== activeDropTarget.dateStr) return false;
+
+    const duration = draggedBooking.service?.duration_minutes || 30;
+    const [targetHour, targetMin] = activeDropTarget.time.split(':').map(Number);
+    const targetMinutes = targetHour * 60 + targetMin;
+    const endMinutes = targetMinutes + duration;
+
+    const [slotHour, slotMin] = slotTime.split(':').map(Number);
+    const slotMinutes = slotHour * 60 + slotMin;
+
+    return slotMinutes >= targetMinutes && slotMinutes < endMinutes;
+  };
 
   const handleStatusUpdate = async (bookingId: string, newStatus: BookingStatus) => {
     try {
@@ -255,23 +420,40 @@ const getBarberColors = (booking: BookingWithDetails) => {
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
-  // Generate time slots for the day view (7 AM to 9 PM)
-  const timeSlots = Array.from({ length: 15 }, (_, i) => {
+  // Generate hourly time slots for display (7 AM to 9 PM)
+  const hourlySlots = Array.from({ length: 14 }, (_, i) => {
     const hour = 7 + i;
     return `${hour.toString().padStart(2, '0')}:00`;
   });
 
-  // Get bookings for a specific time slot
-  const getBookingsForTimeSlot = (date: Date, timeSlot: string) => {
+  // Generate 15-minute intervals within an hour for drop zones
+  const getQuarterSlots = (hourSlot: string) => {
+    const hour = parseInt(hourSlot.split(':')[0]);
+    return [0, 15, 30, 45].map(minutes =>
+      `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+    );
+  };
+
+  // Get bookings for a specific hour (all bookings starting in that hour)
+  const getBookingsForHour = (date: Date, hourSlot: string) => {
+    const hour = parseInt(hourSlot.split(':')[0]);
     return filteredBookings.filter(booking => {
-      // Parse date string as local date to avoid timezone issues
       const bookingDate = parseISO(booking.booking_date);
       if (!isSameDay(bookingDate, date)) return false;
-
       const bookingHour = parseInt(booking.start_time.split(':')[0]);
-      const slotHour = parseInt(timeSlot.split(':')[0]);
-      return bookingHour === slotHour;
+      return bookingHour === hour;
     });
+  };
+
+  // Get the vertical position offset for a booking within its hour (0-75%)
+  const getBookingOffset = (startTime: string) => {
+    const minutes = parseInt(startTime.split(':')[1]);
+    return (minutes / 60) * 100;
+  };
+
+  // Get the height of an appointment based on its duration (as percentage of hour)
+  const getBookingHeight = (durationMinutes: number) => {
+    return (durationMinutes / 60) * 100;
   };
 
   // Get days for week view
@@ -305,11 +487,85 @@ const getBarberColors = (booking: BookingWithDetails) => {
     });
   };
 
+  // Draggable appointment component
+  const DraggableAppointment = ({ booking, children }: { booking: BookingWithDetails; children: React.ReactNode }) => {
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+      id: booking.id,
+    });
+
+    return (
+      <div
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        className={`${styles.draggableAppointment} ${isDragging ? styles.dragging : ''}`}
+        style={{ touchAction: 'none' }}
+      >
+        {children}
+      </div>
+    );
+  };
+
+  // Droppable time slot component
+  const DroppableTimeSlot = ({
+    id,
+    date,
+    timeSlot,
+    className,
+    isInDragRange,
+    children
+  }: {
+    id: string;
+    date: Date;
+    timeSlot: string;
+    className?: string;
+    isInDragRange?: boolean;
+    children?: React.ReactNode
+  }) => {
+    const { setNodeRef, isOver, active } = useDroppable({ id });
+
+    // Check if this is a valid drop target (only for the primary hover slot)
+    let isValidTarget = false;
+    if (active && draggedBooking && isOver) {
+      const serviceDuration = draggedBooking.service?.duration_minutes || 30;
+      const { canReschedule } = canRescheduleToSlot(
+        draggedBooking.id,
+        draggedBooking.barber_id || '',
+        date,
+        timeSlot,
+        serviceDuration,
+        availability,
+        timeOff,
+        allBookingsForValidation
+      );
+      isValidTarget = canReschedule;
+    }
+
+    // Determine if this slot should show the range highlight
+    const showRangeHighlight = isInDragRange && !isOver;
+
+    const slotClasses = [
+      className,
+      styles.droppableSlot,
+      active ? styles.droppableActive : '',
+      isOver && isValidTarget ? styles.droppableOver : '',
+      isOver && !isValidTarget ? styles.droppableInvalid : '',
+      showRangeHighlight ? styles.droppableInRange : '',
+    ].filter(Boolean).join(' ');
+
+    return (
+      <div ref={setNodeRef} className={slotClasses}>
+        {children}
+      </div>
+    );
+  };
+
   // Day names for header
   const dayNamesShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   const dayNamesFull = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
     <View className={styles.container}>
       {/* Calendar Header */}
       <View className={styles.header}>
@@ -416,40 +672,66 @@ const getBarberColors = (booking: BookingWithDetails) => {
                 </View>
               </View>
 
-              {/* Time grid with rows for each hour */}
+              {/* Time grid with hourly rows */}
               <View className={styles.timeGrid}>
-                {timeSlots.map(timeSlot => {
-                  const slotBookings = getBookingsForTimeSlot(currentDate, timeSlot);
+                {hourlySlots.map(hourSlot => {
+                  const hourBookings = getBookingsForHour(currentDate, hourSlot);
+                  const quarterSlots = getQuarterSlots(hourSlot);
                   return (
-                    <View key={timeSlot} className={styles.timeRow}>
+                    <View key={hourSlot} className={styles.timeRow}>
                       <View className={styles.timeLabel}>
-                        <Text>{formatTime(timeSlot)}</Text>
+                        <Text>{formatTime(hourSlot)}</Text>
                       </View>
-                      <View className={styles.appointmentsColumn}>
-                        {slotBookings.map(booking => {
+                      <View className={styles.hourCell}>
+                        {/* Quarter-hour drop zones */}
+                        <View className={styles.quarterDropZones}>
+                          {quarterSlots.map(quarterSlot => {
+                            const dateStr = format(currentDate, 'yyyy-MM-dd');
+                            const slotId = `slot-${dateStr}-${quarterSlot.replace(':', '-')}`;
+                            return (
+                              <DroppableTimeSlot
+                                key={quarterSlot}
+                                id={slotId}
+                                date={currentDate}
+                                timeSlot={quarterSlot}
+                                className={styles.quarterZone}
+                                isInDragRange={isSlotInDragRange(dateStr, quarterSlot)}
+                              />
+                            );
+                          })}
+                        </View>
+                        {/* Appointments */}
+                        {hourBookings.map(booking => {
                           const barberColors = getBarberColors(booking);
+                          const isDraggable = booking.status !== 'completed' && booking.status !== 'cancelled';
+                          const topOffset = getBookingOffset(booking.start_time);
+                          const duration = booking.service?.duration_minutes || 30;
+                          const heightPercent = getBookingHeight(duration);
 
-                          return (
+                          const appointmentContent = (
                             <View
-                              key={booking.id}
                               className={styles.appointmentCard}
                               style={{
-                                position: 'relative',
+                                position: 'absolute',
+                                top: `${topOffset}%`,
+                                height: `${heightPercent}%`,
+                                minHeight: 24,
+                                left: 4,
+                                right: 4,
                                 backgroundColor: barberColors.bg,
                                 boxShadow: `inset 4px 0 0 ${barberColors.accent}`,
+                                zIndex: 10,
+                                overflow: 'hidden',
                               }}
                               onClick={() => setSelectedBooking(booking)}
                             >
-
                               {(() => {
                                 const statusIcon = renderStatusIcon(booking.status);
-
                                 return (
                                   <View className={styles.appointmentTimeRow}>
                                     <Text className={styles.appointmentTime}>
                                       {formatTime(booking.start_time)} – {formatTime(booking.end_time)}
                                     </Text>
-
                                     {statusIcon && (
                                       <View className={styles.dayStatusIcon}>
                                         {statusIcon}
@@ -458,8 +740,6 @@ const getBarberColors = (booking: BookingWithDetails) => {
                                   </View>
                                 );
                               })()}
-
-                              {/* Row 2: Customer */}
                               <Text className={styles.appointmentCustomer}>
                                 {booking.customer
                                   ? `${booking.customer.first_name} ${booking.customer.last_name}`
@@ -467,13 +747,19 @@ const getBarberColors = (booking: BookingWithDetails) => {
                                     ? `${booking.guest_first_name} ${booking.guest_last_name} (Guest)`
                                     : 'Unknown'}
                               </Text>
-
-                              {/* Row 3: Service + Barber */}
                               <Text className={styles.appointmentMeta}>
                                 {booking.service?.name}
                                 {booking.barber?.name && ` · with ${booking.barber.name}`}
                               </Text>
                             </View>
+                          );
+
+                          return isDraggable ? (
+                            <DraggableAppointment key={booking.id} booking={booking}>
+                              {appointmentContent}
+                            </DraggableAppointment>
+                          ) : (
+                            <div key={booking.id}>{appointmentContent}</div>
                           );
                         })}
                       </View>
@@ -502,44 +788,84 @@ const getBarberColors = (booking: BookingWithDetails) => {
                 ))}
               </View>
 
-              {/* Time grid with rows for each hour */}
+              {/* Time grid with hourly rows */}
               <View className={styles.weekTimeGrid}>
-                {timeSlots.map(timeSlot => (
-                  <View key={timeSlot} className={styles.weekTimeRow}>
-                    <View className={styles.weekTimeLabel}>
-                      <Text>{formatTime(timeSlot)}</Text>
-                    </View>
-                    {getWeekDays().map(day => {
-                      const slotBookings = getBookingsForTimeSlot(day, timeSlot);
-                      return (
-                        <View
-                          key={day.toISOString()}
-                          className={`${styles.weekTimeCell} ${isSameDay(day, new Date()) ? styles.todayCell : ''}`}
-                        >
-                          {slotBookings.map(booking => {
-                            const barberColors = getBarberColors(booking);
+                {hourlySlots.map(hourSlot => {
+                  const quarterSlots = getQuarterSlots(hourSlot);
+                  return (
+                    <View key={hourSlot} className={styles.weekTimeRow}>
+                      <View className={styles.weekTimeLabel}>
+                        <Text>{formatTime(hourSlot)}</Text>
+                      </View>
+                      {getWeekDays().map(day => {
+                        const hourBookings = getBookingsForHour(day, hourSlot);
+                        return (
+                          <View
+                            key={day.toISOString()}
+                            className={`${styles.weekTimeCell} ${isSameDay(day, new Date()) ? styles.todayCell : ''}`}
+                          >
+                            {/* Quarter-hour drop zones */}
+                            <View className={styles.quarterDropZones}>
+                              {quarterSlots.map(quarterSlot => {
+                                const dateStr = format(day, 'yyyy-MM-dd');
+                                const slotId = `slot-${dateStr}-${quarterSlot.replace(':', '-')}`;
+                                return (
+                                  <DroppableTimeSlot
+                                    key={quarterSlot}
+                                    id={slotId}
+                                    date={day}
+                                    timeSlot={quarterSlot}
+                                    className={styles.quarterZone}
+                                    isInDragRange={isSlotInDragRange(dateStr, quarterSlot)}
+                                  />
+                                );
+                              })}
+                            </View>
+                            {/* Appointments */}
+                            {hourBookings.map(booking => {
+                              const barberColors = getBarberColors(booking);
+                              const isDraggable = booking.status !== 'completed' && booking.status !== 'cancelled';
+                              const topOffset = getBookingOffset(booking.start_time);
+                              const duration = booking.service?.duration_minutes || 30;
+                              const heightPercent = getBookingHeight(duration);
 
-                            return (
-                              <View
-                                key={booking.id}
-                                className={styles.weekAppointment}
-                                style={{
-                                  backgroundColor: barberColors.bg,
-                                  boxShadow: `inset 4px 0 0 ${barberColors.accent}`,
-                                }}
-                                onClick={() => setSelectedBooking(booking)}
-                              >
-                                <Text className={styles.weekAppointmentName}>
-                                  {booking.customer?.first_name || booking.guest_first_name || 'Guest'}
-                                </Text>
-                              </View>
-                            );
-                          })}
-                        </View>
-                      );
-                    })}
-                  </View>
-                ))}
+                              const appointmentContent = (
+                                <View
+                                  className={styles.weekAppointment}
+                                  style={{
+                                    position: 'absolute',
+                                    top: `${topOffset}%`,
+                                    height: `${heightPercent}%`,
+                                    minHeight: 16,
+                                    left: 2,
+                                    right: 2,
+                                    backgroundColor: barberColors.bg,
+                                    boxShadow: `inset 4px 0 0 ${barberColors.accent}`,
+                                    zIndex: 10,
+                                    overflow: 'hidden',
+                                  }}
+                                  onClick={() => setSelectedBooking(booking)}
+                                >
+                                  <Text className={styles.weekAppointmentName}>
+                                    {booking.customer?.first_name || booking.guest_first_name || 'Guest'}
+                                  </Text>
+                                </View>
+                              );
+
+                              return isDraggable ? (
+                                <DraggableAppointment key={booking.id} booking={booking}>
+                                  {appointmentContent}
+                                </DraggableAppointment>
+                              ) : (
+                                <div key={booking.id}>{appointmentContent}</div>
+                              );
+                            })}
+                          </View>
+                        );
+                      })}
+                    </View>
+                  );
+                })}
               </View>
             </View>
           )}
@@ -751,6 +1077,107 @@ const getBarberColors = (booking: BookingWithDetails) => {
         availability={availability}
         timeOff={timeOff}
       />
+
+      {/* Drag Overlay - shows appointment while dragging */}
+      <DragOverlay>
+        {draggedBooking ? (
+          <View
+            className={styles.dragOverlay}
+            style={{
+              backgroundColor: getBarberColors(draggedBooking).bg,
+              boxShadow: `inset 4px 0 0 ${getBarberColors(draggedBooking).accent}`,
+              padding: 8,
+              paddingLeft: 12,
+            }}
+          >
+            <Text className={styles.appointmentCustomer}>
+              {draggedBooking.customer
+                ? `${draggedBooking.customer.first_name} ${draggedBooking.customer.last_name}`
+                : draggedBooking.guest_first_name
+                  ? `${draggedBooking.guest_first_name} ${draggedBooking.guest_last_name}`
+                  : 'Unknown'}
+            </Text>
+            <Text className={styles.appointmentMeta}>
+              {draggedBooking.service?.name}
+            </Text>
+          </View>
+        ) : null}
+      </DragOverlay>
+
+      {/* Reschedule Confirmation Modal */}
+      {rescheduleTarget && (
+        <div className={styles.rescheduleModal} onClick={() => setRescheduleTarget(null)}>
+          <div className={styles.rescheduleModalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.rescheduleModalHeader}>
+              <h3 className={styles.rescheduleModalTitle}>Reschedule Appointment</h3>
+            </div>
+
+            <div className={styles.rescheduleModalBody}>
+              <div className={styles.rescheduleInfo}>
+                <div className={styles.rescheduleLabel}>Customer</div>
+                <div className={styles.rescheduleValue}>
+                  {rescheduleTarget.booking.customer
+                    ? `${rescheduleTarget.booking.customer.first_name} ${rescheduleTarget.booking.customer.last_name}`
+                    : rescheduleTarget.booking.guest_first_name
+                      ? `${rescheduleTarget.booking.guest_first_name} ${rescheduleTarget.booking.guest_last_name} (Guest)`
+                      : 'Unknown'}
+                </div>
+              </div>
+
+              <div className={styles.rescheduleInfo}>
+                <div className={styles.rescheduleLabel}>Service</div>
+                <div className={styles.rescheduleValue}>
+                  {rescheduleTarget.booking.service?.name}
+                </div>
+              </div>
+
+              <div className={styles.rescheduleTimeChange}>
+                <div className={styles.rescheduleTimeBlock}>
+                  <div className={styles.rescheduleTimeLabel}>From</div>
+                  <div className={styles.rescheduleTimeValue}>
+                    {format(parseISO(rescheduleTarget.booking.booking_date), 'MMM d')}
+                  </div>
+                  <div className={styles.rescheduleTimeValue}>
+                    {formatTime(rescheduleTarget.booking.start_time)}
+                  </div>
+                </div>
+
+                <div className={styles.rescheduleArrow}>→</div>
+
+                <div className={styles.rescheduleTimeBlock}>
+                  <div className={styles.rescheduleTimeLabel}>To</div>
+                  <div className={styles.rescheduleTimeValue}>
+                    {format(rescheduleTarget.newDate, 'MMM d')}
+                  </div>
+                  <div className={styles.rescheduleTimeValue}>
+                    {formatTime(rescheduleTarget.newTime)}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.rescheduleNotice}>
+                Customer will be notified via SMS once Twilio is configured.
+              </div>
+            </div>
+
+            <div className={styles.rescheduleModalActions}>
+              <button
+                className={styles.rescheduleCancel}
+                onClick={() => setRescheduleTarget(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.rescheduleConfirm}
+                onClick={handleReschedule}
+              >
+                Confirm Reschedule
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </View>
+    </DndContext>
   );
 }

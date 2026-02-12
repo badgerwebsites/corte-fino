@@ -274,29 +274,52 @@ export const timeGrid = style({
 export const timeRow = style({
   display: 'grid',
   gridTemplateColumns: '50px 1fr',
-  minHeight: '50px',
-  borderBottom: '1px solid #f1f5f9',
+  minHeight: '60px',
+  borderBottom: '1px solid #444',
   '@media': {
     'screen and (min-width: 768px)': {
       gridTemplateColumns: '70px 1fr',
-      minHeight: '60px',
+      minHeight: '80px',
     },
   },
 });
 
+export const hourCell = style({
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+export const quarterDropZones = style({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+export const quarterZone = style({
+  flex: 1,
+  transition: 'background-color 0.15s ease',
+});
+
 export const timeLabel = style({
-  padding: 4,
+  padding: '0 4px',
   fontSize: 11,
   fontWeight: '500',
-  color: text_primary,
-  borderRight: '1px solid #f1f5f9',
+  color: text_secondary,
+  borderRight: '1px solid #444',
   backgroundColor: dark_bg,
-  textAlign: 'center',
-  alignContent: 'center',
+  textAlign: 'right',
+  paddingTop: 0,
+  marginTop: -8,
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: 6,
+      padding: '0 8px',
       fontSize: 12,
+      marginTop: -9,
     },
   },
 });
@@ -448,40 +471,39 @@ export const weekTimeGrid = style({
 export const weekTimeRow = style({
   display: 'grid',
   gridTemplateColumns: '50px repeat(7, minmax(0, 1fr))',
-  minHeight: '40px',
-  borderBottom: '1px solid #f1f5f9',
+  minHeight: '60px',
+  borderBottom: '1px solid #444',
   '@media': {
     'screen and (min-width: 768px)': {
       gridTemplateColumns: '70px repeat(7, minmax(0, 1fr))',
-      minHeight: '50px',
+      minHeight: '80px',
     },
   },
 });
 
 export const weekTimeLabel = style({
-  padding: 4,
+  padding: '0 4px',
   fontSize: 11,
   fontWeight: '500',
-  color: text_primary,
-  borderRight: '1px solid #f1f5f9',
+  color: text_secondary,
+  borderRight: '1px solid #444',
   backgroundColor: dark_bg,
-  textAlign: 'center',
-  alignContent: 'center',
+  textAlign: 'right',
+  paddingTop: 0,
+  marginTop: -8,
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: 6,
+      padding: '0 8px',
       fontSize: 12,
+      marginTop: -9,
     },
   },
 });
 
 export const weekTimeCell = style({
   minWidth: 0,
-  padding: 4,
-  borderRight: '1px solid #f1f5f9',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 4,
+  position: 'relative',
+  borderRight: '1px solid #333',
   ':last-child': {
     borderRight: 'none',
   },
@@ -939,5 +961,194 @@ export const monthMoreBookings = style({
       fontSize: 13,
       paddingLeft: 8,
     },
+  },
+});
+
+// Drag and Drop Styles
+export const draggableAppointment = style({
+  cursor: 'grab',
+  touchAction: 'none',
+  ':active': {
+    cursor: 'grabbing',
+  },
+});
+
+export const dragging = style({
+  opacity: 0.5,
+});
+
+export const dragOverlay = style({
+  boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+  transform: 'scale(1.02)',
+  opacity: 0.95,
+  borderRadius: 10,
+  cursor: 'grabbing',
+});
+
+export const droppableSlot = style({
+  transition: 'background-color 0.15s ease',
+});
+
+export const droppableActive = style({
+  backgroundColor: 'rgba(150, 207, 224, 0.15)',
+});
+
+export const droppableOver = style({
+  backgroundColor: 'rgba(150, 207, 224, 0.3)',
+  boxShadow: 'inset 0 0 0 2px #96cfe0',
+});
+
+export const droppableInvalid = style({
+  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+  boxShadow: 'inset 0 0 0 2px #ef4444',
+});
+
+export const droppableInRange = style({
+  backgroundColor: 'rgba(150, 207, 224, 0.25)',
+});
+
+// Reschedule Confirmation Modal
+export const rescheduleModal = style({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1100,
+  padding: 12,
+});
+
+export const rescheduleModalContent = style({
+  backgroundColor: dark_bg,
+  borderRadius: 16,
+  maxWidth: '400px',
+  width: '100%',
+  boxShadow: '0 24px 48px rgba(0, 0, 0, 0.2)',
+});
+
+export const rescheduleModalHeader = style({
+  padding: '16px 20px',
+  borderBottom: '1px solid #333',
+});
+
+export const rescheduleModalTitle = style({
+  fontSize: 20,
+  fontWeight: '600',
+  color: text_primary,
+  margin: 0,
+});
+
+export const rescheduleModalBody = style({
+  padding: 20,
+});
+
+export const rescheduleInfo = style({
+  marginBottom: 16,
+});
+
+export const rescheduleLabel = style({
+  fontSize: 13,
+  fontWeight: '500',
+  color: text_muted,
+  marginBottom: 4,
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+});
+
+export const rescheduleValue = style({
+  fontSize: 16,
+  fontWeight: '500',
+  color: text_primary,
+});
+
+export const rescheduleTimeChange = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12,
+  padding: 16,
+  backgroundColor: darker_bg,
+  borderRadius: 8,
+  marginTop: 12,
+});
+
+export const rescheduleTimeBlock = style({
+  flex: 1,
+  textAlign: 'center',
+});
+
+export const rescheduleTimeLabel = style({
+  fontSize: 11,
+  fontWeight: '600',
+  color: text_muted,
+  textTransform: 'uppercase',
+  marginBottom: 4,
+});
+
+export const rescheduleTimeValue = style({
+  fontSize: 14,
+  fontWeight: '500',
+  color: text_primary,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 15,
+    },
+  },
+});
+
+export const rescheduleArrow = style({
+  fontSize: 20,
+  color: button,
+});
+
+export const rescheduleNotice = style({
+  fontSize: 13,
+  color: text_secondary,
+  marginTop: 16,
+  padding: '10px 12px',
+  backgroundColor: 'rgba(150, 207, 224, 0.1)',
+  borderRadius: 6,
+  borderLeft: `3px solid ${button}`,
+});
+
+export const rescheduleModalActions = style({
+  display: 'flex',
+  gap: 12,
+  padding: '16px 20px',
+  borderTop: '1px solid #333',
+});
+
+export const rescheduleCancel = style({
+  flex: 1,
+  padding: '12px 16px',
+  fontSize: 15,
+  fontWeight: '600',
+  backgroundColor: 'transparent',
+  color: text_primary,
+  border: '1px solid #555',
+  borderRadius: 8,
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  ':hover': {
+    backgroundColor: '#333',
+  },
+});
+
+export const rescheduleConfirm = style({
+  flex: 1,
+  padding: '12px 16px',
+  fontSize: 15,
+  fontWeight: '600',
+  backgroundColor: button,
+  color: dark_bg,
+  border: 'none',
+  borderRadius: 8,
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  ':hover': {
+    backgroundColor: '#7ab8cc',
   },
 });
