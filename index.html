@@ -3,15 +3,26 @@
   <head>
     <meta charset="UTF-8" />
 
+    <!-- Viewport with safe area support -->
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover"
     />
 
+    <!-- Description -->
     <meta
       name="description"
       content="Corte Fino - Precision cuts. Refined style. Book your appointment today."
     />
+
+    <!-- 🔥 Makes mobile browser UI dark -->
+    <meta name="theme-color" content="#0b0f14" />
+
+    <!-- 🔥 Enables standalone app style on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- 🔥 Makes iOS status bar dark + transparent -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <title>Corte Fino</title>
 
@@ -24,7 +35,7 @@
     />
   </head>
 
-  <body>
+  <body style="background-color: #101214; margin: 0;">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

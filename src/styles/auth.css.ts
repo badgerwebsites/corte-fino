@@ -5,7 +5,7 @@ const button =  "#96cfe0";
 const border_subtle = "rgba(255,255,255,0.08)";
 
 export const container = style({
-  height: '100dvh',
+  minHeight: '100dvh',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
