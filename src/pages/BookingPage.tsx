@@ -291,7 +291,9 @@ export default function BookingPage() {
                  dateString <= t.end_date
           );
           // Check if barber is already booked at this time
-          const isBooked = isSlotBooked(selectedTime, barber.id);
+          const isBooked = selectedService
+            ? isSlotBooked(selectedTime, barber.id, selectedService.duration_minutes)
+            : false;
 
           return hasAvailability && !hasTimeOff && !isBooked;
         });

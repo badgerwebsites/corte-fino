@@ -860,7 +860,7 @@ export default function AdminPage() {
           <div ref={barberFormRef} className={styles.adminRightColumn}>
             <View className={styles.sectionHeader}>
               <Text className={styles.sectionTitle}>
-                {editingBarber ? 'Edit Barber' : '+ Add Barber'}
+                {editingBarber ? `Edit ${editingBarber.name}` : '+ Add Barber'}
               </Text>
             </View>
 
