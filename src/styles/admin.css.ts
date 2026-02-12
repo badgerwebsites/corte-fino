@@ -1021,6 +1021,7 @@ export const selectIcon = style({
   color: text_primary,
 });
 
+// settings
 export const logoGrid = style({
   display: 'grid',
   gridTemplateColumns: '1fr',

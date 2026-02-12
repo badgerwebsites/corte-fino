@@ -1,6 +1,9 @@
 import { style } from '@vanilla-extract/css';
 
 const dark_bg = "#222222";
+const darker_bg = "#101214";
+const text_primary = "#f5f5f5";
+const text_secondary = "#b0b0b0";
 const button =  "#96cfe0";
 const border_subtle = "rgba(255,255,255,0.08)";
 
@@ -24,7 +27,7 @@ export const formCard = style({
   width: '100%',
   maxWidth: 420,
   padding: 20,
-  backgroundColor: dark_bg,
+  backgroundColor: darker_bg,
   borderColor: border_subtle,
   borderRadius: 12,
   boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
@@ -88,9 +91,10 @@ export const inputGroup = style({
 export const input = style({
   padding: '10px 12px',
   fontSize: 15,
+  color: text_primary,
   borderRadius: 8,
-  backgroundColor: '#f9f9f9',
-  border: '1px solid #e5e5e5',
+  backgroundColor: dark_bg,
+  border: '1px solid #b0b0b0',
   outline: 'none',
   transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
   '::placeholder': {
@@ -105,6 +109,19 @@ export const input = style({
     'screen and (min-width: 768px)': {
         padding: '12px 12px',
         fontSize: 16,
+    },
+  },
+  selectors: {
+    '&:-webkit-autofill': {
+      WebkitBoxShadow: '0 0 0 1000px #222222 inset',
+      WebkitTextFillColor: text_primary,
+      transition: 'background-color 5000s ease-in-out 0s',
+      caretColor: text_primary,
+    },
+    '&:-webkit-autofill:focus': {
+      WebkitBoxShadow: '0 0 0 1000px #222222 inset',
+      WebkitTextFillColor: text_primary,
+      caretColor: text_primary,
     },
   },
 });
@@ -159,7 +176,7 @@ export const footer = style({
 
 export const footerText = style({
   fontSize: 20,
-  color: '#9ca3af',
+  color: text_secondary,
   textAlign: 'center',
   '@media': {
     'screen and (min-width: 768px)': {
