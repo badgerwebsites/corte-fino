@@ -59,6 +59,15 @@ export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState('');
 
+  // Guest booking state
+  const [isGuestBooking, setIsGuestBooking] = useState(false);
+  const [showGuestForm, setShowGuestForm] = useState(false);
+  const [guestInfo, setGuestInfo] = useState({
+    firstName: '',
+    lastName: '',
+    phone: '',
+  });
+
   useEffect(() => {
     loadData();
   }, []);
@@ -255,10 +264,153 @@ export default function BookingPage() {
     localStorage.setItem('pendingBooking', JSON.stringify(bookingState));
   };
 
+  const handleGuestBooking = async () => {
+    if (!guestInfo.firstName || !guestInfo.lastName || !guestInfo.phone) {
+      alert('Please fill in all guest information fields');
+      return;
+    }
+
+    if (!selectedService || !selectedDate || !selectedTime) {
+      alert('Please complete all booking selections');
+      return;
+    }
+
+    setBookingInProgress(true);
+
+    try {
+      // If "any barber" was selected, use round-robin to pick the next available barber
+      let bookingBarber = selectedBarber;
+      if (anyBarber && !selectedBarber) {
+        const dayOfWeek = getDay(selectedDate);
+        const dateString = format(selectedDate, 'yyyy-MM-dd');
+
+        // Get all barbers who are available for this date/time slot
+        const availableBarbers = barbers.filter(barber => {
+          const hasAvailability = availability.some(
+            a => a.barber_id === barber.id &&
+                 a.day_of_week === dayOfWeek &&
+                 a.is_available
+          );
+          const hasTimeOff = timeOff.some(
+            t => t.barber_id === barber.id &&
+                 dateString >= t.start_date &&
+                 dateString <= t.end_date
+          );
+          const isBooked = selectedService
+            ? isSlotBooked(selectedTime, barber.id, selectedService.duration_minutes)
+            : false;
+
+          return hasAvailability && !hasTimeOff && !isBooked;
+        });
+
+        if (availableBarbers.length === 0) {
+          alert('No barber available for this time slot. Please select a different time.');
+          setBookingInProgress(false);
+          return;
+        }
+
+        // Round-robin logic
+        const lastBarberId = shopSettings?.last_rotation_barber_id;
+
+        if (availableBarbers.length === 1) {
+          bookingBarber = availableBarbers[0];
+        } else if (!lastBarberId) {
+          bookingBarber = availableBarbers[0];
+        } else {
+          const lastIndex = barbers.findIndex(b => b.id === lastBarberId);
+          let found = false;
+          for (let i = 1; i <= barbers.length; i++) {
+            const nextIndex = (lastIndex + i) % barbers.length;
+            const nextBarber = barbers[nextIndex];
+            if (availableBarbers.some(ab => ab.id === nextBarber.id)) {
+              bookingBarber = nextBarber;
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            bookingBarber = availableBarbers[0];
+          }
+        }
+
+        if (bookingBarber && shopSettings?.id) {
+          await supabase
+            .from('shop_settings')
+            .update({ last_rotation_barber_id: bookingBarber.id })
+            .eq('id', shopSettings.id);
+          setShopSettings(prev => prev ? { ...prev, last_rotation_barber_id: bookingBarber!.id } : prev);
+        }
+      }
+
+      if (!bookingBarber) {
+        alert('No barber available for this time slot. Please select a different time.');
+        setBookingInProgress(false);
+        return;
+      }
+
+      // Calculate end time
+      const [startHours, startMins] = selectedTime.split(':').map(Number);
+      const totalMinutes = startHours * 60 + startMins + selectedService.duration_minutes;
+      const endHours = Math.floor(totalMinutes / 60);
+      const endMins = totalMinutes % 60;
+      const endTime = `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
+
+      // Calculate price
+      const timePeriod = getTimePeriod(selectedTime, bookingBarber);
+      const priceEntry = pricing.find(
+        p => p.barber_id === bookingBarber!.id &&
+             p.service_id === selectedService.id &&
+             p.time_period === timePeriod
+      );
+      const totalPrice = priceEntry?.price || selectedService.base_price;
+
+      // Create guest booking
+      const { error: bookingError } = await supabase
+        .from('bookings')
+        .insert({
+          customer_id: null,
+          barber_id: bookingBarber.id,
+          service_id: selectedService.id,
+          booking_date: format(selectedDate, 'yyyy-MM-dd'),
+          start_time: selectedTime,
+          end_time: endTime,
+          total_price: totalPrice,
+          status: 'confirmed',
+          cancellation_fee_charged: false,
+          reminder_sent: false,
+          review_request_sent: false,
+          is_guest: true,
+          guest_first_name: guestInfo.firstName,
+          guest_last_name: guestInfo.lastName,
+          guest_phone: guestInfo.phone,
+        });
+
+      if (bookingError) throw bookingError;
+
+      setConfirmedBookingDetails({
+        serviceName: selectedService.name,
+        barberName: bookingBarber.name,
+        date: formatDate(selectedDate),
+        time: formatTimeTo12Hour(selectedTime),
+        price: totalPrice,
+        rewardPoints: 0, // Guests don't earn points
+      });
+
+      setShowConfirmation(true);
+      setIsGuestBooking(false);
+      setShowGuestForm(false);
+
+    } catch (error) {
+      console.error('Error creating guest booking:', error);
+      alert('Failed to create booking. Please try again.');
+    } finally {
+      setBookingInProgress(false);
+    }
+  };
+
   const handleBooking = async () => {
     if (!user || !customer) {
-      saveBookingState();
-      navigate('/login?redirect=/book');
+      // Don't redirect to login anymore - guest choice will be shown in UI
       return;
     }
 
@@ -911,19 +1063,101 @@ export default function BookingPage() {
                 </Text>
               </View>
 
-              <View className={styles.buttonGroup}>
-                <button
-                  className={styles.confirmButton}
-                  onClick={handleBooking}
-                  disabled={bookingInProgress}
-                >
-                  {bookingInProgress
-                    ? (isReschedule ? 'Rescheduling...' : 'Booking...')
-                    : user
-                      ? (isReschedule ? 'Reschedule Booking' : 'Confirm Booking')
-                      : 'Login to Book'}
-                </button>
-              </View>
+              {/* Show different UI based on auth state */}
+              {user ? (
+                // Logged in user - show confirm button
+                <View className={styles.buttonGroup}>
+                  <button
+                    className={styles.confirmButton}
+                    onClick={handleBooking}
+                    disabled={bookingInProgress}
+                  >
+                    {bookingInProgress
+                      ? (isReschedule ? 'Rescheduling...' : 'Booking...')
+                      : (isReschedule ? 'Reschedule Booking' : 'Confirm Booking')}
+                  </button>
+                </View>
+              ) : showGuestForm ? (
+                // Guest form - collect guest info
+                <View className={styles.guestFormSection}>
+                  <Text className={styles.guestFormTitle}>Guest Information</Text>
+
+                  <View className={styles.guestInputGroup}>
+                    <label className={styles.guestInputLabel}>First Name</label>
+                    <input
+                      type="text"
+                      className={styles.guestInput}
+                      placeholder="Enter your first name"
+                      value={guestInfo.firstName}
+                      onChange={(e) => setGuestInfo(prev => ({ ...prev, firstName: e.target.value }))}
+                    />
+                  </View>
+
+                  <View className={styles.guestInputGroup}>
+                    <label className={styles.guestInputLabel}>Last Name</label>
+                    <input
+                      type="text"
+                      className={styles.guestInput}
+                      placeholder="Enter your last name"
+                      value={guestInfo.lastName}
+                      onChange={(e) => setGuestInfo(prev => ({ ...prev, lastName: e.target.value }))}
+                    />
+                  </View>
+
+                  <View className={styles.guestInputGroup}>
+                    <label className={styles.guestInputLabel}>Phone Number</label>
+                    <input
+                      type="tel"
+                      className={styles.guestInput}
+                      placeholder="Enter your phone number"
+                      value={guestInfo.phone}
+                      onChange={(e) => setGuestInfo(prev => ({ ...prev, phone: e.target.value }))}
+                    />
+                  </View>
+
+                  <View className={styles.guestFormButtons}>
+                    <button
+                      className={styles.confirmButton}
+                      onClick={handleGuestBooking}
+                      disabled={bookingInProgress}
+                    >
+                      {bookingInProgress ? 'Booking...' : 'Confirm Booking'}
+                    </button>
+                    <Text
+                      className={styles.guestBackLink}
+                      onClick={() => setShowGuestForm(false)}
+                    >
+                      ← Back to booking options
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                // Not logged in - show login/guest choice
+                <View className={styles.guestChoiceSection}>
+                  <button
+                    className={styles.loginButton}
+                    onClick={() => {
+                      saveBookingState();
+                      navigate('/login?redirect=/book');
+                    }}
+                  >
+                    Log in to Book
+                  </button>
+
+                  <Text className={styles.orDivider}>or</Text>
+
+                  <button
+                    className={styles.guestButton}
+                    onClick={() => {
+                      setIsGuestBooking(true);
+                      setShowGuestForm(true);
+                    }}
+                  >
+                    <span>Book as Guest</span>
+                    <span className={styles.guestButtonSubtext}>(Will not receive rewards points)</span>
+                  </button>
+                </View>
+              )}
             </View>
           </View>
         </View>

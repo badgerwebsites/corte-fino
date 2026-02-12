@@ -152,57 +152,62 @@ const getBarberColors = (booking: BookingWithDetails) => {
 
       if (error) throw error;
 
-      // Award reward points when marking as completed
+      // Award reward points when marking as completed (only for non-guest bookings)
       if (newStatus === 'completed' && selectedBooking) {
-        // Fetch the service's reward points directly from the database
-        const { data: serviceData, error: serviceError } = await supabase
-          .from('services')
-          .select('reward_points')
-          .eq('id', selectedBooking.service_id)
-          .single();
-
-        if (serviceError) {
-          console.error('Failed to fetch service:', serviceError);
-          alert('Appointment marked as complete, but failed to fetch service for reward points.');
+        // Skip reward points for guest bookings
+        if (selectedBooking.is_guest || !selectedBooking.customer_id) {
+          alert('Appointment marked as complete. (Guest booking - no reward points)');
         } else {
-          const serviceRewardPoints = serviceData?.reward_points || 0;
+          // Fetch the service's reward points directly from the database
+          const { data: serviceData, error: serviceError } = await supabase
+            .from('services')
+            .select('reward_points')
+            .eq('id', selectedBooking.service_id)
+            .single();
 
-          if (serviceRewardPoints > 0) {
-            // Fetch the customer's current points fresh from the database
-            const { data: customerData, error: fetchError } = await supabase
-              .from('customers')
-              .select('reward_points')
-              .eq('id', selectedBooking.customer_id)
-              .single();
-
-            if (fetchError) {
-              console.error('Failed to fetch customer points:', fetchError);
-              alert('Appointment marked as complete, but failed to fetch customer for reward points.');
-            } else {
-              const currentPoints = customerData?.reward_points || 0;
-              const newPoints = currentPoints + serviceRewardPoints;
-
-              const { data: updateResult, error: pointsError } = await supabase
-                .from('customers')
-                .update({ reward_points: newPoints })
-                .eq('id', selectedBooking.customer_id)
-                .select('reward_points');
-
-              if (pointsError) {
-                console.error('Failed to award points:', pointsError);
-                alert('Appointment marked as complete, but failed to award reward points.');
-              } else if (!updateResult || updateResult.length === 0) {
-                console.error('No rows updated - RLS policy may be blocking the update');
-                console.log('Customer ID:', selectedBooking.customer_id);
-                console.log('New points value:', newPoints);
-                alert('Appointment marked as complete, but could not update reward points (permission issue). Check RLS policies.');
-              } else {
-                console.log('Points updated successfully:', updateResult);
-                alert(`Appointment completed! ${serviceRewardPoints} reward points awarded to customer. New total: ${updateResult[0].reward_points}`);
-              }
-            }
+          if (serviceError) {
+            console.error('Failed to fetch service:', serviceError);
+            alert('Appointment marked as complete, but failed to fetch service for reward points.');
           } else {
-            alert('Appointment marked as complete. (No reward points for this service)');
+            const serviceRewardPoints = serviceData?.reward_points || 0;
+
+            if (serviceRewardPoints > 0) {
+              // Fetch the customer's current points fresh from the database
+              const { data: customerData, error: fetchError } = await supabase
+                .from('customers')
+                .select('reward_points')
+                .eq('id', selectedBooking.customer_id)
+                .single();
+
+              if (fetchError) {
+                console.error('Failed to fetch customer points:', fetchError);
+                alert('Appointment marked as complete, but failed to fetch customer for reward points.');
+              } else {
+                const currentPoints = customerData?.reward_points || 0;
+                const newPoints = currentPoints + serviceRewardPoints;
+
+                const { data: updateResult, error: pointsError } = await supabase
+                  .from('customers')
+                  .update({ reward_points: newPoints })
+                  .eq('id', selectedBooking.customer_id)
+                  .select('reward_points');
+
+                if (pointsError) {
+                  console.error('Failed to award points:', pointsError);
+                  alert('Appointment marked as complete, but failed to award reward points.');
+                } else if (!updateResult || updateResult.length === 0) {
+                  console.error('No rows updated - RLS policy may be blocking the update');
+                  console.log('Customer ID:', selectedBooking.customer_id);
+                  console.log('New points value:', newPoints);
+                  alert('Appointment marked as complete, but could not update reward points (permission issue). Check RLS policies.');
+                } else {
+                  console.log('Points updated successfully:', updateResult);
+                  alert(`Appointment completed! ${serviceRewardPoints} reward points awarded to customer. New total: ${updateResult[0].reward_points}`);
+                }
+              }
+            } else {
+              alert('Appointment marked as complete. (No reward points for this service)');
+            }
           }
         }
       }
@@ -439,7 +444,11 @@ const getBarberColors = (booking: BookingWithDetails) => {
 
                               {/* Row 2: Customer */}
                               <Text className={styles.appointmentCustomer}>
-                                {booking.customer?.first_name} {booking.customer?.last_name}
+                                {booking.customer
+                                  ? `${booking.customer.first_name} ${booking.customer.last_name}`
+                                  : booking.guest_first_name
+                                    ? `${booking.guest_first_name} ${booking.guest_last_name} (Guest)`
+                                    : 'Unknown'}
                               </Text>
 
                               {/* Row 3: Service + Barber */}
@@ -504,7 +513,7 @@ const getBarberColors = (booking: BookingWithDetails) => {
                                 onClick={() => setSelectedBooking(booking)}
                               >
                                 <Text className={styles.weekAppointmentName}>
-                                  {booking.customer?.first_name}
+                                  {booking.customer?.first_name || booking.guest_first_name || 'Guest'}
                                 </Text>
                               </View>
                             );
@@ -564,7 +573,7 @@ const getBarberColors = (booking: BookingWithDetails) => {
                               }}
                             >
                               <Text className={styles.monthBookingText}>
-                                {booking.customer?.first_name}
+                                {booking.customer?.first_name || booking.guest_first_name || 'Guest'}
                               </Text>
                             </div>
                           ))}
@@ -602,21 +611,25 @@ const getBarberColors = (booking: BookingWithDetails) => {
               <View className={styles.detailRow}>
                 <Text className={styles.detailLabel}>Customer</Text>
                 <Text className={styles.detailValue}>
-                  {selectedBooking.customer?.first_name} {selectedBooking.customer?.last_name}
+                  {selectedBooking.customer
+                    ? `${selectedBooking.customer.first_name} ${selectedBooking.customer.last_name}`
+                    : selectedBooking.guest_first_name
+                      ? `${selectedBooking.guest_first_name} ${selectedBooking.guest_last_name} (Guest)`
+                      : 'Unknown'}
                 </Text>
               </View>
 
               <View className={styles.detailRow}>
                 <Text className={styles.detailLabel}>Phone</Text>
                 <Text className={styles.detailValue}>
-                  {selectedBooking.customer?.phone || 'N/A'}
+                  {selectedBooking.customer?.phone || selectedBooking.guest_phone || 'N/A'}
                 </Text>
               </View>
 
               <View className={styles.detailRow}>
                 <Text className={styles.detailLabel}>Email</Text>
                 <Text className={styles.detailValue}>
-                  {selectedBooking.customer?.email || 'N/A'}
+                  {selectedBooking.customer?.email || (selectedBooking.is_guest ? 'Guest - No email' : 'N/A')}
                 </Text>
               </View>
 

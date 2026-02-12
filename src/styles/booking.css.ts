@@ -777,3 +777,185 @@ export const confirmationPrimaryButton = style({
     },
   },
 });
+
+// Guest Booking Styles
+export const guestChoiceSection = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+  marginTop: 20,
+  padding: 20,
+  backgroundColor: darker_bg,
+  borderRadius: 12,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 24,
+      gap: 20,
+    },
+  },
+});
+
+export const loginButton = style({
+  padding: "14px 24px",
+  fontSize: 18,
+  fontWeight: 600,
+  backgroundColor: button,
+  color: "#1a1a1a",
+  borderRadius: 8,
+  border: "none",
+  cursor: "pointer",
+  transition: "all 0.3s ease",
+  letterSpacing: "0.03em",
+  textTransform: "uppercase",
+  ":hover": {
+    transform: "translateY(-1px)",
+    boxShadow: "0 4px 12px rgba(168,220,232,0.4)",
+  },
+  ":active": {
+    transform: "translateY(0)",
+  },
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: "16px 32px",
+      fontSize: 20,
+    },
+  },
+});
+
+export const orDivider = style({
+  display: "flex",
+  alignItems: "center",
+  gap: 16,
+  color: text_muted,
+  fontSize: 14,
+  fontWeight: 500,
+  "::before": {
+    content: '""',
+    flex: 1,
+    height: 1,
+    backgroundColor: border_subtle,
+  },
+  "::after": {
+    content: '""',
+    flex: 1,
+    height: 1,
+    backgroundColor: border_subtle,
+  },
+});
+
+export const guestButton = style({
+  padding: "14px 24px",
+  fontSize: 16,
+  fontWeight: 500,
+  backgroundColor: "transparent",
+  color: text_primary,
+  borderRadius: 8,
+  border: `2px solid ${text_muted}`,
+  cursor: "pointer",
+  transition: "all 0.3s ease",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 4,
+  ":hover": {
+    borderColor: button,
+    color: button,
+  },
+  ":active": {
+    transform: "scale(0.98)",
+  },
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: "16px 32px",
+      fontSize: 18,
+    },
+  },
+});
+
+export const guestButtonSubtext = style({
+  fontSize: 12,
+  color: text_muted,
+  fontWeight: 400,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 13,
+    },
+  },
+});
+
+export const guestFormSection = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+  marginTop: 20,
+  padding: 20,
+  backgroundColor: darker_bg,
+  borderRadius: 12,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 24,
+      gap: 20,
+    },
+  },
+});
+
+export const guestFormTitle = style({
+  fontSize: 18,
+  fontWeight: 600,
+  color: text_primary,
+  textAlign: "center",
+  marginBottom: 8,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 20,
+    },
+  },
+});
+
+export const guestInputGroup = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+});
+
+export const guestInputLabel = style({
+  fontSize: 14,
+  color: text_secondary,
+  fontWeight: 500,
+});
+
+export const guestInput = style({
+  padding: "12px 14px",
+  fontSize: 16,
+  borderRadius: 8,
+  backgroundColor: dark_bg,
+  border: `1px solid ${border_subtle}`,
+  color: text_primary,
+  outline: "none",
+  transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+  "::placeholder": {
+    color: text_muted,
+  },
+  ":focus": {
+    borderColor: button,
+    boxShadow: "0 0 0 2px rgba(150, 207, 224, 0.2)",
+  },
+});
+
+export const guestFormButtons = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 12,
+  marginTop: 8,
+});
+
+export const guestBackLink = style({
+  fontSize: 14,
+  color: text_muted,
+  textAlign: "center",
+  cursor: "pointer",
+  transition: "color 0.2s ease",
+  ":hover": {
+    color: button,
+  },
+});

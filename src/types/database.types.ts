@@ -57,7 +57,7 @@ export type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' 
 
 export interface Booking {
   id: string;
-  customer_id: string;
+  customer_id?: string;
   barber_id?: string;
   service_id: string;
   booking_date: string;
@@ -72,6 +72,11 @@ export interface Booking {
   cancelled_at?: string;
   reminder_sent: boolean;
   review_request_sent: boolean;
+  // Guest booking fields
+  guest_first_name?: string;
+  guest_last_name?: string;
+  guest_phone?: string;
+  is_guest: boolean;
   created_at: string;
   updated_at: string;
 }
