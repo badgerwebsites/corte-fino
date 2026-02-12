@@ -26,7 +26,47 @@ export default function CustomerDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [cancellingBooking, setCancellingBooking] = useState<BookingWithDetails | null>(null);
   const [cancelling, setCancelling] = useState(false);
+    const [expandedRecurring, setExpandedRecurring] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Group bookings: separate recurring groups from standalone bookings
+  const { recurringGroups, standaloneBookings } = useMemo(() => {
+    const groups: Record<string, BookingWithDetails[]> = {};
+    const standalone: BookingWithDetails[] = [];
+
+    bookings.forEach(booking => {
+      if (booking.recurrence_group_id) {
+        if (!groups[booking.recurrence_group_id]) {
+          groups[booking.recurrence_group_id] = [];
+        }
+        groups[booking.recurrence_group_id].push(booking);
+      } else {
+        standalone.push(booking);
+      }
+    });
+
+    // Convert groups to RecurringBookingGroup format
+    const recurringGroups: RecurringBookingGroup[] = Object.entries(groups).map(([groupId, bookings]) => {
+      // Sort by date to get the next upcoming one
+      const sorted = [...bookings].sort((a, b) =>
+        a.booking_date.localeCompare(b.booking_date) || a.start_time.localeCompare(b.start_time)
+      );
+      return {
+        groupId,
+        pattern: sorted[0].recurrence_pattern || 'recurring',
+        nextBooking: sorted[0],
+        allBookings: sorted,
+        remainingCount: sorted.length,
+      };
+    });
+
+    // Sort recurring groups by next booking date
+    recurringGroups.sort((a, b) =>
+      a.nextBooking.booking_date.localeCompare(b.nextBooking.booking_date)
+    );
+
+    return { recurringGroups, standaloneBookings: standalone };
+  }, [bookings]);
 
   // Refresh customer data (including reward points) when dashboard loads
   useEffect(() => {
@@ -138,18 +178,29 @@ export default function CustomerDashboardPage() {
     return hoursUntil < 12;
   };
 
-  const handleCancelBooking = async () => {
+  const handleCancelBooking = async (mode: 'single' | 'all') => {
     if (!cancellingBooking) return;
 
     setCancelling(true);
     try {
-      // Delete the booking instead of just updating status
-      const { error } = await supabase
-        .from('bookings')
-        .delete()
-        .eq('id', cancellingBooking.id);
+      if (mode === 'all' && cancellingBooking.recurrence_group_id) {
+        // Cancel all future appointments in the recurring series
+        const { error } = await supabase
+          .from('bookings')
+          .delete()
+          .eq('recurrence_group_id', cancellingBooking.recurrence_group_id)
+          .gte('booking_date', cancellingBooking.booking_date);
 
-      if (error) throw error;
+        if (error) throw error;
+      } else {
+        // Delete just this booking
+        const { error } = await supabase
+          .from('bookings')
+          .delete()
+          .eq('id', cancellingBooking.id);
+
+        if (error) throw error;
+      }
 
       setCancellingBooking(null);
       loadBookings();
@@ -246,7 +297,71 @@ export default function CustomerDashboardPage() {
               </View>
             ) : (
               <View className={styles.bookingsList}>
-                {bookings.map((booking) => (
+                {/* Recurring Booking Groups */}
+                {recurringGroups.map((group) => (
+                  <View key={group.groupId} className={styles.bookingCard}>
+                    <View className={styles.bookingMain}>
+                      <View className={styles.bookingInfo}>
+                        <Text className={styles.bookingDate}>
+                          {formatDateShort(group.nextBooking.booking_date)}
+                        </Text>
+                        <View className={styles.bookingMeta}>
+                          <Text>
+                            <span className={styles.bookingTime}>{formatTime(group.nextBooking.start_time)}</span>
+                          </Text>
+                          <Text>{group.nextBooking.service?.name}</Text>
+                          {group.nextBooking.barber && <Text>with {group.nextBooking.barber.name}</Text>}
+                        </View>
+                        <Text className={styles.recurringBadge}>
+                          Recurring {RECURRENCE_LABELS[group.pattern as keyof typeof RECURRENCE_LABELS] || group.pattern} · {group.remainingCount} remaining
+                        </Text>
+                      </View>
+                      <View className={styles.bookingRight}>
+                        <Text className={styles.bookingPrice}>
+                          ${group.nextBooking.total_price.toFixed(2)}
+                        </Text>
+                        <View className={`${styles.statusBadge} ${styles[group.nextBooking.status]}`}>
+                          <Text>{group.nextBooking.status}</Text>
+                        </View>
+                      </View>
+                    </View>
+
+                    {/* Expandable list of all appointments in the series */}
+                    {expandedRecurring === group.groupId && (
+                      <View className={styles.recurringList}>
+                        {group.allBookings.map((booking, index) => (
+                          <View key={booking.id} className={styles.recurringItem}>
+                            <Text className={styles.recurringItemDate}>
+                              {index === 0 ? 'Next: ' : ''}{formatDateShort(booking.booking_date)} at {formatTime(booking.start_time)}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+
+                    <View className={styles.bookingActions}>
+                      <button
+                        className={styles.actionLink}
+                        onClick={() => setExpandedRecurring(
+                          expandedRecurring === group.groupId ? null : group.groupId
+                        )}
+                      >
+                        {expandedRecurring === group.groupId ? 'Hide dates' : 'View all dates'}
+                      </button>
+                      {isUpcoming(group.nextBooking) && (
+                        <button
+                          className={styles.actionLinkDanger}
+                          onClick={() => setCancellingBooking(group.nextBooking)}
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </View>
+                  </View>
+                ))}
+
+                {/* Standalone (non-recurring) Bookings */}
+                {standaloneBookings.map((booking) => (
                   <View key={booking.id} className={styles.bookingCard}>
                     <View className={styles.bookingMain}>
                       <View className={styles.bookingInfo}>
@@ -344,6 +459,11 @@ export default function CustomerDashboardPage() {
               <Text className={styles.modalBookingTime}>
                 {formatTime(cancellingBooking.start_time)} · {cancellingBooking.service?.name}
               </Text>
+              {cancellingBooking.recurrence_group_id && (
+                <Text className={styles.recurringBadge}>
+                  Recurring {RECURRENCE_LABELS[cancellingBooking.recurrence_pattern as keyof typeof RECURRENCE_LABELS] || 'appointment'}
+                </Text>
+              )}
             </View>
 
             {isWithin12Hours(cancellingBooking) ? (
@@ -361,22 +481,52 @@ export default function CustomerDashboardPage() {
               </View>
             )}
 
-            <View className={styles.modalActions}>
-              <button
-                className={styles.modalKeepButton}
-                onClick={() => setCancellingBooking(null)}
-                disabled={cancelling}
-              >
-                Keep
-              </button>
-              <button
-                className={styles.modalCancelButton}
-                onClick={handleCancelBooking}
-                disabled={cancelling}
-              >
-                {cancelling ? 'Cancelling...' : 'Cancel'}
-              </button>
-            </View>
+            {/* Show options for recurring bookings */}
+            {cancellingBooking.recurrence_group_id ? (
+              <View className={styles.cancelOptions}>
+                <button
+                  className={styles.cancelOptionButton}
+                  onClick={() => handleCancelBooking('single')}
+                  disabled={cancelling}
+                >
+                  <span className={styles.cancelOptionLabel}>Cancel this appointment only</span>
+                  <span className={styles.cancelOptionDesc}>Other appointments in the series will remain</span>
+                </button>
+                <button
+                  className={styles.cancelOptionButtonDanger}
+                  onClick={() => handleCancelBooking('all')}
+                  disabled={cancelling}
+                >
+                  <span className={styles.cancelOptionLabel}>Cancel all future appointments</span>
+                  <span className={styles.cancelOptionDesc}>Cancel this and all remaining appointments in the series</span>
+                </button>
+                <button
+                  className={styles.modalKeepButton}
+                  onClick={() => setCancellingBooking(null)}
+                  disabled={cancelling}
+                  style={{ marginTop: 8 }}
+                >
+                  Keep appointments
+                </button>
+              </View>
+            ) : (
+              <View className={styles.modalActions}>
+                <button
+                  className={styles.modalKeepButton}
+                  onClick={() => setCancellingBooking(null)}
+                  disabled={cancelling}
+                >
+                  Keep
+                </button>
+                <button
+                  className={styles.modalCancelButton}
+                  onClick={() => handleCancelBooking('single')}
+                  disabled={cancelling}
+                >
+                  {cancelling ? 'Cancelling...' : 'Cancel'}
+                </button>
+              </View>
+            )}
           </div>
         </div>
       )}

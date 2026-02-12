@@ -580,3 +580,103 @@ export const modalCancelButton = style({
   },
 });
 
+// Recurring booking styles
+export const recurringBadge = style({
+  display: "inline-block",
+  marginTop: 8,
+  padding: "4px 10px",
+  fontSize: 12,
+  fontWeight: 600,
+  backgroundColor: "rgba(150, 207, 224, 0.15)",
+  color: button,
+  borderRadius: 6,
+  letterSpacing: "0.02em",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 14,
+    },
+  },
+});
+
+export const recurringList = style({
+  marginTop: 12,
+  padding: 12,
+  backgroundColor: darker_bg,
+  borderRadius: 8,
+  maxHeight: 200,
+  overflowY: "auto",
+});
+
+export const recurringItem = style({
+  padding: "8px 0",
+  borderBottom: `1px solid ${border_subtle}`,
+  ":last-child": {
+    borderBottom: "none",
+  },
+});
+
+export const recurringItemDate = style({
+  fontSize: 14,
+  color: text_secondary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 15,
+    },
+  },
+});
+
+// Cancel modal options for recurring
+export const cancelOptions = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
+  marginTop: 12,
+  marginBottom: 12,
+});
+
+export const cancelOptionButton = style({
+  padding: "14px 16px",
+  fontSize: 15,
+  fontWeight: 500,
+  backgroundColor: darker_bg,
+  color: text_primary,
+  border: `1px solid ${border_subtle}`,
+  borderRadius: 8,
+  cursor: "pointer",
+  textAlign: "left",
+  transition: "all 0.15s",
+  ":hover": {
+    borderColor: button,
+    backgroundColor: "rgba(150, 207, 224, 0.1)",
+  },
+});
+
+export const cancelOptionButtonDanger = style({
+  padding: "14px 16px",
+  fontSize: 15,
+  fontWeight: 500,
+  backgroundColor: darker_bg,
+  color: "#ef4444",
+  border: "1px solid #ef4444",
+  borderRadius: 8,
+  cursor: "pointer",
+  textAlign: "left",
+  transition: "all 0.15s",
+  ":hover": {
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
+  },
+});
+
+export const cancelOptionLabel = style({
+  display: "block",
+  fontWeight: 600,
+  marginBottom: 2,
+});
+
+export const cancelOptionDesc = style({
+  display: "block",
+  fontSize: 13,
+  color: text_muted,
+  fontWeight: 400,
+});
+
