@@ -289,6 +289,7 @@ export const formGroup = style({
 export const formRow = style({
   display: 'grid',
   gridTemplateColumns: '1fr',
+  marginBottom: 4,
   '@media': {
     'screen and (min-width: 768px)': {
       gridTemplateColumns: '1fr 1fr',
@@ -711,6 +712,7 @@ export const pricingTimeBlock = style({
   display: 'flex',
   flexDirection: 'column',
   gap: 4,
+  marginBottom: 12,
 });
 
 export const pricingTimeLabel = style({
@@ -766,10 +768,10 @@ export const checkboxLabel = style({
   alignItems: 'center',
   gap: 12,
   cursor: 'pointer',
-  paddingTop: 16,
+  // paddingTop: 16,
   marginBottom: 20,
   color: text_primary,
-  fontSize: 16,
+  fontSize: 18,
 });
 
 export const checkbox = style({
@@ -1042,7 +1044,7 @@ export const logoGridItem = style({
 });
 
 export const logoLabel = style({
-  fontSize: '0.875rem',
+  fontSize: 16,
   fontWeight: 500,
-  color: '#4a5568',
+  color: text_primary,
 });

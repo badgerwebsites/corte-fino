@@ -1060,40 +1060,43 @@ export default function AdminPage() {
 
       {activeTab === 'settings' && (
         <View className={styles.section}>
-          <View className={styles.sectionHeader}>
+          {/* <View className={styles.sectionHeader}>
             <Text className={styles.sectionTitle}>Site Settings</Text>
-          </View>
+          </View> */}
 
-          <View className={styles.form}>
+          {/* <View className={styles.form}> */}
             {/* Rewards Program Toggle */}
-            <View className={styles.formGroup}>
-              <Text className={styles.subsectionTitle}>Rewards Program</Text>
-              <Text className={styles.sectionDescription}>
+            {/* <View className={styles.formGroup}> */}
+              {/* <Text className={styles.subsectionTitle}>Rewards Program</Text> */}
+              {/* <Text className={styles.sectionDescription}>
                 Enable or disable the rewards program. When disabled, the rewards section will be hidden from customers.
-              </Text>
-              <View style={{ marginTop: '1rem' }}>
-                <label className={styles.checkboxLabel}>
+              </Text> */}
+              <View>
+                {/* <label className={styles.checkboxLabel}>
                   <input
                     type="checkbox"
+                    className={styles.checkbox}
                     checked={siteSettings?.rewards_enabled !== false}
                     onChange={(e) => handleSiteSettingChange('rewards_enabled', e.target.checked)}
                   />
                   <Text>Enable rewards program</Text>
-                </label>
-              </View>
-            </View>
+                </label> */}
+              {/* </View> */}
+            {/* </View> */}
 
             {/* Navigation Carousel Logos */}
             <View className={styles.formGroup}>
-              <Text className={styles.subsectionTitle}>Navigation Carousel Logos</Text>
-              <Text className={styles.sectionDescription}>
-                These logos rotate in the navigation bar. Use "Hide" to remove a logo from the carousel. Note: Refresh the page after making changes to see updates in the navigation.
-              </Text>
+              <View className={styles.sectionHeader}>
+                <Text className={styles.subsectionTitle}>Navigation Logos (Carousel)</Text>
+              </View>
+                <Text className={styles.sectionDescription}>
+                  These logos rotate in the navigation bar. Use "Hide" to remove a logo from the carousel. Note: Refresh the page after making changes to see updates in the navigation.
+                </Text>
 
-              <View style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                <View>
+              <View className={styles.logoGrid}>
+                <View className={styles.logoGridItem}>
                   <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <Text className={styles.label}>Logo 1</Text>
+                    {/* <Text className={styles.label}>Logo 1</Text> */}
                     <label className={styles.checkboxLabel} style={{ marginBottom: 0 }}>
                       <input
                         type="checkbox"
@@ -1113,9 +1116,9 @@ export default function AdminPage() {
                   )}
                 </View>
 
-                <View>
+                <View className={styles.logoGridItem}>
                   <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <Text className={styles.label}>Logo 2</Text>
+                    {/* <Text className={styles.label}>Logo 2</Text> */}
                     <label className={styles.checkboxLabel} style={{ marginBottom: 0 }}>
                       <input
                         type="checkbox"
@@ -1135,9 +1138,9 @@ export default function AdminPage() {
                   )}
                 </View>
 
-                <View>
+                <View className={styles.logoGridItem}>
                   <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <Text className={styles.label}>Logo 3</Text>
+                    {/* <Text className={styles.label}>Logo 3</Text> */}
                     <label className={styles.checkboxLabel} style={{ marginBottom: 0 }}>
                       <input
                         type="checkbox"
@@ -1160,14 +1163,16 @@ export default function AdminPage() {
             </View>
 
             {/* Hero Section */}
-            <View className={styles.formGroup} style={{ marginTop: '2rem' }}>
-              <Text className={styles.subsectionTitle}>Hero Logos (Carousel)</Text>
+            <View className={styles.formGroup}>
+              <View className={styles.sectionHeader}>
+                <Text className={styles.subsectionTitle}>Hero Logos (Carousel)</Text>
+              </View>
               <Text className={styles.sectionDescription}>
                 Add multiple logos to create a rotating carousel on the home page hero section. Upload at least 2 logos to enable the carousel.
               </Text>
               <View className={styles.logoGrid}>
                 <View className={styles.logoGridItem}>
-                  <Text className={styles.logoLabel}>Hero Logo 1</Text>
+                  {/* <Text className={styles.logoLabel}>Hero Logo 1</Text> */}
                   <ImageUpload
                     currentImageUrl={siteSettings?.hero_logo_url || undefined}
                     onImageChange={(url) => handleSiteSettingChange('hero_logo_url', url)}
@@ -1176,7 +1181,7 @@ export default function AdminPage() {
                   />
                 </View>
                 <View className={styles.logoGridItem}>
-                  <Text className={styles.logoLabel}>Hero Logo 2</Text>
+                  {/* <Text className={styles.logoLabel}>Hero Logo 2</Text> */}
                   <ImageUpload
                     currentImageUrl={siteSettings?.hero_logo_2_url || undefined}
                     onImageChange={(url) => handleSiteSettingChange('hero_logo_2_url', url)}
@@ -1185,7 +1190,7 @@ export default function AdminPage() {
                   />
                 </View>
                 <View className={styles.logoGridItem}>
-                  <Text className={styles.logoLabel}>Hero Logo 3</Text>
+                  {/* <Text className={styles.logoLabel}>Hero Logo 3</Text> */}
                   <ImageUpload
                     currentImageUrl={siteSettings?.hero_logo_3_url || undefined}
                     onImageChange={(url) => handleSiteSettingChange('hero_logo_3_url', url)}
@@ -1196,8 +1201,10 @@ export default function AdminPage() {
               </View>
             </View>
 
-            <View className={styles.formGroup} style={{ marginTop: '2rem' }}>
-              <Text className={styles.subsectionTitle}>Hero Background</Text>
+            <View className={styles.formGroup}>
+              <View className={styles.sectionHeader}>
+                <Text className={styles.subsectionTitle}>Hero Background</Text>
+              </View>
               <Text className={styles.sectionDescription}>
                 The background image that appears behind the logo on the home page.
               </Text>
@@ -1218,8 +1225,8 @@ export default function AdminPage() {
         <View className={styles.section}>
           <View className={styles.adminSplitLayout}>
 
-            {/* LEFT COLUMN */}
-            <View className={styles.adminLeftColumn}>
+          {/* LEFT COLUMN */}
+          <View className={styles.adminLeftColumn}>
 
           {/* Code Entry */}
             <View className={styles.verifyCodeForm}>
@@ -1285,6 +1292,16 @@ export default function AdminPage() {
             )}
 
           <View className={styles.rewardsBorder} />
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                className={styles.checkbox}
+                checked={siteSettings?.rewards_enabled !== false}
+                onChange={(e) => handleSiteSettingChange('rewards_enabled', e.target.checked)}
+              />
+            <Text>Enable rewards program</Text>
+            </label>
+
             {rewards.length > 0 && (
                 rewards.map((reward) => (
                   <View key={reward.id} className={styles.barberCard}>

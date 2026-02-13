@@ -17,8 +17,8 @@ export const label = style({
   display: 'block',
   marginBottom: 12,
   fontWeight: '500',
-  color: text_secondary,
-  fontSize: '0.875rem',
+  color: text_primary,
+  fontSize: 16,
   '@media': {
     'screen and (min-width: 768px)': {
       fontSize: '1rem',
