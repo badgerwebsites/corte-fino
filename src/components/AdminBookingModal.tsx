@@ -191,11 +191,12 @@ export function AdminBookingModal({
   };
 
   // Calculate price for the booking
-  const bookingPrice = selectedService && selectedBarber && selectedTime
+  const bookingPrice = selectedService && selectedBarber && selectedTime && selectedDate
     ? calculatePrice(
         selectedBarber.id,
         selectedService.id,
         selectedTime,
+        selectedDate,
         selectedBarber,
         pricing,
         selectedService.base_price

@@ -238,13 +238,17 @@ export default function BookingPage() {
   };
 
   const calculatePrice = (): number => {
-    if (!selectedService || !selectedBarber || !selectedTime) return 0;
+    if (!selectedService || !selectedBarber || !selectedTime || !selectedDate) return 0;
 
     const timePeriod = getTimePeriod(selectedTime, selectedBarber);
+    const dayOfWeek = getDay(selectedDate); // 0=Sun, 1=Mon, ..., 6=Sat
+
+    // Look for day-specific price
     const priceEntry = pricing.find(
       p => p.barber_id === selectedBarber.id &&
            p.service_id === selectedService.id &&
-           p.time_period === timePeriod
+           p.time_period === timePeriod &&
+           p.day_of_week === dayOfWeek
     );
 
     return priceEntry?.price || 0;

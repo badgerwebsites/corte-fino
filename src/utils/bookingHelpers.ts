@@ -42,22 +42,28 @@ export function getTimePeriod(time: string, barber: Barber): TimePeriod {
 }
 
 /**
- * Calculate price based on barber, service, time period, and pricing table
+ * Calculate price based on barber, service, time period, day of week, and pricing table
  */
 export function calculatePrice(
   barberId: string,
   serviceId: string,
   time: string,
+  bookingDate: Date,
   barber: Barber,
   pricing: BarberServicePricing[],
   defaultPrice: number = 0
 ): number {
   const timePeriod = getTimePeriod(time, barber);
+  const dayOfWeek = getDay(bookingDate); // 0=Sun, 1=Mon, ..., 6=Sat
+
+  // Look for day-specific price
   const priceEntry = pricing.find(
     p => p.barber_id === barberId &&
          p.service_id === serviceId &&
-         p.time_period === timePeriod
+         p.time_period === timePeriod &&
+         p.day_of_week === dayOfWeek
   );
+
   return priceEntry?.price || defaultPrice;
 }
 

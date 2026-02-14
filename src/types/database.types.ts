@@ -185,6 +185,7 @@ export interface BarberServicePricing {
   barber_id: string;
   service_id: string;
   time_period: TimePeriod;
+  day_of_week: number | null; // 0=Sun, 1=Mon, ..., 6=Sat
   price: number;
   created_at: string;
   updated_at: string;

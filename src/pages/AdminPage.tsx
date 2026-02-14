@@ -123,24 +123,25 @@ export default function AdminPage() {
     }
   };
 
-  const formatTimeShort = (time: string): string => {
-    const [hours] = time.split(':').map(Number);
-    const period = hours >= 12 ? 'pm' : 'am';
-    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-    return `${displayHours}${period}`;
-  };
+  const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  const getPrice = (barberId: string, serviceId: string, timePeriod: 'regular' | 'evening'): number => {
+  const getPrice = (barberId: string, serviceId: string, timePeriod: 'regular' | 'evening', dayOfWeek: number): number => {
     const priceEntry = pricing.find(
-      p => p.barber_id === barberId && p.service_id === serviceId && p.time_period === timePeriod
+      p => p.barber_id === barberId &&
+           p.service_id === serviceId &&
+           p.time_period === timePeriod &&
+           p.day_of_week === dayOfWeek
     );
     return priceEntry?.price || 0;
   };
 
-  const handlePriceUpdate = async (barberId: string, serviceId: string, timePeriod: 'regular' | 'evening', newPrice: number) => {
+  const handlePriceUpdate = async (barberId: string, serviceId: string, timePeriod: 'regular' | 'evening', dayOfWeek: number, newPrice: number) => {
     try {
       const existingPrice = pricing.find(
-        p => p.barber_id === barberId && p.service_id === serviceId && p.time_period === timePeriod
+        p => p.barber_id === barberId &&
+             p.service_id === serviceId &&
+             p.time_period === timePeriod &&
+             p.day_of_week === dayOfWeek
       );
 
       if (existingPrice) {
@@ -157,6 +158,7 @@ export default function AdminPage() {
             barber_id: barberId,
             service_id: serviceId,
             time_period: timePeriod,
+            day_of_week: dayOfWeek,
             price: newPrice,
           });
 
@@ -611,59 +613,67 @@ export default function AdminPage() {
 
       {activeTab === 'pricing' && (
         <View>
-          {/* <Text className={styles.sectionTitle}>Set Prices by Barber & Time</Text> */}
-
           {services.map((service) => (
             <View key={service.id} className={styles.serviceSection}>
               <Text className={styles.serviceSectionTitle}>
                 {service.name} ({service.duration_minutes} min)
               </Text>
 
-              <View className={styles.pricingGrid}>
-                {barbers.map((barber) => (
-                  <View key={barber.id} className={styles.pricingRow}>
-                    <Text className={styles.barberNameCell}>{barber.name}</Text>
-                    <View className={styles.priceInputWrapper}>
-                      <Text className={styles.priceInputLabel}>Regular <span className={styles.priceTimeHint}>{formatTimeShort(barber.regular_hours_start)}–{formatTimeShort(barber.regular_hours_end)}</span></Text>
-                      <View className={styles.priceInputCell}>
-                        <Text className={styles.dollarSign}>$</Text>
-                        <input
-                          type="number"
-                          step="0.25"
-                          min="0"
-                          className={styles.priceInput}
-                          value={getPrice(barber.id, service.id, 'regular') || ''}
-                          onChange={(e) => handlePriceUpdate(
-                            barber.id,
-                            service.id,
-                            'regular',
-                            parseFloat(e.target.value) || 0
-                          )}
-                          placeholder="0"
-                        />
+              <View className={styles.dayPricingContainer}>
+                {/* Day headers */}
+                <View className={styles.dayPricingHeader}>
+                  <View className={styles.dayPricingBarberHeader}>Barber</View>
+                  {DAY_NAMES.map((day, index) => (
+                    <View key={index} className={styles.dayPricingDayHeader}>
+                      <Text className={styles.dayPricingDayName}>{day}</Text>
+                      <View className={styles.dayPricingPeriodLabels}>
+                        <Text className={styles.dayPricingPeriodLabel}>Reg</Text>
+                        <Text className={styles.dayPricingPeriodLabel}>Eve</Text>
                       </View>
                     </View>
+                  ))}
+                </View>
 
-                    <View className={styles.priceInputWrapper}>
-                      <Text className={styles.priceInputLabel}>Evening <span className={styles.priceTimeHint}>{formatTimeShort(barber.evening_hours_start)}–{formatTimeShort(barber.evening_hours_end)}</span></Text>
-                      <View className={styles.priceInputCell}>
-                        <Text className={styles.dollarSign}>$</Text>
-                        <input
-                          type="number"
-                          step="0.25"
-                          min="0"
-                          className={styles.priceInput}
-                          value={getPrice(barber.id, service.id, 'evening') || ''}
-                          onChange={(e) => handlePriceUpdate(
-                            barber.id,
-                            service.id,
-                            'evening',
-                            parseFloat(e.target.value) || 0
-                          )}
-                          placeholder="0"
-                        />
+                {/* Barber rows */}
+                {barbers.map((barber) => (
+                  <View key={barber.id} className={styles.dayPricingRow}>
+                    <View className={styles.dayPricingBarberName}>{barber.name}</View>
+                    {DAY_NAMES.map((_, dayIndex) => (
+                      <View key={dayIndex} className={styles.dayPricingCell}>
+                        <View className={styles.dayPricingInputGroup}>
+                          <input
+                            type="number"
+                            step="1"
+                            min="0"
+                            className={styles.dayPriceInput}
+                            value={getPrice(barber.id, service.id, 'regular', dayIndex) || ''}
+                            onChange={(e) => handlePriceUpdate(
+                              barber.id,
+                              service.id,
+                              'regular',
+                              dayIndex,
+                              parseFloat(e.target.value) || 0
+                            )}
+                            placeholder="$"
+                          />
+                          <input
+                            type="number"
+                            step="1"
+                            min="0"
+                            className={styles.dayPriceInput}
+                            value={getPrice(barber.id, service.id, 'evening', dayIndex) || ''}
+                            onChange={(e) => handlePriceUpdate(
+                              barber.id,
+                              service.id,
+                              'evening',
+                              dayIndex,
+                              parseFloat(e.target.value) || 0
+                            )}
+                            placeholder="$"
+                          />
+                        </View>
                       </View>
-                    </View>
+                    ))}
                   </View>
                 ))}
               </View>

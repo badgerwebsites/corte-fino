@@ -276,6 +276,117 @@ export const dollarSign = style({
   color: text_secondary,
 });
 
+// Day-based pricing grid
+export const dayPricingContainer = style({
+  overflowX: 'auto',
+  marginTop: 12,
+  paddingBottom: 8,
+});
+
+export const dayPricingHeader = style({
+  display: 'grid',
+  gridTemplateColumns: '100px repeat(7, minmax(80px, 1fr))',
+  gap: 4,
+  marginBottom: 8,
+  minWidth: 700,
+});
+
+export const dayPricingBarberHeader = style({
+  fontSize: 13,
+  fontWeight: '600',
+  color: text_secondary,
+  padding: '8px 4px',
+  display: 'flex',
+  alignItems: 'flex-end',
+});
+
+export const dayPricingDayHeader = style({
+  textAlign: 'center',
+  padding: '4px 2px',
+  backgroundColor: darker_bg,
+  borderRadius: 4,
+});
+
+export const dayPricingDayName = style({
+  fontSize: 14,
+  fontWeight: '600',
+  color: text_primary,
+  marginBottom: 4,
+});
+
+export const dayPricingPeriodLabels = style({
+  display: 'flex',
+  justifyContent: 'center',
+  gap: 8,
+});
+
+export const dayPricingPeriodLabel = style({
+  fontSize: 10,
+  fontWeight: '500',
+  color: text_secondary,
+  textTransform: 'uppercase',
+  width: 32,
+  textAlign: 'center',
+});
+
+export const dayPricingRow = style({
+  display: 'grid',
+  gridTemplateColumns: '100px repeat(7, minmax(80px, 1fr))',
+  gap: 4,
+  marginBottom: 4,
+  minWidth: 700,
+});
+
+export const dayPricingBarberName = style({
+  fontSize: 14,
+  fontWeight: '500',
+  color: text_primary,
+  padding: '8px 4px',
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: darker_bg,
+  borderRadius: 4,
+});
+
+export const dayPricingCell = style({
+  padding: '4px 2px',
+  backgroundColor: darker_bg,
+  borderRadius: 4,
+});
+
+export const dayPricingInputGroup = style({
+  display: 'flex',
+  justifyContent: 'center',
+  gap: 4,
+});
+
+export const dayPriceInput = style({
+  width: 36,
+  backgroundColor: dark_bg,
+  color: text_primary,
+  padding: '6px 2px',
+  border: '1px solid #333',
+  borderRadius: 4,
+  fontSize: 13,
+  fontWeight: '500',
+  textAlign: 'center',
+  transition: 'border-color 0.2s',
+  ':focus': {
+    outline: 'none',
+    borderColor: button,
+  },
+  '::placeholder': {
+    color: text_muted,
+    fontSize: 11,
+  },
+  '::-webkit-inner-spin-button': {
+    display: 'none',
+  },
+  '::-webkit-outer-spin-button': {
+    display: 'none',
+  },
+});
+
 // services
 export const form = style({
   marginBottom: 8,
