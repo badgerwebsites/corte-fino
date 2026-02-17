@@ -95,6 +95,7 @@ export function Navigation() {
   }, []);
 
   const handleLogout = async () => {
+    localStorage.removeItem('adminActiveTab');
     await supabase.auth.signOut();
     navigate('/login', { replace: true });
   };
@@ -125,32 +126,6 @@ export function Navigation() {
           </View>
         </Link>
 
-        {/* <View className={styles.navButtons}>
-          {isAuthenticated ? (
-            <button
-              onClick={handleLogout}
-              className={styles.logoutButton}
-            >
-              Logout
-            </button>
-          ) : isDesktop ? (
-            <a
-              href="/login"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.loginButton}
-            >
-              Login
-            </a>
-          ) : (
-            <Link
-              to="/login"
-              className={styles.loginButton}
-            >
-              Login
-            </Link>
-          )}
-        </View> */}
         <View className={styles.navButtons}>
           {isAuthenticated ? (
             location.pathname === '/' ? (

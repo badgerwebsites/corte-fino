@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Customer } from '../types/database.types';
-import * as styles from '../styles/adminBooking.css';
+import * as styles from '../styles/customerSearch.css';
 
 interface CustomerSearchInputProps {
   onSelect: (customer: Customer) => void;
@@ -92,23 +92,25 @@ export function CustomerSearchInput({
   // If a customer is selected, show the selected state
   if (selectedCustomer) {
     return (
-      <div className={styles.selectedCustomer}>
-        <div className={styles.selectedCustomerInfo}>
-          <span className={styles.selectedCustomerName}>
-            {selectedCustomer.first_name} {selectedCustomer.last_name}
-          </span>
-          <span className={styles.selectedCustomerDetail}>
-            {selectedCustomer.phone} &middot; {selectedCustomer.email}
-          </span>
+      <div ref={containerRef} className={styles.searchContainer}>
+        <div className={styles.selectedCustomer}>
+          <div className={styles.selectedCustomerInfo}>
+            <span className={styles.selectedCustomerName}>
+              {selectedCustomer.first_name} {selectedCustomer.last_name}
+            </span>
+            <span className={styles.selectedCustomerDetail}>
+              {selectedCustomer.phone} &middot; {selectedCustomer.email}
+            </span>
+          </div>
+          <button
+            type="button"
+            className={styles.clearButton}
+            onClick={onClear}
+            title="Clear selection"
+          >
+            &times;
+          </button>
         </div>
-        <button
-          type="button"
-          className={styles.clearButton}
-          onClick={onClear}
-          title="Clear selection"
-        >
-          &times;
-        </button>
       </div>
     );
   }
@@ -155,3 +157,4 @@ export function CustomerSearchInput({
     </div>
   );
 }
+

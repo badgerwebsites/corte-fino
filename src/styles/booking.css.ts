@@ -478,7 +478,7 @@ export const confirmContainer = style({
 export const confirmCard = style({
   // marginTop: 12,
   marginBottom: 100,
-  padding: 16,
+  padding: 8,
   backgroundColor: dark_bg,
   borderRadius: 8,
   border: `1px solid ${border_subtle}`,
@@ -487,7 +487,7 @@ export const confirmCard = style({
   "@media": {
     "screen and (min-width: 768px)": {
       // marginTop: 24,
-      padding: 40,
+      padding: 20,
       // margin: "32px auto",
     },
   },
@@ -497,16 +497,16 @@ export const confirmSection = style({
   display: "flex",
   flexDirection: "column",
   // gap: 10,
-  paddingBottom: 16,
-  marginBottom: 16,
+  paddingBottom: 8,
+  marginBottom: 8,
   borderBottom: "1px solid rgba(255,255,255,0.08)",
   alignItems: 'center',
 
   "@media": {
     "screen and (min-width: 768px)": {
       gap: 14,
-      paddingBottom: 28,
-      marginBottom: 28,
+      paddingBottom: 16,
+      marginBottom: 16,
       flexDirection: "row",
     },
   },
@@ -521,18 +521,18 @@ export const confirmLabel = style({
   fontWeight: 600,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 16,
+      fontSize: 14,
     },
   },
 });
 
 export const confirmValue = style({
-  fontSize: 20,
+  fontSize: 18,
   fontWeight: 500,
   color: text_primary,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 24,
+      fontSize: 22,
     },
   },
 });
@@ -549,9 +549,14 @@ export const confirmDetail = style({
 });
 
 export const priceAmount = style({
-  fontSize: 28,
+  fontSize: 20,
   fontWeight: 400,
   color: text_primary,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 24,
+    },
+  },
 });
 
 export const policySection = style({
@@ -559,7 +564,7 @@ export const policySection = style({
   backgroundColor: "#fef3c7",
   borderRadius: 4,
   border: "1px solid #fcd34d",
-  marginBottom: 20,
+  marginBottom: 12,
 });
 
 export const policyText = style({
@@ -605,7 +610,7 @@ export const confirmButton = style({
   padding: "12px 24px",
   fontSize: 18,
   fontWeight: 500,
-  backgroundColor: button,
+  backgroundColor: '#22c55e',
   color: "#1a1a1a",
   borderRadius: 8,
   border: `1px solid ${text_muted}`,
@@ -613,6 +618,7 @@ export const confirmButton = style({
   transition: "all 0.3s ease",
   letterSpacing: "0.05em",
   ':hover': {
+    backgroundColor: '#16a34a',
     transform: 'translateY(-1px)',
     boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
   },

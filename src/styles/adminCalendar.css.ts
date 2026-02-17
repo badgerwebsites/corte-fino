@@ -6,6 +6,7 @@ const button =  "#96cfe0";
 const text_primary = "#f5f5f5";
 const text_secondary = "#b0b0b0";
 const text_muted = "#8a8a8a";
+const border_hover = "rgba(255,255,255,0.18)";
 
 export const container = style({
   backgroundColor: dark_bg,
@@ -101,6 +102,7 @@ export const controls = style({
   alignItems: 'center',
   gap: 12,
   flexWrap: 'wrap',
+  justifyContent: 'center',
   '@media': {
     'screen and (min-width: 768px)': {
       gap: 16,
@@ -189,6 +191,50 @@ export const viewButtonActive = style({
   color: '#1a1a1a',
 });
 
+export const bookAppointmentButton = style({
+  padding: '10px 16px',
+  fontSize: 16,
+  fontWeight: 600,
+  backgroundColor: button,
+  color: darker_bg,
+  border: 'none',
+  borderRadius: 8,
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  ':hover': {
+    backgroundColor: '#7fbccd',
+  },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '6px 12px',
+      borderRadius: 32,
+    },
+  },
+});
+
+export const plusIcon = style({
+  fontSize: 20,
+  fontWeight: 600,
+  lineHeight: 1,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 24,
+    },
+  },
+});
+
+export const mobileOnlyText = style({
+  display: 'inline',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      display: 'none',
+    },
+  },
+});
+
 // Day View Styles
 export const dayView = style({
   overflow: 'auto',
@@ -204,7 +250,7 @@ export const dayHeader = style({
   zIndex: 10,
   '@media': {
     'screen and (min-width: 768px)': {
-      gridTemplateColumns: '70px 1fr',
+      gridTemplateColumns: '80px 1fr',
     },
   },
 });
@@ -214,7 +260,7 @@ export const dayHeaderToday = style({
 });
 
 export const dayTimeColumnHeader = style({
-  borderRight: '1px solid #f1f5f9',
+  borderRight: '1px solid #e2e8f0',
   backgroundColor: dark_bg,
 });
 
@@ -278,7 +324,7 @@ export const timeRow = style({
   borderBottom: '1px solid #444',
   '@media': {
     'screen and (min-width: 768px)': {
-      gridTemplateColumns: '70px 1fr',
+      gridTemplateColumns: '80px 1fr',
       minHeight: '80px',
     },
   },
@@ -288,6 +334,10 @@ export const hourCell = style({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
+});
+
+export const hourCellToday = style({
+  backgroundColor: darker_bg,
 });
 
 export const quarterDropZones = style({
@@ -306,20 +356,17 @@ export const quarterZone = style({
 });
 
 export const timeLabel = style({
-  padding: '0 4px',
-  fontSize: 11,
-  fontWeight: '500',
+  padding: '4px 2px',
+  fontSize: 10,
+  fontWeight: '400',
   color: text_secondary,
-  borderRight: '1px solid #444',
+  borderRight: '1px solid #e2e8f0',
   backgroundColor: dark_bg,
-  textAlign: 'right',
-  paddingTop: 0,
-  marginTop: -8,
+  textAlign: 'center',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0 8px',
+      padding: '4px 4px',
       fontSize: 12,
-      marginTop: -9,
     },
   },
 });
@@ -349,20 +396,25 @@ export const appointmentCard = style({
 });
 
 export const appointmentTime = style({
-  fontSize: 14,
+  fontSize: 12,
   fontWeight: '500',
   color: text_primary,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 14,
+    },
+  },
 });
 
 export const appointmentCustomer = style({
-  fontSize: 14,
+  fontSize: 12,
   fontWeight: '500',
   color: text_primary,
-});
-
-export const appointmentMeta = style({
-  fontSize: 13,
-  color: text_secondary,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 14,
+    },
+  },
 });
 
 // Week View Styles
@@ -482,20 +534,17 @@ export const weekTimeRow = style({
 });
 
 export const weekTimeLabel = style({
-  padding: '0 4px',
-  fontSize: 11,
-  fontWeight: '500',
+  padding: '4px 2px',
+  fontSize: 10,
+  fontWeight: '400',
   color: text_secondary,
-  borderRight: '1px solid #444',
+  borderRight: '1px solid #e2e8f0',
   backgroundColor: dark_bg,
-  textAlign: 'right',
-  paddingTop: 0,
-  marginTop: -8,
+  textAlign: 'center',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0 8px',
+      padding: '4px 4px',
       fontSize: 12,
-      marginTop: -9,
     },
   },
 });
@@ -543,9 +592,14 @@ export const weekAppointmentName = style({
   maxWidth: '100%',
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: 12,
+      fontSize: 14,
     },
   },
+});
+
+export const appointmentMeta = style({
+  fontSize: 12,
+  color: text_secondary,
 });
 
 // Status Colors
@@ -594,6 +648,7 @@ export const modal = style({
 export const modalContent = style({
   backgroundColor: dark_bg,
   borderRadius: 16,
+  border: `1px solid ${border_hover}`,
   maxWidth: '450px',
   width: '100%',
   maxHeight: '90vh',

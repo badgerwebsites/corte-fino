@@ -8,10 +8,11 @@ import type { Barber, BookingWithDetails, Service, BarberServicePricing, BarberA
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/adminCalendar.css';
-import * as bookingStyles from '../styles/adminBooking.css';
+// import * as bookingStyles from '../styles/adminBooking.css';
 import { ChevronLeft, ChevronRight, Check, Ban, Circle } from "lucide-react";
-import { AdminBookingModal } from './AdminBookingModal';
+// import { AdminBookingModal } from './AdminBookingModal';
 import { canRescheduleToSlot, calculateEndTime } from '../utils/bookingHelpers';
+import { useNavigate } from 'react-router-dom';
 
 interface AdminCalendarProps {
   barbers: Barber[];
@@ -25,15 +26,13 @@ interface AdminCalendarProps {
 type ViewMode = 'day' | 'week' | 'month';
 type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
 
-export function AdminCalendar({ barbers, services, pricing, availability, timeOff, onBookingUpdate }: AdminCalendarProps) {
+export function AdminCalendar({ barbers, availability, timeOff, onBookingUpdate }: AdminCalendarProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedBarberId, setSelectedBarberId] = useState<string>('all');
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
   const [selectedBooking, setSelectedBooking] = useState<BookingWithDetails | null>(null);
-
-  // Admin booking modal state
-  const [showBookingModal, setShowBookingModal] = useState(false);
+  const navigate = useNavigate();
 
   // Drag and drop state
   const [draggedBooking, setDraggedBooking] = useState<BookingWithDetails | null>(null);
@@ -603,14 +602,6 @@ const getBarberColors = (booking: BookingWithDetails) => {
 
 
         <View className={styles.controls}>
-          <button
-            className={bookingStyles.bookAppointmentButton}
-            onClick={() => setShowBookingModal(true)}
-          >
-            <span className={bookingStyles.plusIcon}>+</span>
-            Book Appointment
-          </button>
-
           <div className={styles.selectWrapper}>
             <select
               className={styles.barberFilter}
@@ -648,6 +639,19 @@ const getBarberColors = (booking: BookingWithDetails) => {
               Month
             </button>
           </View>
+            <button
+              className={styles.bookAppointmentButton}
+              onClick={() =>
+                navigate('/book', {
+                  state: { adminMode: true },
+                })
+              }
+            >
+              <span className={styles.plusIcon}>+</span>
+              <span className={styles.mobileOnlyText}>
+                Book Appointment
+              </span>
+            </button>
         </View>
       </View>
         <>
@@ -682,7 +686,12 @@ const getBarberColors = (booking: BookingWithDetails) => {
                       <View className={styles.timeLabel}>
                         <Text>{formatTime(hourSlot)}</Text>
                       </View>
-                      <View className={styles.hourCell}>
+                      <View
+                        className={`${styles.hourCell} ${
+                          isSameDay(currentDate, new Date()) ? styles.hourCellToday : ''
+                        }`}
+                      >
+                      {/* <View className={styles.hourCell}> */}
                         {/* Quarter-hour drop zones */}
                         <View className={styles.quarterDropZones}>
                           {quarterSlots.map(quarterSlot => {
@@ -745,11 +754,8 @@ const getBarberColors = (booking: BookingWithDetails) => {
                                   ? `${booking.customer.first_name} ${booking.customer.last_name}`
                                   : booking.guest_first_name
                                     ? `${booking.guest_first_name} ${booking.guest_last_name} (Guest)`
-                                    : 'Unknown'}
-                              </Text>
-                              <Text className={styles.appointmentMeta}>
-                                {booking.service?.name}
-                                {booking.barber?.name && ` · with ${booking.barber.name}`}
+                                    : 'Unknown'} 
+                                {booking.service?.name && ` - ${booking.service.name}`}
                               </Text>
                             </View>
                           );
@@ -1064,7 +1070,7 @@ const getBarberColors = (booking: BookingWithDetails) => {
       )}
 
       {/* Admin Booking Modal */}
-      <AdminBookingModal
+      {/* <AdminBookingModal
         isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
         onSuccess={() => {
@@ -1076,7 +1082,7 @@ const getBarberColors = (booking: BookingWithDetails) => {
         pricing={pricing}
         availability={availability}
         timeOff={timeOff}
-      />
+      /> */}
 
       {/* Drag Overlay - shows appointment while dragging */}
       <DragOverlay>

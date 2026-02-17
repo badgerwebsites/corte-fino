@@ -465,7 +465,7 @@ export const contactInfo = style({
 });
 
 export const contactText = style({
-  fontSize: 13,
+  fontSize: 15,
   color: '#7fb8ff',
   "@media": {
     "screen and (min-width: 768px)": {

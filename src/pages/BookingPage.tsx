@@ -11,8 +11,10 @@ import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/booking.css';
 import * as calendarStyles from '../styles/calendar.css';
+import { CustomerSearchInput } from '../components/CustomerSearchInput';
+import type { Customer } from '../types/database.types';
 
-type BookingStep = 1 | 2 | 3 | 4;
+type BookingStep = 0 | 1 | 2 | 3 | 4;
 
 interface LocationState {
   rescheduleFrom?: string;
@@ -22,15 +24,19 @@ interface LocationState {
 
 export default function BookingPage() {
   const { user, customer } = useAuth();
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as LocationState | null;
+  const isAdminMode = location.state?.adminMode;
+  const isAdmin = isAdminMode || !!customer?.is_admin;
+
 
   // Check if this is a reschedule
   const rescheduleFromId = locationState?.rescheduleFrom;
   const isReschedule = !!rescheduleFromId;
 
-  const [step, setStep] = useState<BookingStep>(1);
+  const [step, setStep] = useState<BookingStep>(isAdmin ? 0 : 1);
   const [loading, setLoading] = useState(true);
   const [bookingInProgress, setBookingInProgress] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -421,6 +427,11 @@ export default function BookingPage() {
       return;
     }
 
+    if (isAdmin && !selectedCustomer) {
+      alert("Please select a customer.");
+      return;
+    }
+
     setBookingInProgress(true);
 
     try {
@@ -542,7 +553,10 @@ export default function BookingPage() {
       const { error: bookingError } = await supabase
         .from('bookings')
         .insert({
-          customer_id: user.id,
+          customer_id: isAdmin
+            ? selectedCustomer?.id
+            : user.id,
+          created_by_admin: isAdmin,
           barber_id: bookingBarber.id,
           service_id: selectedService.id,
           booking_date: format(selectedDate, 'yyyy-MM-dd'),
@@ -783,26 +797,6 @@ export default function BookingPage() {
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
-  // const resetBooking = () => {
-  //   setSelectedService(null);
-  //   setSelectedBarber(null);
-  //   setAnyBarber(false);
-  //   setSelectedDate(undefined);
-  //   setSelectedTime('');
-  //   setStep(1);
-  // };
-
-  // if (loading) {
-  //   return (
-  //     <>
-  //       <Navigation />
-  //       <View className={styles.container}>
-  //         <Text className={styles.title}>Loading...</Text>
-  //       </View>
-  //     </>
-  //   );
-  // }
-
   const today = startOfDay(new Date());
   const endMonth = addMonths(today, 6);
 
@@ -828,6 +822,15 @@ export default function BookingPage() {
 
       {/* Progress Indicator */}
       <View className={styles.progressBar}>
+        {isAdmin && (
+          <>
+            <View className={`${styles.progressStep} ${step >= 0 ? styles.progressStepActive : ''}`}>
+              <View className={styles.progressNumber}>0</View>
+              <Text className={styles.progressLabel}>Customer</Text>
+            </View>
+            <View className={styles.progressLine} />
+          </>
+        )}
         <View className={`${styles.progressStep} ${step >= 1 ? styles.progressStepActive : ''}`}>
           <View className={styles.progressNumber}>1</View>
           <Text className={styles.progressLabel}>Service</Text>
@@ -849,9 +852,39 @@ export default function BookingPage() {
         </View>
       </View>
 
+      {/* Step 0: Select Customer (Admin Only) */}
+      {isAdmin && step === 0 && (
+        <View className={styles.stepContainer}>
+          <Text className={styles.stepTitle}>Select Customer</Text>
+
+          <CustomerSearchInput
+            selectedCustomer={selectedCustomer}
+            onSelect={(customer) => {
+              setSelectedCustomer(customer);
+              setStep(1);
+            }}
+            onClear={() => setSelectedCustomer(null)}
+          />
+        </View>
+      )}
+
       {/* Step 1: Select Service */}
       {step === 1 && (
         <View className={styles.stepContainer}>
+          {isAdmin && (
+            <button
+              className={styles.backButton}
+              onClick={() => {
+                setSelectedService(null);
+                setSelectedBarber(null);
+                setSelectedDate(undefined);
+                setSelectedTime('');
+                setStep(0);
+              }}
+            >
+              ← Back to Customer
+            </button>
+          )}
           {/* <Text className={styles.stepTitle}>Select a Service</Text> */}
           <View className={styles.serviceGrid}>
             {services.map((service) => (
@@ -1026,6 +1059,14 @@ export default function BookingPage() {
             <Text className={styles.stepTitle}>Confirm Your Booking</Text>
 
             <View className={styles.confirmCard}>
+              {isAdmin && selectedCustomer && (
+                <View className={styles.confirmSection}>
+                  <Text className={styles.confirmLabel}>Customer</Text>
+                  <Text className={styles.confirmValue}>
+                    {selectedCustomer.first_name} {selectedCustomer.last_name}
+                  </Text>
+                </View>
+              )}
               <View className={styles.confirmSection}>
                 <Text className={styles.confirmLabel}>Service</Text>
                 <Text className={styles.confirmValue}>{selectedService?.name}</Text>

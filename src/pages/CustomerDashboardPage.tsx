@@ -20,7 +20,7 @@ interface RecurringBookingGroup {
 }
 
 export default function CustomerDashboardPage() {
-  const { user, customer, refreshCustomer } = useAuth();
+  const { user, customer, refreshCustomer, loading: authLoading } = useAuth();
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -82,52 +82,53 @@ export default function CustomerDashboardPage() {
   }, [customer, loading, navigate]);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
+  if (authLoading) return; // 🔥 WAIT for auth
+
+  if (!user) {
+    navigate('/login', { replace: true });
+    return;
+  }
+
+  const loadData = async () => {
+    try {
+      const currentDate = new Date();
+      const today = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+
+      const [bookingsRes, settingsRes] = await Promise.all([
+        supabase
+          .from('bookings')
+          .select(`
+            *,
+            barber:barbers(*),
+            service:services(*)
+          `)
+          .eq('customer_id', user.id)
+          .in('status', ['pending', 'confirmed'])
+          .gte('booking_date', today)
+          .order('booking_date', { ascending: true }),
+        supabase.from('site_settings').select('*').single(),
+      ]);
+
+      if (bookingsRes.error) throw bookingsRes.error;
+
+      const now = new Date();
+      const filtered = (bookingsRes.data || []).filter(booking => {
+        const endDateTime = new Date(`${booking.booking_date}T${booking.end_time}`);
+        const oneHourAfterEnd = new Date(endDateTime.getTime() + 60 * 60 * 1000);
+        return now < oneHourAfterEnd;
+      });
+
+      setBookings(filtered);
+      setSiteSettings(settingsRes.data || null);
+    } catch (error) {
+      console.error('Error loading bookings:', error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const loadData = async () => {
-      try {
-        // Use local date to avoid UTC timezone issues
-        const currentDate = new Date();
-        const today = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
-        const [bookingsRes, settingsRes] = await Promise.all([
-          supabase
-            .from('bookings')
-            .select(`
-              *,
-              barber:barbers(*),
-              service:services(*)
-            `)
-            .eq('customer_id', user.id)
-            .in('status', ['pending', 'confirmed'])
-            .gte('booking_date', today)
-            .order('booking_date', { ascending: true }),
-          supabase.from('site_settings').select('*').single(),
-        ]);
-
-        if (bookingsRes.error) throw bookingsRes.error;
-
-        // Filter out appointments that ended more than 1 hour ago
-        const now = new Date();
-        const filtered = (bookingsRes.data || []).filter(booking => {
-          const endDateTime = new Date(`${booking.booking_date}T${booking.end_time}`);
-          const oneHourAfterEnd = new Date(endDateTime.getTime() + 60 * 60 * 1000);
-          return now < oneHourAfterEnd;
-        });
-
-        setBookings(filtered);
-        setSiteSettings(settingsRes.data || null);
-      } catch (error) {
-        console.error('Error loading bookings:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [user, navigate]);
+  loadData();
+}, [user, authLoading, navigate]);
 
   const loadBookings = async () => {
     if (!user) return;

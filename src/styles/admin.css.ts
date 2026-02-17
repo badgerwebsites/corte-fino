@@ -904,7 +904,7 @@ export const tabBadge = style({
   fontSize: 14,
   fontWeight: '600',
   backgroundColor: '#0ea5e9',
-  color: '#ffffff',
+  color: text_primary,
   borderRadius: '9999px',
   lineHeight: 1.5,
 });
@@ -932,16 +932,19 @@ export const verifyCodeInput = style({
   letterSpacing: '0.2em',
   textAlign: 'center',
   textTransform: 'uppercase',
-  border: '2px solid #0ea5e9',
+  border: '2px solid #b0b0b0',
   borderRadius: '0.5rem',
-  backgroundColor: '#f0f9ff',
+  backgroundColor: darker_bg,
+  color: text_primary,
+  caretColor: text_primary,
   ':focus': {
     outline: 'none',
-    border: '2px solid #0284c7',
+    border: '2px solid #7fbccd',
   },
   '::placeholder': {
     fontSize: '0.875rem',
     fontWeight: '400',
+    color: text_secondary,
     letterSpacing: '0',
     textTransform: 'none',
   },
@@ -954,17 +957,18 @@ export const verifyCodeInput = style({
 
 export const verifyCodeButton = style({
   padding: '16px 16px',
+  whiteSpace: 'nowrap',
+  background: button,
+  color: dark_bg,
+  border: 'none',
+  borderRadius: 8,
   fontSize: 16,
   fontWeight: '500',
-  backgroundColor: '#0ea5e9',
-  color: text_primary,
-  border: 'none',
-  borderRadius: '0.5rem',
   cursor: 'pointer',
-  transition: 'all 0.2s',
-  whiteSpace: 'nowrap',
+  transition: 'all 0.3s ease',
+  letterSpacing: '0.05em',
   ':hover': {
-    backgroundColor: '#0284c7',
+    backgroundColor: '#7fbccd',
   },
 });
 

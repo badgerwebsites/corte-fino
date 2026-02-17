@@ -13,8 +13,16 @@ import { Text } from '../ui/Text';
 import * as styles from '../styles/admin.css';
 import { ChevronDown } from "lucide-react";
 
+type AdminTab =
+  | 'calendar'
+  | 'pricing'
+  | 'services'
+  | 'barbers'
+  | 'rewards'
+  | 'settings';
+
 export default function AdminPage() {
-  const { user, customer } = useAuth();
+  const { user, customer, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -25,7 +33,23 @@ export default function AdminPage() {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'calendar' | 'pricing' | 'services' | 'barbers' | 'rewards' | 'settings'>('calendar');
+  const isAdminTab = (value: string): value is AdminTab => {
+    return [
+      'calendar',
+      'pricing',
+      'services',
+      'barbers',
+      'rewards',
+      'settings',
+    ].includes(value as AdminTab);
+  };
+  const [activeTab, setActiveTab] = useState<AdminTab>(() => {
+    const saved = localStorage.getItem('adminActiveTab');
+    if (saved && isAdminTab(saved)) {
+      return saved;
+    }
+    return 'calendar';
+  });
   const [verifyCode, setVerifyCode] = useState('');
 
   // Barber form state
@@ -71,18 +95,25 @@ export default function AdminPage() {
   const rewardFormRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
+  localStorage.setItem('adminActiveTab', activeTab);
+}, [activeTab]);
 
-    if (customer && !customer.is_admin) {
-      navigate('/dashboard');
-      return;
-    }
 
-    loadData();
-  }, [user, customer, navigate]);
+  useEffect(() => {
+  if (authLoading) return;
+
+  if (!user) {
+    navigate('/login', { replace: true });
+    return;
+  }
+
+  if (customer && !customer.is_admin) {
+    navigate('/dashboard', { replace: true });
+    return;
+  }
+
+  loadData();
+}, [user, customer, authLoading, navigate]);
 
   const loadData = async () => {
     try {
