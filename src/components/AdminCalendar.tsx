@@ -44,6 +44,9 @@ export function AdminCalendar({ barbers, availability, timeOff, onBookingUpdate 
   const [allBookingsForValidation, setAllBookingsForValidation] = useState<Booking[]>([]);
   const [activeDropTarget, setActiveDropTarget] = useState<{ dateStr: string; time: string } | null>(null);
 
+  // Cancel confirmation for recurring appointments
+  const [cancelTarget, setCancelTarget] = useState<BookingWithDetails | null>(null);
+
   // Configure drag sensor with distance constraint (allows clicks to work)
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -391,6 +394,44 @@ const getBarberColors = (booking: BookingWithDetails) => {
     } catch (error) {
       console.error('Error updating booking status:', error);
       alert('Failed to update booking status');
+    }
+  };
+
+  // Handle canceling a single appointment or all in a recurring series
+  const handleCancelAppointment = async (booking: BookingWithDetails, cancelAll: boolean) => {
+    try {
+      const updateData = {
+        status: 'cancelled' as const,
+        cancelled_at: new Date().toISOString(),
+      };
+
+      if (cancelAll && booking.recurrence_group_id) {
+        // Cancel all future appointments in the series (including this one)
+        const { error } = await supabase
+          .from('bookings')
+          .update(updateData)
+          .eq('recurrence_group_id', booking.recurrence_group_id)
+          .gte('booking_date', booking.booking_date)
+          .neq('status', 'completed');
+
+        if (error) throw error;
+      } else {
+        // Cancel just this appointment
+        const { error } = await supabase
+          .from('bookings')
+          .update(updateData)
+          .eq('id', booking.id);
+
+        if (error) throw error;
+      }
+
+      loadBookings();
+      setSelectedBooking(null);
+      setCancelTarget(null);
+      onBookingUpdate?.();
+    } catch (error) {
+      console.error('Error canceling booking:', error);
+      alert('Failed to cancel booking');
     }
   };
 
@@ -1058,7 +1099,15 @@ const getBarberColors = (booking: BookingWithDetails) => {
                 {selectedBooking.status !== 'cancelled' && selectedBooking.status !== 'completed' && (
                   <button
                     className={styles.actionCancel}
-                    onClick={() => handleStatusUpdate(selectedBooking.id, 'cancelled')}
+                    onClick={() => {
+                      if (selectedBooking.recurrence_group_id) {
+                        // Show confirmation modal for recurring appointments
+                        setCancelTarget(selectedBooking);
+                      } else {
+                        // Directly cancel non-recurring appointments
+                        handleStatusUpdate(selectedBooking.id, 'cancelled');
+                      }
+                    }}
                   >
                     Delete
                   </button>
@@ -1178,6 +1227,67 @@ const getBarberColors = (booking: BookingWithDetails) => {
                 onClick={handleReschedule}
               >
                 Confirm Reschedule
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal for Recurring Appointments */}
+      {cancelTarget && (
+        <div className={styles.rescheduleModal} onClick={() => setCancelTarget(null)}>
+          <div className={styles.rescheduleModalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.rescheduleModalHeader}>
+              <h3 className={styles.rescheduleModalTitle}>Cancel Recurring Appointment</h3>
+            </div>
+
+            <div className={styles.rescheduleModalBody}>
+              <div className={styles.rescheduleInfo}>
+                <div className={styles.rescheduleLabel}>Customer</div>
+                <div className={styles.rescheduleValue}>
+                  {cancelTarget.customer
+                    ? `${cancelTarget.customer.first_name} ${cancelTarget.customer.last_name}`
+                    : cancelTarget.guest_first_name
+                      ? `${cancelTarget.guest_first_name} ${cancelTarget.guest_last_name} (Guest)`
+                      : 'Unknown'}
+                </div>
+              </div>
+
+              <div className={styles.rescheduleInfo}>
+                <div className={styles.rescheduleLabel}>Service</div>
+                <div className={styles.rescheduleValue}>{cancelTarget.service?.name}</div>
+              </div>
+
+              <div className={styles.rescheduleInfo}>
+                <div className={styles.rescheduleLabel}>Appointment</div>
+                <div className={styles.rescheduleValue}>
+                  {format(parseISO(cancelTarget.booking_date), 'EEE, MMM d, yyyy')} at {formatTime(cancelTarget.start_time)}
+                </div>
+              </div>
+
+              <div className={styles.cancelMessage}>
+                This appointment is part of a recurring series. What would you like to do?
+              </div>
+            </div>
+
+            <div className={styles.cancelModalActions}>
+              <button
+                className={styles.cancelSingleButton}
+                onClick={() => handleCancelAppointment(cancelTarget, false)}
+              >
+                Cancel This Appointment Only
+              </button>
+              <button
+                className={styles.cancelAllButton}
+                onClick={() => handleCancelAppointment(cancelTarget, true)}
+              >
+                Cancel All Future Appointments
+              </button>
+              <button
+                className={styles.rescheduleCancel}
+                onClick={() => setCancelTarget(null)}
+              >
+                Go Back
               </button>
             </div>
           </div>

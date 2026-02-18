@@ -965,3 +965,135 @@ export const guestBackLink = style({
     color: button,
   },
 });
+
+// Recurring Appointment Styles
+export const recurringSection = style({
+  marginTop: 16,
+  marginBottom: 16,
+  padding: 16,
+  backgroundColor: darker_bg,
+  borderRadius: 8,
+  border: `1px solid ${border_subtle}`,
+  textAlign: "left",
+  "@media": {
+    "screen and (min-width: 768px)": {
+      padding: 20,
+    },
+  },
+});
+
+export const recurringCheckboxLabel = style({
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  cursor: "pointer",
+});
+
+export const recurringCheckbox = style({
+  width: 18,
+  height: 18,
+  accentColor: button,
+  cursor: "pointer",
+});
+
+export const recurringCheckboxText = style({
+  fontSize: 16,
+  fontWeight: 500,
+  color: text_primary,
+});
+
+export const recurringOptions = style({
+  marginTop: 16,
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+});
+
+export const recurringOptionGroup = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+});
+
+export const recurringOptionLabel = style({
+  fontSize: 14,
+  color: text_secondary,
+  fontWeight: 500,
+});
+
+export const recurringSelect = style({
+  padding: "10px 14px",
+  fontSize: 16,
+  borderRadius: 6,
+  backgroundColor: dark_bg,
+  border: `1px solid ${border_subtle}`,
+  color: text_primary,
+  cursor: "pointer",
+  outline: "none",
+  transition: "border-color 0.2s ease",
+  ":focus": {
+    borderColor: button,
+  },
+});
+
+export const recurringPreview = style({
+  marginTop: 8,
+  padding: 12,
+  backgroundColor: dark_bg,
+  borderRadius: 6,
+  border: `1px solid ${border_subtle}`,
+});
+
+export const recurringPreviewTitle = style({
+  fontSize: 14,
+  fontWeight: 600,
+  color: text_primary,
+  marginBottom: 10,
+});
+
+export const recurringDateList = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+  maxHeight: 200,
+  overflowY: "auto",
+});
+
+export const recurringDateItem = style({
+  padding: "8px 10px",
+  borderRadius: 4,
+  fontSize: 14,
+});
+
+export const dateAvailable = style({
+  backgroundColor: "rgba(34, 197, 94, 0.1)",
+  border: "1px solid rgba(34, 197, 94, 0.3)",
+});
+
+export const dateUnavailable = style({
+  backgroundColor: "rgba(239, 68, 68, 0.1)",
+  border: "1px solid rgba(239, 68, 68, 0.3)",
+});
+
+export const recurringDateText = style({
+  color: text_primary,
+  fontWeight: 400,
+});
+
+export const recurringDateWarning = style({
+  fontSize: 12,
+  color: "#ef4444",
+  marginTop: 4,
+  fontWeight: 400,
+});
+
+export const recurringWarning = style({
+  marginTop: 12,
+  padding: 10,
+  backgroundColor: "rgba(251, 191, 36, 0.1)",
+  border: "1px solid rgba(251, 191, 36, 0.3)",
+  borderRadius: 6,
+  fontSize: 13,
+  color: "#fbbf24",
+  fontWeight: 400,
+});

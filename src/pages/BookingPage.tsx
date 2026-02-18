@@ -5,7 +5,8 @@ import { DayPicker } from 'react-day-picker';
 import { addMonths, format, isBefore, startOfDay, getDay } from 'date-fns';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
-import type { Barber, Service, BarberServicePricing, BarberAvailability, BarberTimeOff, Booking, ShopSettings } from '../types/database.types';
+import type { Barber, Service, BarberServicePricing, BarberAvailability, BarberTimeOff, Booking, ShopSettings, RecurrencePattern } from '../types/database.types';
+import { RECURRENCE_LABELS } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
@@ -13,6 +14,7 @@ import * as styles from '../styles/booking.css';
 import * as calendarStyles from '../styles/calendar.css';
 import { CustomerSearchInput } from '../components/CustomerSearchInput';
 import type { Customer } from '../types/database.types';
+import { generateRecurringDates, checkRecurringAvailability, type DateAvailabilityResult } from '../utils/bookingHelpers';
 
 type BookingStep = 0 | 1 | 2 | 3 | 4;
 
@@ -72,6 +74,12 @@ export default function BookingPage() {
     lastName: '',
     phone: '',
   });
+
+  // Recurring appointment state (admin only)
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern>('weekly');
+  const [recurrenceCount, setRecurrenceCount] = useState(8);
+  const [recurringAvailability, setRecurringAvailability] = useState<DateAvailabilityResult[]>([]);
 
   useEffect(() => {
     loadData();
@@ -175,6 +183,26 @@ export default function BookingPage() {
       }
     }
   }, [loading, user, services, barbers]);
+
+  // Check recurring availability when recurring options change
+  useEffect(() => {
+    if (!isRecurring || !selectedDate || !selectedTime || !selectedBarber || !selectedService) {
+      setRecurringAvailability([]);
+      return;
+    }
+
+    const dates = generateRecurringDates(selectedDate, recurrencePattern, recurrenceCount);
+    const results = checkRecurringAvailability(
+      dates,
+      selectedTime,
+      selectedBarber.id,
+      selectedService.duration_minutes,
+      availability,
+      timeOff,
+      existingBookings
+    );
+    setRecurringAvailability(results);
+  }, [isRecurring, selectedDate, selectedTime, selectedBarber, selectedService, recurrencePattern, recurrenceCount, availability, timeOff, existingBookings]);
 
   const loadData = async () => {
     try {
@@ -549,38 +577,86 @@ export default function BookingPage() {
         }
       }
 
-      // Create the booking
-      const { error: bookingError } = await supabase
-        .from('bookings')
-        .insert({
-          customer_id: isAdmin
-            ? selectedCustomer?.id
-            : user.id,
-          created_by_admin: isAdmin,
+      // Create the booking(s)
+      if (isRecurring && isAdmin && recurringAvailability.length > 0) {
+        // Create multiple recurring bookings
+        const groupId = crypto.randomUUID();
+        const availableDates = recurringAvailability.filter(r => r.available);
+
+        if (availableDates.length === 0) {
+          alert('No available dates for the recurring appointment. Please adjust your selection.');
+          setBookingInProgress(false);
+          return;
+        }
+
+        const bookingsToInsert = availableDates.map((result, index) => ({
+          customer_id: selectedCustomer?.id,
+          created_by_admin: true,
           barber_id: bookingBarber.id,
           service_id: selectedService.id,
-          booking_date: format(selectedDate, 'yyyy-MM-dd'),
+          booking_date: result.dateString,
           start_time: selectedTime,
           end_time: endTime,
           total_price: totalPrice,
-          status: 'confirmed',
+          status: 'confirmed' as const,
           cancellation_fee_charged: false,
           reminder_sent: false,
           review_request_sent: false,
+          recurrence_group_id: groupId,
+          recurrence_pattern: recurrencePattern,
+          recurrence_index: index,
+        }));
+
+        const { error: bookingError } = await supabase
+          .from('bookings')
+          .insert(bookingsToInsert);
+
+        if (bookingError) throw bookingError;
+
+        // Store booking details for confirmation screen
+        const skippedCount = recurringAvailability.length - availableDates.length;
+        setConfirmedBookingDetails({
+          serviceName: selectedService.name,
+          barberName: bookingBarber.name,
+          date: `${availableDates.length} appointments scheduled${skippedCount > 0 ? ` (${skippedCount} skipped)` : ''}`,
+          time: formatTimeTo12Hour(selectedTime),
+          price: totalPrice * availableDates.length,
+          rewardPoints: selectedService.reward_points * availableDates.length,
         });
+      } else {
+        // Create single booking
+        const { error: bookingError } = await supabase
+          .from('bookings')
+          .insert({
+            customer_id: isAdmin
+              ? selectedCustomer?.id
+              : user.id,
+            created_by_admin: isAdmin,
+            barber_id: bookingBarber.id,
+            service_id: selectedService.id,
+            booking_date: format(selectedDate, 'yyyy-MM-dd'),
+            start_time: selectedTime,
+            end_time: endTime,
+            total_price: totalPrice,
+            status: 'confirmed',
+            cancellation_fee_charged: false,
+            reminder_sent: false,
+            review_request_sent: false,
+          });
 
-      if (bookingError) throw bookingError;
+        if (bookingError) throw bookingError;
 
-      // Store booking details for confirmation screen
-      // Show actual assigned barber name even if "Any Barber" was selected
-      setConfirmedBookingDetails({
-        serviceName: selectedService.name,
-        barberName: bookingBarber.name,
-        date: formatDate(selectedDate),
-        time: formatTimeTo12Hour(selectedTime),
-        price: totalPrice,
-        rewardPoints: rescheduleFromId ? 0 : selectedService.reward_points,
-      });
+        // Store booking details for confirmation screen
+        // Show actual assigned barber name even if "Any Barber" was selected
+        setConfirmedBookingDetails({
+          serviceName: selectedService.name,
+          barberName: bookingBarber.name,
+          date: formatDate(selectedDate),
+          time: formatTimeTo12Hour(selectedTime),
+          price: totalPrice,
+          rewardPoints: rescheduleFromId ? 0 : selectedService.reward_points,
+        });
+      }
 
       // Show confirmation screen
       setShowConfirmation(true);
@@ -1105,6 +1181,79 @@ export default function BookingPage() {
                   Cancellations within 12 hours will incur a 50% cancellation fee.
                 </Text>
               </View>
+
+              {/* Recurring appointment option (admin only) */}
+              {isAdmin && !isReschedule && (
+                <View className={styles.recurringSection}>
+                  <label className={styles.recurringCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={isRecurring}
+                      onChange={(e) => setIsRecurring(e.target.checked)}
+                      className={styles.recurringCheckbox}
+                    />
+                    <Text className={styles.recurringCheckboxText}>Make this appointment recurring</Text>
+                  </label>
+
+                  {isRecurring && (
+                    <View className={styles.recurringOptions}>
+                      <View className={styles.recurringOptionGroup}>
+                        <Text className={styles.recurringOptionLabel}>Frequency</Text>
+                        <select
+                          value={recurrencePattern}
+                          onChange={(e) => setRecurrencePattern(e.target.value as RecurrencePattern)}
+                          className={styles.recurringSelect}
+                        >
+                          <option value="weekly">{RECURRENCE_LABELS['weekly']}</option>
+                          <option value="biweekly">{RECURRENCE_LABELS['biweekly']}</option>
+                          <option value="monthly">{RECURRENCE_LABELS['monthly']}</option>
+                        </select>
+                      </View>
+
+                      <View className={styles.recurringOptionGroup}>
+                        <Text className={styles.recurringOptionLabel}>Number of appointments</Text>
+                        <select
+                          value={recurrenceCount}
+                          onChange={(e) => setRecurrenceCount(Number(e.target.value))}
+                          className={styles.recurringSelect}
+                        >
+                          <option value={4}>4 appointments</option>
+                          <option value={8}>8 appointments</option>
+                          <option value={12}>12 appointments</option>
+                        </select>
+                      </View>
+
+                      {recurringAvailability.length > 0 && (
+                        <View className={styles.recurringPreview}>
+                          <Text className={styles.recurringPreviewTitle}>Scheduled dates:</Text>
+                          <View className={styles.recurringDateList}>
+                            {recurringAvailability.map((result, index) => (
+                              <View
+                                key={result.dateString}
+                                className={`${styles.recurringDateItem} ${result.available ? styles.dateAvailable : styles.dateUnavailable}`}
+                              >
+                                <Text className={styles.recurringDateText}>
+                                  {index + 1}. {format(result.date, 'EEE, MMM d, yyyy')}
+                                </Text>
+                                {!result.available && (
+                                  <Text className={styles.recurringDateWarning}>
+                                    {result.reason}
+                                  </Text>
+                                )}
+                              </View>
+                            ))}
+                          </View>
+                          {recurringAvailability.some(r => !r.available) && (
+                            <Text className={styles.recurringWarning}>
+                              Some dates are unavailable. These appointments will be skipped.
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                    </View>
+                  )}
+                </View>
+              )}
 
               {/* Show different UI based on auth state */}
               {user ? (

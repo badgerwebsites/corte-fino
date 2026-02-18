@@ -21,6 +21,76 @@ type AdminTab =
   | 'rewards'
   | 'settings';
 
+// Price input component that only saves on blur for better performance
+function PriceInput({
+  initialValue,
+  onSave,
+  className,
+  placeholder = '$',
+}: {
+  initialValue: number;
+  onSave: (value: number) => void;
+  className?: string;
+  placeholder?: string;
+}) {
+  const [localValue, setLocalValue] = useState(initialValue > 0 ? initialValue.toString() : '');
+  const lastSavedValue = useRef<number | null>(null);
+
+  // Only update from props if it's a genuinely new value (not our pending save catching up)
+  useEffect(() => {
+    const currentNumValue = parseFloat(localValue) || 0;
+    // Only sync from props if:
+    // 1. We haven't saved a value yet, OR
+    // 2. The prop matches what we saved (confirming our save), OR
+    // 3. The prop is different from both what we have and what we saved (external change)
+    if (lastSavedValue.current === null) {
+      // Initial mount - sync from props
+      setLocalValue(initialValue > 0 ? initialValue.toString() : '');
+    } else if (initialValue === lastSavedValue.current) {
+      // Our save was confirmed - keep showing our value (no flicker)
+      lastSavedValue.current = null;
+    } else if (initialValue !== currentNumValue && initialValue !== lastSavedValue.current) {
+      // External change - sync from props
+      setLocalValue(initialValue > 0 ? initialValue.toString() : '');
+      lastSavedValue.current = null;
+    }
+  }, [initialValue]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalValue(e.target.value);
+  };
+
+  const handleBlur = () => {
+    const numValue = parseFloat(localValue) || 0;
+    const currentPropValue = initialValue || 0;
+    // Only save if value actually changed
+    if (numValue !== currentPropValue) {
+      lastSavedValue.current = numValue;
+      onSave(numValue);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur();
+    }
+  };
+
+  return (
+    <input
+      type="number"
+      step="1"
+      min="0"
+      className={className}
+      value={localValue}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      placeholder={placeholder}
+    />
+  );
+}
+
 export default function AdminPage() {
   const { user, customer, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -168,21 +238,28 @@ export default function AdminPage() {
 
   const handlePriceUpdate = async (barberId: string, serviceId: string, timePeriod: 'regular' | 'evening', dayOfWeek: number, newPrice: number) => {
     try {
-      const existingPrice = pricing.find(
-        p => p.barber_id === barberId &&
-             p.service_id === serviceId &&
-             p.time_period === timePeriod &&
-             p.day_of_week === dayOfWeek
-      );
+      // First, check the database directly for existing record (not local state which may be stale)
+      const { data: existingRecords, error: fetchError } = await supabase
+        .from('barber_service_pricing')
+        .select('id')
+        .eq('barber_id', barberId)
+        .eq('service_id', serviceId)
+        .eq('time_period', timePeriod)
+        .eq('day_of_week', dayOfWeek)
+        .limit(1);
 
-      if (existingPrice) {
+      if (fetchError) throw fetchError;
+
+      if (existingRecords && existingRecords.length > 0) {
+        // Update existing record
         const { error } = await supabase
           .from('barber_service_pricing')
           .update({ price: newPrice })
-          .eq('id', existingPrice.id);
+          .eq('id', existingRecords[0].id);
 
         if (error) throw error;
       } else {
+        // Insert new record
         const { error } = await supabase
           .from('barber_service_pricing')
           .insert({
@@ -672,35 +749,27 @@ export default function AdminPage() {
                     {DAY_NAMES.map((_, dayIndex) => (
                       <View key={dayIndex} className={styles.dayPricingCell}>
                         <View className={styles.dayPricingInputGroup}>
-                          <input
-                            type="number"
-                            step="1"
-                            min="0"
-                            className={styles.dayPriceInput}
-                            value={getPrice(barber.id, service.id, 'regular', dayIndex) || ''}
-                            onChange={(e) => handlePriceUpdate(
+                          <PriceInput
+                            initialValue={getPrice(barber.id, service.id, 'regular', dayIndex)}
+                            onSave={(value) => handlePriceUpdate(
                               barber.id,
                               service.id,
                               'regular',
                               dayIndex,
-                              parseFloat(e.target.value) || 0
+                              value
                             )}
-                            placeholder="$"
-                          />
-                          <input
-                            type="number"
-                            step="1"
-                            min="0"
                             className={styles.dayPriceInput}
-                            value={getPrice(barber.id, service.id, 'evening', dayIndex) || ''}
-                            onChange={(e) => handlePriceUpdate(
+                          />
+                          <PriceInput
+                            initialValue={getPrice(barber.id, service.id, 'evening', dayIndex)}
+                            onSave={(value) => handlePriceUpdate(
                               barber.id,
                               service.id,
                               'evening',
                               dayIndex,
-                              parseFloat(e.target.value) || 0
+                              value
                             )}
-                            placeholder="$"
+                            className={styles.dayPriceInput}
                           />
                         </View>
                       </View>
