@@ -18,6 +18,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [heroBackground, setHeroBackground] = useState<string>(DEFAULT_HERO_BACKGROUND);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Hero carousel state (matches nav carousel)
   const [heroLogoIndex, setHeroLogoIndex] = useState(0);
@@ -54,6 +55,8 @@ export default function HomePage() {
         ]);
       } catch (error) {
         console.error('Error loading data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -93,8 +96,10 @@ export default function HomePage() {
         >
           <View className={styles.heroOverlay} />
 
-          <View className={styles.heroContent}>
-            {activeHeroLogos.length > 1 ? (
+          <View className={`${styles.heroContent} ${isLoading ? styles.heroContentLoading : ''}`}>
+            {isLoading ? (
+              <View className={styles.heroLogoPlaceholder} />
+            ) : activeHeroLogos.length > 1 ? (
               <View className={styles.heroCarouselContainer}>
                 <View
                   className={styles.heroCarouselTrack}

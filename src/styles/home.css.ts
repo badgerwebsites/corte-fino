@@ -76,6 +76,11 @@ export const heroContent = style({
   animation: `${fadeIn} 1s ease-out`,
 });
 
+export const heroContentLoading = style({
+  opacity: 0,
+  animation: "none",
+});
+
 export const heroLogoLarge = style({
   width: "100%",
   height: "auto",
@@ -91,6 +96,19 @@ export const heroLogoLarge = style({
 
 export const heroLogoWhite = style({
   filter: "brightness(0) invert(1)",
+});
+
+export const heroLogoPlaceholder = style({
+  width: "100%",
+  maxWidth: 400,
+  aspectRatio: "1 / 1",
+  marginBottom: 60,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      maxWidth: 400,
+      marginBottom: 80,
+    },
+  },
 });
 
 export const heroCarouselContainer = style({
