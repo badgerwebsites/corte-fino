@@ -15,6 +15,7 @@ import * as calendarStyles from '../styles/calendar.css';
 import { CustomerSearchInput } from '../components/CustomerSearchInput';
 import type { Customer } from '../types/database.types';
 import { generateRecurringDates, checkRecurringAvailability, type DateAvailabilityResult } from '../utils/bookingHelpers';
+import { ChevronDown } from "lucide-react";
 
 type BookingStep = 0 | 1 | 2 | 3 | 4;
 
@@ -1192,40 +1193,44 @@ export default function BookingPage() {
                       onChange={(e) => setIsRecurring(e.target.checked)}
                       className={styles.recurringCheckbox}
                     />
-                    <Text className={styles.recurringCheckboxText}>Make this appointment recurring</Text>
+                    <Text className={styles.recurringCheckboxText}>Recurring Appointment</Text>
                   </label>
 
                   {isRecurring && (
                     <View className={styles.recurringOptions}>
                       <View className={styles.recurringOptionGroup}>
                         <Text className={styles.recurringOptionLabel}>Frequency</Text>
-                        <select
-                          value={recurrencePattern}
-                          onChange={(e) => setRecurrencePattern(e.target.value as RecurrencePattern)}
-                          className={styles.recurringSelect}
-                        >
-                          <option value="weekly">{RECURRENCE_LABELS['weekly']}</option>
-                          <option value="biweekly">{RECURRENCE_LABELS['biweekly']}</option>
-                          <option value="monthly">{RECURRENCE_LABELS['monthly']}</option>
-                        </select>
+                        <View className={styles.selectWrapper}>
+                          <select
+                            value={recurrencePattern}
+                            onChange={(e) => setRecurrencePattern(e.target.value as RecurrencePattern)}
+                            className={styles.recurringSelect}
+                          >
+                            <option value="weekly">{RECURRENCE_LABELS['weekly']}</option>
+                            <option value="biweekly">{RECURRENCE_LABELS['biweekly']}</option>
+                            <option value="monthly">{RECURRENCE_LABELS['monthly']}</option>
+                          </select>
+                          <ChevronDown size={18} className={styles.selectIcon} />
+                        </View>
                       </View>
 
                       <View className={styles.recurringOptionGroup}>
                         <Text className={styles.recurringOptionLabel}>Number of appointments</Text>
-                        <select
-                          value={recurrenceCount}
-                          onChange={(e) => setRecurrenceCount(Number(e.target.value))}
-                          className={styles.recurringSelect}
-                        >
-                          <option value={4}>4 appointments</option>
-                          <option value={8}>8 appointments</option>
-                          <option value={12}>12 appointments</option>
-                        </select>
+                        <View className={styles.selectWrapper}>
+                          <select
+                            value={recurrenceCount}
+                            onChange={(e) => setRecurrenceCount(Number(e.target.value))}
+                            className={styles.recurringSelect}
+                          >
+                            <option value={4}>4 appointments</option>
+                            <option value={8}>8 appointments</option>
+                            <option value={12}>12 appointments</option>
+                          </select>
+                          <ChevronDown size={18} className={styles.selectIcon} />
+                        </View>
                       </View>
 
-                      {recurringAvailability.length > 0 && (
-                        <View className={styles.recurringPreview}>
-                          <Text className={styles.recurringPreviewTitle}>Scheduled dates:</Text>
+                        {recurringAvailability.length > 0 && (
                           <View className={styles.recurringDateList}>
                             {recurringAvailability.map((result, index) => (
                               <View
@@ -1242,7 +1247,6 @@ export default function BookingPage() {
                                 )}
                               </View>
                             ))}
-                          </View>
                           {recurringAvailability.some(r => !r.available) && (
                             <Text className={styles.recurringWarning}>
                               Some dates are unavailable. These appointments will be skipped.
@@ -1255,7 +1259,6 @@ export default function BookingPage() {
                 </View>
               )}
 
-              {/* Show different UI based on auth state */}
               {user ? (
                 // Logged in user - show confirm button
                 <View className={styles.buttonGroup}>
@@ -1423,9 +1426,6 @@ export default function BookingPage() {
               <Link to="/dashboard" className={styles.confirmationPrimaryButton}>
                 Back to Dashboard
               </Link>
-              {/* <Link to="/" className={styles.confirmationSecondaryButton}>
-                Back to Home
-              </Link> */}
             </View>
           </div>
         </div>

@@ -82,12 +82,15 @@ export const codeModal = style({
 });
 
 export const codeModalContent = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  textAlign: 'center',
   backgroundColor: dark_bg,
   borderRadius: 16,
   padding: 20,
   maxWidth: 400,
   width: "100%",
-  textAlign: "center",
   boxShadow: "0 24px 48px rgba(0, 0, 0, 0.2)",
   border: `1px solid ${border_subtle}`,
 });
@@ -121,17 +124,18 @@ export const codeModalHint = style({
 });
 
 export const codeModalButton = style({
-  padding: "12px 24px",
-  fontSize: 18,
-  fontWeight: 500,
+  padding: "12px 16px",
+  fontSize: 16,
+  fontWeight: 600,  
+  letterSpacing: '0.05em',
+  textTransform: 'uppercase',
   backgroundColor: button,
   color: "#1a1a1a",
   borderRadius: 8,
-  border: `1px solid ${text_muted}`,
+  border: `1px solid ${border_subtle}`,
   cursor: "pointer",
   transition: "all 0.3s ease",
   marginTop: 12,
-  letterSpacing: "0.05em",
   ':hover': {
     transform: 'translateY(-1px)',
     boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
@@ -347,16 +351,17 @@ export const progressText = style({
 
 export const redeemButton = style({
   padding: "12px 24px",
-  fontSize: 16,
-  fontWeight: 500,
+  fontSize: 15,
+  fontWeight: 600,
+  letterSpacing: '0.05em',
+  textTransform: 'uppercase',
   backgroundColor: button,
   color: "#1a1a1a",
   borderRadius: 8,
-  border: `1px solid ${text_muted}`,
+  border: `1px solid ${border_subtle}`,
   cursor: "pointer",
   transition: "all 0.3s ease",
   marginTop: "auto",
-  letterSpacing: "0.05em",
   ':hover': {
     transform: 'translateY(-1px)',
     boxShadow: '0 4px 12px rgba(168,220,232,0.4)',

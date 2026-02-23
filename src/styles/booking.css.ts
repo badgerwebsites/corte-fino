@@ -613,7 +613,7 @@ export const confirmButton = style({
   backgroundColor: '#22c55e',
   color: "#1a1a1a",
   borderRadius: 8,
-  border: `1px solid ${text_muted}`,
+  border: `1px solid ${border_subtle}`,
   cursor: "pointer",
   transition: "all 0.3s ease",
   letterSpacing: "0.05em",
@@ -652,7 +652,7 @@ export const confirmationOverlay = style({
 export const confirmationModal = style({
   backgroundColor: dark_bg,
   borderRadius: 16,
-  padding: 20,
+  padding: 16,
   maxWidth: 350,
   width: "100%",
   boxShadow: "0 24px 48px rgba(0, 0, 0, 0.16)",
@@ -661,7 +661,7 @@ export const confirmationModal = style({
   animation: `${slideInUp} 0.4s ease-out`,
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: 40,
+      padding: 32,
     },
   },
 });
@@ -689,8 +689,8 @@ export const confirmationCheckmark = style({
   color: "#166534",
   "@media": {
     "screen and (min-width: 768px)": {
-      width: 40,
-      height: 40,
+      width: 48,
+      height: 48,
     },
   },
 });
@@ -699,7 +699,6 @@ export const confirmationTitle = style({
   fontSize: 24,
   fontWeight: 600,
   color: text_primary,
-  letterSpacing: "-0.02em",
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 28,
@@ -708,9 +707,10 @@ export const confirmationTitle = style({
 });
 
 export const confirmationDetails = style({
-  backgroundColor: darker_bg,
+  // backgroundColor: darker_bg,
   borderRadius: 12,
-  padding: 20,
+  border: `1px solid ${text_secondary}`,
+  padding: 16,
   marginTop: 12,
   marginBottom: 12,
   textAlign: "left",
@@ -722,7 +722,7 @@ export const confirmationDetailRow = style({
   alignItems: "center",
   paddingTop: 12,
   paddingBottom: 12,
-  borderBottom: "1px solid #f0f0f0",
+  borderBottom: `1px solid ${text_primary}`,
   selectors: {
     "&:first-child": {
       paddingTop: 0,
@@ -735,13 +735,13 @@ export const confirmationDetailRow = style({
 });
 
 export const confirmationDetailLabel = style({
-  fontSize: 14,
+  fontSize: 16,
   color: text_secondary,
   fontWeight: 400,
 });
 
 export const confirmationDetailValue = style({
-  fontSize: 14,
+  fontSize: 16,
   color: text_primary,
   fontWeight: 500,
   textAlign: "right",
@@ -749,37 +749,32 @@ export const confirmationDetailValue = style({
 
 export const confirmationButtons = style({
   marginTop: 24,
-  marginBottom: 8,
+  marginBottom: 12,
   "@media": {
     "screen and (min-width: 768px)": {
-      marginTop: 32,
+      marginTop: 28,
+      marginBottom: 0,
     },
   },
 });
 
 export const confirmationPrimaryButton = style({
-  padding: "12px 24px",
+  padding: "12px 16px",
+  backgroundColor: "transparent",
+  color: button,
+  borderRadius: 8,
   fontSize: 18,
   fontWeight: 500,
-  backgroundColor: button,
-  color: "#1a1a1a",
-  borderRadius: 8,
-  textDecoration: "none",
-  border: `1px solid ${text_muted}`,
   cursor: "pointer",
-  transition: "all 0.3s ease",
-  letterSpacing: "0.05em",
+  transition: "all 0.2s ease",
+  textDecoration: "none",
+  border: `3px solid ${button}`,
   ':hover': {
-    transform: 'translateY(-1px)',
     boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
-  },
-  ":active": {
-    transform: "translateY(0)",
   },
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: "16px 32px",
-      fontSize: 20,
+      fontSize: 22,
     },
   },
 });
@@ -970,16 +965,8 @@ export const guestBackLink = style({
 export const recurringSection = style({
   marginTop: 16,
   marginBottom: 16,
-  padding: 16,
-  backgroundColor: darker_bg,
-  borderRadius: 8,
-  border: `1px solid ${border_subtle}`,
+  padding: 4,
   textAlign: "left",
-  "@media": {
-    "screen and (min-width: 768px)": {
-      padding: 20,
-    },
-  },
 });
 
 export const recurringCheckboxLabel = style({
@@ -997,7 +984,7 @@ export const recurringCheckbox = style({
 });
 
 export const recurringCheckboxText = style({
-  fontSize: 16,
+  fontSize: 18,
   fontWeight: 500,
   color: text_primary,
 });
@@ -1016,45 +1003,47 @@ export const recurringOptionGroup = style({
 });
 
 export const recurringOptionLabel = style({
-  fontSize: 14,
+  fontSize: 16,
   color: text_secondary,
   fontWeight: 500,
 });
 
+export const selectWrapper = style({
+  position: "relative",
+  width: "100%",
+});
+
 export const recurringSelect = style({
-  padding: "10px 14px",
+  padding: "10px 40px 10px 14px",
   fontSize: 16,
   borderRadius: 6,
   backgroundColor: dark_bg,
-  border: `1px solid ${border_subtle}`,
+  border: `1px solid ${text_secondary}`,
   color: text_primary,
   cursor: "pointer",
   outline: "none",
   transition: "border-color 0.2s ease",
-  ":focus": {
-    borderColor: button,
-  },
+
+  appearance: "none",
+  WebkitAppearance: "none",
+  MozAppearance: "none",
+
+  width: "100%",
 });
 
-export const recurringPreview = style({
-  marginTop: 8,
-  padding: 12,
-  backgroundColor: dark_bg,
-  borderRadius: 6,
-  border: `1px solid ${border_subtle}`,
-});
-
-export const recurringPreviewTitle = style({
-  fontSize: 14,
-  fontWeight: 600,
-  color: text_primary,
-  marginBottom: 10,
+export const selectIcon = style({
+  position: "absolute",
+  right: 12,
+  top: "50%",
+  transform: "translateY(-50%)",
+  pointerEvents: "none",
+  color: text_secondary,
 });
 
 export const recurringDateList = style({
   display: "flex",
   flexDirection: "column",
-  gap: 6,
+  gap: 8,
   maxHeight: 200,
   overflowY: "auto",
 });

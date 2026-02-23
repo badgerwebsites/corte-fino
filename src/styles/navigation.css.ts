@@ -1,6 +1,9 @@
 // styles/navigation.css.ts
 import { style } from '@vanilla-extract/css';
 
+const button =  "#96cfe0";
+const text_primary = "#f5f5f5";
+
 export const nav = style({
   position: 'fixed',
   top: 0,
@@ -10,8 +13,7 @@ export const nav = style({
   backgroundColor: '#101214',
   boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
   padding: '12px 12px',
-  borderBottom: '1px solid #ffffff',
-
+  borderBottom: `1px solid ${text_primary}`,
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '12px 18px',
@@ -114,9 +116,9 @@ const baseButton = {
 export const loginButton = style({
   ...baseButton,
 
-  color: '#ffffff',
+  color: text_primary,
   backgroundColor: 'transparent',
-  border: '3px solid #ffffff',
+  border: `3px solid ${text_primary}`,
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '4px 12px',
@@ -124,7 +126,8 @@ export const loginButton = style({
     },
   },
   ':hover': {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    color: button,
+    border: `3px solid ${button}`,
   },
   ':active': {
     transform: 'scale(0.97)',
@@ -148,7 +151,8 @@ export const logoutButton = style({
     },
   },
   ':hover': {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    color: '#a93232',
+    border: '3px solid #a93232',
   },
   ':active': {
     transform: 'scale(0.97)',

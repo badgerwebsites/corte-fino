@@ -1183,7 +1183,7 @@ export const rescheduleCancel = style({
   fontWeight: '600',
   backgroundColor: 'transparent',
   color: text_primary,
-  border: '1px solid #555',
+  border: `1px solid ${text_primary}`,
   borderRadius: 8,
   cursor: 'pointer',
   transition: 'all 0.2s',
@@ -1232,14 +1232,15 @@ export const cancelSingleButton = style({
   padding: '12px 16px',
   fontSize: 15,
   fontWeight: '600',
-  backgroundColor: '#fbbf24',
-  color: '#1a1a1a',
+  backgroundColor: '#b45309',
+  color: '#ffffff',
   border: 'none',
   borderRadius: 8,
   cursor: 'pointer',
-  transition: 'all 0.2s',
+  transition: 'all 0.2s ease',
+
   ':hover': {
-    backgroundColor: '#f59e0b',
+    backgroundColor: '#92400e',
   },
 });
 
@@ -1247,13 +1248,14 @@ export const cancelAllButton = style({
   padding: '12px 16px',
   fontSize: 15,
   fontWeight: '600',
-  backgroundColor: '#ef4444',
+  backgroundColor: '#991b1b',  // deep red
   color: '#ffffff',
   border: 'none',
   borderRadius: 8,
   cursor: 'pointer',
-  transition: 'all 0.2s',
+  transition: 'all 0.2s ease',
+
   ':hover': {
-    backgroundColor: '#dc2626',
+    backgroundColor: '#7f1d1d',
   },
 });

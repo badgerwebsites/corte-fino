@@ -257,11 +257,40 @@ export default function CustomerDashboardPage() {
             <View className={styles.header}>
               <Text className={styles.greeting}>Welcome back, {customer?.first_name}</Text>
               {bookings.length > 0 && (
-                <View className={styles.section}>
-                  <Link to="/book" className={styles.primaryCta}>
-                    Book Appointment
-                  </Link>
-                </View>
+                <Link to="/book" className={styles.primaryCta}>
+                  Book Appointment
+                </Link>
+              )}
+              {/* Rewards Card */}
+              {siteSettings?.rewards_enabled !== false && (
+                // <View className={styles.section}>
+                  <View className={styles.rewardsCard}>
+                    <View className={styles.rewardsInfo}>
+                      <svg
+                        className={styles.rewardsIcon}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                      >
+                        <rect x="3" y="8" width="18" height="13" rx="2" />
+                        <line x1="12" y1="8" x2="12" y2="21" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <path d="M12 8c0-2-1.5-4-3-4-1.5 0-2.5 1-2.5 2.5C6.5 8 9 8 12 8z" />
+                        <path d="M12 8c0-2 1.5-4 3-4 1.5 0 2.5 1 2.5 2.5C17.5 8 15 8 12 8z" />
+                      </svg>
+                      <Text className={styles.rewardsText}>
+                        <span className={styles.rewardsPoints}>{customer?.reward_points || 0}</span> points
+                      </Text>
+                    </View>
+                    <Link to="/rewards" className={styles.rewardsLink}>
+                      Rewards
+                    </Link>
+                  </View>
+                // </View>
               )}
             </View>
 
@@ -314,7 +343,10 @@ export default function CustomerDashboardPage() {
                           {group.nextBooking.barber && <Text>with {group.nextBooking.barber.name}</Text>}
                         </View>
                         <Text className={styles.recurringBadge}>
-                          Recurring {RECURRENCE_LABELS[group.pattern as keyof typeof RECURRENCE_LABELS] || group.pattern} · {group.remainingCount} remaining
+                          Recurring {RECURRENCE_LABELS[group.pattern as keyof typeof RECURRENCE_LABELS] || group.pattern} ·{" "}
+                          <span className={styles.remainingText}>
+                            {group.remainingCount} remaining
+                          </span>
                         </Text>
                       </View>
                       <View className={styles.bookingRight}>
@@ -330,10 +362,10 @@ export default function CustomerDashboardPage() {
                     {/* Expandable list of all appointments in the series */}
                     {expandedRecurring === group.groupId && (
                       <View className={styles.recurringList}>
-                        {group.allBookings.map((booking, index) => (
+                        {group.allBookings.map((booking) => (
                           <View key={booking.id} className={styles.recurringItem}>
                             <Text className={styles.recurringItemDate}>
-                              {index === 0 ? 'Next: ' : ''}{formatDateShort(booking.booking_date)} at {formatTime(booking.start_time)}
+                              {formatDateShort(booking.booking_date)} at {formatTime(booking.start_time)}
                             </Text>
                           </View>
                         ))}
@@ -407,38 +439,6 @@ export default function CustomerDashboardPage() {
               </View>
             )}
           </View>
-
-          {/* Rewards Card */}
-          {siteSettings?.rewards_enabled !== false && (
-            <View className={styles.section}>
-              <View className={styles.rewardsCard}>
-                <View className={styles.rewardsInfo}>
-                  <svg
-                    className={styles.rewardsIcon}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden
-                  >
-                    <rect x="3" y="8" width="18" height="13" rx="2" />
-                    <line x1="12" y1="8" x2="12" y2="21" />
-                    <line x1="3" y1="12" x2="21" y2="12" />
-                    <path d="M12 8c0-2-1.5-4-3-4-1.5 0-2.5 1-2.5 2.5C6.5 8 9 8 12 8z" />
-                    <path d="M12 8c0-2 1.5-4 3-4 1.5 0 2.5 1 2.5 2.5C17.5 8 15 8 12 8z" />
-                  </svg>
-                  <Text className={styles.rewardsText}>
-                    <span className={styles.rewardsPoints}>{customer?.reward_points || 0}</span> points
-                  </Text>
-                </View>
-                <Link to="/rewards" className={styles.rewardsLink}>
-                  Rewards
-                </Link>
-              </View>
-            </View>
-          )}
         </View>
       </View>
 
@@ -524,7 +524,7 @@ export default function CustomerDashboardPage() {
                   onClick={() => handleCancelBooking('single')}
                   disabled={cancelling}
                 >
-                  {cancelling ? 'Cancelling...' : 'Cancel'}
+                  {cancelling ? 'Cancelling...' : 'Delete'}
                 </button>
               </View>
             )}

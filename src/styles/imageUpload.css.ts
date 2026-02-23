@@ -101,7 +101,7 @@ export const removeOverlay = style({
   width: 32,
   height: 32,
   borderRadius: '50%',
-  backgroundColor: '#dc2626',
+  backgroundColor: '#c24141',
   color: darker_bg,
   border: 'none',
   fontSize: 16,
@@ -113,7 +113,7 @@ export const removeOverlay = style({
   transition: 'all 0.2s',
 
   ':hover': {
-    backgroundColor: '#b91c1c',
+    backgroundColor: '#a93232',
     transform: 'scale(1.05)',
   },
 });

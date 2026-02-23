@@ -11,13 +11,12 @@ const border_subtle = "rgba(255,255,255,0.08)";
 export const container = style({
   minHeight: "100vh",
   backgroundColor: darker_bg,
-  paddingTop: 72,
+  paddingTop: 60,
   paddingBottom: 100,
   gap: 20,
-
   "@media": {
     "screen and (min-width: 768px)": {
-      paddingTop: 84,
+      paddingTop: 78,
     },
   },
 });
@@ -40,7 +39,8 @@ export const header = style({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-
+  marginTop: 8,
+  marginBottom: 12,
   "@media": {
     "screen and (min-width: 768px)": {
       flexDirection: "row",
@@ -54,12 +54,11 @@ export const greeting = style({
   fontWeight: 600,
   color: text_primary,
   letterSpacing: "-0.02em",
-  marginBottom: 4,
-  // marginTop: 4,
+  marginBottom: 8,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 28,
-      marginTop: 8,
+      marginBottom: 0,
     },
   },
 });
@@ -74,7 +73,7 @@ export const primaryCta = style({
   textTransform: 'uppercase',
   backgroundColor: button,
   color: '#1f1f1f',
-  border: "none",
+  border: `1px solid ${border_subtle}`,
   borderRadius: 10,
   cursor: "pointer",
   textDecoration: "none",
@@ -99,14 +98,13 @@ export const statsRow = style({
 
 export const section = style({
   marginBottom: 16,
-  marginTop: 8,
+  // marginTop: 8,
 });
 
 export const sectionHeader = style({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  // marginBottom: 12,
 });
 
 export const emptyState = style({
@@ -114,24 +112,24 @@ export const emptyState = style({
   flexDirection: "column",
   alignItems: "center",
   textAlign: "center",
-  padding: "20px",
+  padding: "8px",
   gap: 16,
-  backgroundColor: dark_bg,
-  borderRadius: 16,
-  border: `1px solid ${border_subtle}`,
-  boxShadow: "0 12px 32px rgba(0,0,0,0.6)",
+  // backgroundColor: dark_bg,
+  // borderRadius: 16,
+  // border: `1px solid ${border_subtle}`,
+  // boxShadow: "0 12px 32px rgba(0,0,0,0.6)",
   margin: "0 auto",
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: "32px",
+      padding: "20px",
       gap: 20,
     },
   },
 });
 
 export const emptyStateIcon = style({
-  width: 48,
-  height: 48,
+  width: 68,
+  height: 68,
   color: text_primary,
   "@media": {
     "screen and (min-width: 768px)": {
@@ -148,20 +146,20 @@ export const emptyStateTitle = style({
   letterSpacing: "-0.01em",
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 24,
+      fontSize: 28,
     },
   },
 });
 
 export const emptyStateText = style({
-  fontSize: 14,
+  fontSize: 16,
   color: text_secondary,
   lineHeight: 1.5,
   maxWidth: 280,
 
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 16,
+      fontSize: 18,
       maxWidth: 340,
     },
   },
@@ -177,6 +175,7 @@ export const emptyStateButton = style({
   backgroundColor: button,
   color: '#1f1f1f',
   borderRadius: 10,
+  border: `1px solid ${border_subtle}`,
   textDecoration: "none",
   transition: "all 0.15s",
   ':hover': {
@@ -197,20 +196,19 @@ export const emptyStateButton = style({
 export const bookingsList = style({
   display: "flex",
   flexDirection: "column",
-  gap: 12,
+  gap: 16,
 });
 
 export const bookingCard = style({
   padding: "20px",
-  backgroundColor: dark_bg,
+  // backgroundColor: dark_bg,
   borderRadius: 16,
-  border: `1px solid ${border_subtle}`,
+  border: `1px solid ${text_secondary}`,
   boxShadow: "0 12px 32px rgba(0,0,0,0.6)",  
   transition: "border-color 0.15s, box-shadow 0.15s",
-  // ":hover": {
-  //   borderColor: "#e5e5e5",
-  //   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
-  // },
+  ":hover": {
+    border: `1px solid ${text_primary}`,
+  },
 });
 
 export const bookingMain = style({
@@ -226,7 +224,7 @@ export const bookingInfo = style({
 });
 
 export const bookingDate = style({
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 600,
   color: text_primary,
   marginBottom: 6,
@@ -239,7 +237,7 @@ export const bookingDate = style({
 });
 
 export const bookingMeta = style({
-  fontSize: 16,
+  fontSize: 18,
   color: text_secondary,
   lineHeight: 1.5,
   display: "flex",
@@ -255,7 +253,7 @@ export const bookingMeta = style({
 export const bookingTime = style({
   color: text_primary,
   fontWeight: 500,
-  fontSize: 18,
+  fontSize: 20,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 22,
@@ -272,7 +270,7 @@ export const bookingRight = style({
 });
 
 export const bookingPrice = style({
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 600,
   color: text_primary,
   letterSpacing: "-0.01em",
@@ -285,7 +283,7 @@ export const bookingPrice = style({
 
 export const statusBadge = style({
   padding: "4px 8px",
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 600,
   borderRadius: 6,
   textTransform: "uppercase",
@@ -332,7 +330,7 @@ export const bookingActions = style({
 
 export const actionLink = style({
   padding: 0,
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 500,
   backgroundColor: "transparent",
   color: button,
@@ -346,7 +344,7 @@ export const actionLink = style({
 
 export const actionLinkDanger = style({
   padding: 0,
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 500,
   backgroundColor: "transparent",
   color: "#ef4444",
@@ -360,16 +358,16 @@ export const actionLinkDanger = style({
 
 export const rewardsCard = style({
   display: "flex",
+  gap: 20,
   alignItems: "center",
-  justifyContent: "space-between",
-  padding: "16px 12px",
-  backgroundColor: dark_bg,
-  borderRadius: 16,
-  border: `1px solid ${border_subtle}`,
-  boxShadow: "0 12px 32px rgba(0,0,0,0.6)",  
+  justifyContent: "center",
+  textAlign: "center",
+  marginTop: 16,
+  marginBottom: 4,
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: "16px 20px",
+      padding: "8px 0px",
+      margin: 0,
     },
   },
 });
@@ -384,10 +382,11 @@ export const rewardsIcon = style({
   width: 28,
   height: 28,
   color: text_primary,
+  marginBottom: 4,
 });
 
 export const rewardsText = style({
-  fontSize: 18,
+  fontSize: 20,
   color: text_primary,
   fontWeight: 400,
 });
@@ -403,14 +402,16 @@ export const rewardsLink = style({
   fontWeight: 600,  
   letterSpacing: '0.05em',
   textTransform: 'uppercase',
-  backgroundColor: button,
-  color: '#1f1f1f',
+  color: text_primary,
   borderRadius: 10,
+  border: `2px solid ${text_primary}`,
   textDecoration: "none",
   transition: "all 0.15s",
   ':hover': {
-    transform: 'translateY(-1px)',
     boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
+    color: button,
+    borderRadius: 10,
+    border: `2px solid ${button}`,
   },
   ":active": {
     transform: "translateY(0)",
@@ -471,7 +472,6 @@ export const modalTitle = style({
   fontSize: 22,
   fontWeight: 600,
   color: text_primary,
-  letterSpacing: "-0.01em",
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 24,
@@ -484,8 +484,8 @@ export const modalBookingInfo = style({
   flexDirection: "column",
   gap: 6,                
   padding: 16,
-  backgroundColor: darker_bg,
-  borderRadius: 10,
+  border: `1px solid ${text_primary}`,
+  borderRadius: 12,
   marginTop: 12,
   marginBottom: 12,
 });
@@ -530,7 +530,7 @@ export const feeWarningText = style({
 });
 
 export const nofeeText = style({
-  fontSize: 15,
+  fontSize: 16,
   color: text_muted,
 });
 
@@ -542,7 +542,7 @@ export const modalActions = style({
 
 export const modalKeepButton = style({
   flex: 1,
-  padding: "14px 16px",
+  padding: "12px 16px",
   fontSize: 16,
   fontWeight: 500,
   backgroundColor: button,
@@ -562,7 +562,7 @@ export const modalKeepButton = style({
 
 export const modalCancelButton = style({
   flex: 1,
-  padding: "14px 16px",
+  padding: "12px 16px",
   fontSize: 16,
   fontWeight: 500,
   backgroundColor: "#dc2626",
@@ -584,25 +584,31 @@ export const modalCancelButton = style({
 export const recurringBadge = style({
   display: "inline-block",
   marginTop: 8,
-  padding: "4px 10px",
-  fontSize: 12,
-  fontWeight: 600,
-  backgroundColor: "rgba(150, 207, 224, 0.15)",
-  color: button,
+  padding: "8px 10px",
+  fontSize: 13,
+  fontWeight: 500,
+  backgroundColor: 'rgba(34, 197, 94, 0.18)',
+  color: '#22c55e',
   borderRadius: 6,
   letterSpacing: "0.02em",
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 14,
+      fontSize: 15,
+    },
+  },
+});
+
+export const remainingText = style({
+  '@media': {
+    'screen and (max-width: 767px)': {
+      display: 'block',
+      marginTop: 2,
     },
   },
 });
 
 export const recurringList = style({
-  marginTop: 12,
-  padding: 12,
-  backgroundColor: darker_bg,
-  borderRadius: 8,
+  marginTop: 4,
   maxHeight: 200,
   overflowY: "auto",
 });
@@ -617,7 +623,7 @@ export const recurringItem = style({
 
 export const recurringItemDate = style({
   fontSize: 14,
-  color: text_secondary,
+  color: text_primary,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 15,
@@ -638,9 +644,9 @@ export const cancelOptionButton = style({
   padding: "14px 16px",
   fontSize: 15,
   fontWeight: 500,
-  backgroundColor: darker_bg,
+  backgroundColor: 'transparent',
   color: text_primary,
-  border: `1px solid ${border_subtle}`,
+  border: `1px solid ${text_secondary}`,
   borderRadius: 8,
   cursor: "pointer",
   textAlign: "left",
@@ -655,7 +661,7 @@ export const cancelOptionButtonDanger = style({
   padding: "14px 16px",
   fontSize: 15,
   fontWeight: 500,
-  backgroundColor: darker_bg,
+  backgroundColor: 'transparent',
   color: "#ef4444",
   border: "1px solid #ef4444",
   borderRadius: 8,
