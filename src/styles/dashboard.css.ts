@@ -40,7 +40,7 @@ export const header = style({
   flexDirection: "column",
   alignItems: "center",
   marginTop: 8,
-  marginBottom: 12,
+  marginBottom: 16,
   "@media": {
     "screen and (min-width: 768px)": {
       flexDirection: "row",
@@ -79,7 +79,6 @@ export const primaryCta = style({
   textDecoration: "none",
   textAlign: "center",
   transition: "all 0.15s",
-  // marginTop: 12,
   ':hover': {
     transform: 'translateY(-1px)',
     boxShadow: '0 4px 12px rgba(168,220,232,0.4)',

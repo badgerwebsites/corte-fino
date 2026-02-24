@@ -149,7 +149,7 @@ export function ImageUpload({
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
               >
-                Change
+                Edit
               </button>
             </View>
           ) : (

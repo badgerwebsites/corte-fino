@@ -287,17 +287,18 @@ export const dayPricingHeader = style({
   display: 'grid',
   gridTemplateColumns: '100px repeat(7, minmax(80px, 1fr))',
   gap: 4,
-  marginBottom: 8,
+  marginBottom: 4,
   minWidth: 700,
 });
 
 export const dayPricingBarberHeader = style({
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: '600',
   color: text_secondary,
   padding: '8px 4px',
   display: 'flex',
   alignItems: 'flex-end',
+  justifyContent: 'center',
 });
 
 export const dayPricingDayHeader = style({
@@ -343,15 +344,17 @@ export const dayPricingBarberName = style({
   color: text_primary,
   padding: '8px 4px',
   display: 'flex',
-  alignItems: 'center',
   backgroundColor: darker_bg,
   borderRadius: 4,
+  justifyContent: 'center',
+  textAlign: 'center',
 });
 
 export const dayPricingCell = style({
   padding: '4px 2px',
   backgroundColor: darker_bg,
   borderRadius: 4,
+  alignContent: 'center',
 });
 
 export const dayPricingInputGroup = style({
@@ -361,7 +364,7 @@ export const dayPricingInputGroup = style({
 });
 
 export const dayPriceInput = style({
-  width: 36,
+  width: 28,
   backgroundColor: dark_bg,
   color: text_primary,
   padding: '6px 2px',
@@ -384,6 +387,11 @@ export const dayPriceInput = style({
   },
   '::-webkit-outer-spin-button': {
     display: 'none',
+  },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      width: 36,
+    },
   },
 });
 
@@ -426,10 +434,10 @@ export const input = style({
   width: '100%',
   backgroundColor: darker_bg,
   color: text_primary,
-  border: '1px solid #1a1a1a',
+  border: `1px solid ${text_muted}`,
   boxSizing: 'border-box',
   padding: '0.625rem',
-  borderRadius: 4,
+  borderRadius: 8,
   fontSize: '0.875rem',
   '@media': {
     'screen and (min-width: 768px)': {
@@ -458,10 +466,10 @@ export const textarea = style({
   width: '100%',
   backgroundColor: darker_bg,
   color: text_primary,
-  border: '1px solid #1a1a1a',
+  border: `1px solid ${text_muted}`,
   boxSizing: 'border-box',
   padding: '0.625rem',
-  borderRadius: 4,
+  borderRadius: 8,
   fontSize: '0.875rem',
   fontFamily: 'inherit',
   resize: 'vertical',
@@ -491,13 +499,14 @@ export const submitButton = style({
   padding: '0.625rem 1.25rem',
   background: button,
   color: dark_bg,
-  border: 'none',
-  borderRadius: 4,
+  border: `1px solid ${border_subtle}`,
+  borderRadius: 8,
   fontSize: 16,
-  fontWeight: '500',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
-  letterSpacing: '0.02em',
+  textTransform: "uppercase",
+  letterSpacing: "0.1em",
+  fontWeight: 600,
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '0.75rem 1.5rem',
@@ -514,11 +523,12 @@ export const cancelButton = style({
   backgroundColor: '#fecaca',
   color: '#dc2626',
   border: 'none',
-  borderRadius: 4,
+  borderRadius: 8,
   fontSize: 16,
-  fontWeight: '500',
   cursor: 'pointer',
-  letterSpacing: '0.02em',
+  textTransform: "uppercase",
+  letterSpacing: "0.1em",
+  fontWeight: 600,
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '0.75rem 1.5rem',
@@ -574,10 +584,9 @@ export const barberName = style({
 export const barberDetail = style({
   color: text_secondary,
   fontSize: '0.8125rem',
-  marginBottom: '0.25rem',
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: '0.9rem',
+      fontSize: 14,
     },
   },
 });
@@ -809,6 +818,7 @@ export const pricingTimeline = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '1rem',
+  marginBottom: 12,
   '@media': {
     'screen and (min-width: 768px)': {
       flexDirection: 'row',
@@ -823,7 +833,6 @@ export const pricingTimeBlock = style({
   display: 'flex',
   flexDirection: 'column',
   gap: 4,
-  marginBottom: 12,
 });
 
 export const pricingTimeLabel = style({
@@ -838,10 +847,10 @@ export const timeInput = style({
   width: '100%',
   backgroundColor: darker_bg,
   color: text_primary,
-  border: '1px solid #1a1a1a',
+  border: `1px solid ${text_muted}`,
   boxSizing: 'border-box',
   padding: '0.625rem',
-  borderRadius: 4,
+  borderRadius: 8,
   fontSize: '0.875rem',
   colorScheme: 'dark',
   '@media': {
@@ -948,19 +957,14 @@ export const verifyCodeInput = style({
     letterSpacing: '0',
     textTransform: 'none',
   },
-  '@media': {
-    'screen and (min-width: 768px)': {
-      maxWidth: '200px',
-    },
-  },
 });
 
 export const verifyCodeButton = style({
-  padding: '16px 16px',
+  padding: '14px 16px',
   whiteSpace: 'nowrap',
-  background: button,
-  color: dark_bg,
-  border: 'none',
+  background: 'transparent',
+  color: button,
+  border: `3px solid ${button}`,
   borderRadius: 8,
   fontSize: 16,
   fontWeight: '500',
@@ -968,7 +972,7 @@ export const verifyCodeButton = style({
   transition: 'all 0.3s ease',
   letterSpacing: '0.05em',
   ':hover': {
-    backgroundColor: '#7fbccd',
+    backgroundColor: darker_bg,
   },
 });
 
@@ -997,7 +1001,6 @@ export const redemptionCard = style({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '1.25rem',
     },
   },
 });
@@ -1031,7 +1034,21 @@ export const redemptionDate = style({
   color: text_secondary,
 });
 
+export const redemptionRightSide = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '0.75rem',
+
+  '@media': {
+    'screen and (min-width: 768px)': {
+      alignItems: 'flex-end',
+    },
+  },
+});
+
 export const redemptionCodeDisplay = style({
+  width: '80%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -1052,16 +1069,17 @@ export const redemptionCode = style({
 export const redemptionActions = style({
   display: 'flex',
   justifyContent: 'center',
-  gap: '0.5rem',
+  gap: '0.75rem',
+  width: '100%',
 });
 
 export const confirmButton = style({
   padding: '0.5rem 1rem',
-  fontSize: '0.875rem',
+  fontSize: 16,
   fontWeight: '500',
   backgroundColor: 'transparent',
   color: button,
-  border: `1px solid ${button}`,
+  border: `2px solid ${button}`,
   borderRadius: '0.375rem',
   cursor: 'pointer',
   transition: 'all 0.2s',
@@ -1072,11 +1090,11 @@ export const confirmButton = style({
 
 export const rejectButton = style({
   padding: '0.5rem 1rem',
-  fontSize: '0.875rem',
+  fontSize: 16,
   fontWeight: '500',
   backgroundColor: 'transparent',
   color: '#ef4444',
-  border: '1px solid #ef4444',
+  border: '2px solid #ef4444',
   borderRadius: '0.375rem',
   cursor: 'pointer',
   transition: 'all 0.2s',
@@ -1103,11 +1121,11 @@ export const select = style({
   width: '100%',
   backgroundColor: darker_bg,
   color: text_primary,
-  border: '1px solid #1a1a1a',
+  border: `1px solid ${text_muted}`,
   boxSizing: 'border-box',
   padding: '0.625rem',
   paddingRight: '2.5rem',
-  borderRadius: 4,
+  borderRadius: 8,
   fontSize: '0.875rem',
   appearance: 'none',
   WebkitAppearance: 'none',

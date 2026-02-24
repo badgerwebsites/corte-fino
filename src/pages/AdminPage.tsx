@@ -1324,6 +1324,8 @@ export default function AdminPage() {
                         {new Date(redemption.redeemed_at).toLocaleDateString()}
                       </Text>
                     </View>
+                    <View className={styles.redemptionRightSide}>
+
                     <View className={styles.redemptionCodeDisplay}>
                       <Text className={styles.redemptionCode}>{redemption.redemption_code}</Text>
                     </View>
@@ -1340,6 +1342,7 @@ export default function AdminPage() {
                       >
                         Reject
                       </button>
+                    </View>
                     </View>
                   </View>
                 ))}
@@ -1374,7 +1377,7 @@ export default function AdminPage() {
                         )}
                       </View>
                       <Text className={styles.barberDetail}>
-                        {reward.points_required} points · {reward.reward_type} · {reward.item_name}
+                        {reward.points_required} points •
                       </Text>
                       {reward.description && (
                         <Text className={styles.barberDetail}>{reward.description}</Text>
@@ -1514,7 +1517,7 @@ export default function AdminPage() {
 
               <View className={styles.formActions}>
                 <button type="submit" className={styles.submitButton}>
-                  {editingReward ? 'Update Reward' : 'Add Reward'}
+                  {editingReward ? 'Update' : 'Add Reward'}
                 </button>
                 {editingReward && (
                   <button

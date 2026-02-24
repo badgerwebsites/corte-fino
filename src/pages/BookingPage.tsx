@@ -83,6 +83,11 @@ export default function BookingPage() {
   const [recurringAvailability, setRecurringAvailability] = useState<DateAvailabilityResult[]>([]);
 
   useEffect(() => {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [step]);
+  
+  useEffect(() => {
     loadData();
   }, []);
 

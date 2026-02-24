@@ -5,7 +5,7 @@ const darker_bg = "#101214";
 const button =  "#96cfe0";
 const text_primary = "#f5f5f5";
 const text_secondary = "#b0b0b0";
-// const text_muted = "#8a8a8a";
+const text_muted = "#8a8a8a";
 // const border_subtle = "rgba(255,255,255,0.08)";
 // const border_hover = "rgba(255,255,255,0.18)";
 
@@ -79,8 +79,8 @@ export const previewContainer = style({
   alignItems: 'center',
   gap: '0.75rem',
   padding: '1rem',
-  border: `1px solid ${text_secondary}`,
-  borderRadius: '0.5rem',
+  border: `1px solid ${text_muted}`,
+  borderRadius: 8,
   backgroundColor: darker_bg,
 });
 
