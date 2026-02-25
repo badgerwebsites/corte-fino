@@ -17,7 +17,7 @@ export const label = style({
   display: 'block',
   marginBottom: 12,
   fontWeight: '500',
-  color: text_primary,
+  color: text_secondary,
   fontSize: 16,
   '@media': {
     'screen and (min-width: 768px)': {
@@ -36,7 +36,7 @@ export const dropzone = style({
   alignItems: 'center',
   justifyContent: 'center',
   padding: '2rem 1rem',
-  border: '2px dashed #96cfe0',
+  border: '2px dashed #a5d8e6',
   borderRadius: '0.5rem',
   backgroundColor: darker_bg,
   cursor: 'pointer',
@@ -101,7 +101,7 @@ export const removeOverlay = style({
   width: 32,
   height: 32,
   borderRadius: '50%',
-  backgroundColor: '#c24141',
+  backgroundColor: '#c94a4a',
   color: darker_bg,
   border: 'none',
   fontSize: 16,
@@ -113,7 +113,7 @@ export const removeOverlay = style({
   transition: 'all 0.2s',
 
   ':hover': {
-    backgroundColor: '#a93232',
+    backgroundColor: '#b43f3f',
     transform: 'scale(1.05)',
   },
 });
@@ -127,7 +127,8 @@ export const changeButtonOverlay = style({
   color: darker_bg,
   border: `none`,
   borderRadius: 4,
-  fontSize: 14,
+  fontSize: 16,
+  fontWeight: 600,
   cursor: 'pointer',
   transition: 'all 0.2s',
 

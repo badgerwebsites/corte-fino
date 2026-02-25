@@ -485,6 +485,9 @@ export const textarea = style({
     outline: 'none',
     border: '1px solid #96cfe0',
   },
+  '::placeholder': {
+    color: text_muted,
+  },
 });
 
 export const formActions = style({
@@ -581,25 +584,12 @@ export const barberName = style({
   },
 });
 
-export const barberHeader = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 8,
-  '@media': {
-    'screen and (min-width: 768px)': {
-      flexDirection: 'row',
-      gap: 12,
-    },
-  },
-});
-
-
 export const barberDetail = style({
   color: text_secondary,
   fontSize: 13,
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: 14,
+      fontSize: 15,
     },
   },
 });
@@ -617,7 +607,7 @@ export const barberActions = style({
 export const editButton = style({
   padding: '8px 12px',
   background: 'transparent',
-  color: '#0e7490',
+  color: '#0ea5e9',
   border: '1px solid #a5d8e6',
   borderRadius: 4,
   fontSize: 14,
@@ -639,9 +629,9 @@ export const editButton = style({
 export const deleteButton = style({
   padding: '8px 12px',
   background: 'transparent',
-  color: '#b91c1c',
+  color: '#ef4444',
   border: '1px solid #e5a3a3',
-  borderRadius: '4px',
+  borderRadius: 4,
   fontSize: 14,
   fontWeight: '500',
   cursor: 'pointer',
@@ -663,6 +653,11 @@ export const barberNameRow = style({
   display: 'flex',
   alignItems: 'center',
   gap: 8,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      gap: 12,
+    },
+  },
 });
 
 export const activeToggleButton = style({
@@ -810,11 +805,10 @@ export const pricingPeriodsTitle = style({
   fontWeight: '600',
   color: text_primary,
   marginBottom: 12,
-  paddingTop: 8,
+  paddingTop: 4,
   '@media': {
     'screen and (min-width: 768px)': {
-        paddingTop: 0,
-        marginBottom: 16,
+        fontSize: 18,
     },
   },
 });
@@ -911,49 +905,56 @@ export const tabBadge = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  marginLeft: '0.5rem',
-  minWidth: '1.25rem',
-  height: '1.25 rem',
-  padding: '2px 8px',
-  fontSize: 14,
-  fontWeight: '600',
+  marginLeft: 4,
+  minWidth: 18,
+  height: 18,
+  padding: '0 2px',
+  fontSize: 13,
+  fontWeight: 600,
   backgroundColor: '#0ea5e9',
-  color: text_primary,
+  color: darker_bg,
   borderRadius: '9999px',
-  lineHeight: 1.5,
+  transform: 'translateY(-1px)',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '0 4px',
+      marginLeft: 8,
+      fontSize: 16,
+      minWidth: 24,
+      height: 24,
+      transform: 'translateY(-3px)',
+    },
+  },
 });
 
 // Rewards tab styles
 export const verifyCodeForm = style({
   display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  marginBottom: 16,
-  '@media': {
-    'screen and (min-width: 768px)': {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-  },
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+  marginBottom: 12,
+  width: '100%',
 });
 
 export const verifyCodeInput = style({
   flex: 1,
-  padding: '0.75rem 1rem',
+  minWidth: 0,
+  padding: '10px 10px',
   fontSize: '1.25rem',
   fontWeight: '600',
   fontFamily: 'monospace',
   letterSpacing: '0.2em',
   textAlign: 'center',
   textTransform: 'uppercase',
-  border: '2px solid #b0b0b0',
-  borderRadius: '0.5rem',
+  border: '1px solid #b0b0b0',
+  borderRadius: 8,
   backgroundColor: darker_bg,
   color: text_primary,
   caretColor: text_primary,
   ':focus': {
     outline: 'none',
-    border: '2px solid #7fbccd',
+    border: '1px solid #a5d8e6',
   },
   '::placeholder': {
     fontSize: '0.875rem',
@@ -962,14 +963,19 @@ export const verifyCodeInput = style({
     letterSpacing: '0',
     textTransform: 'none',
   },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '12px 10px',
+    },
+  },
 });
 
-export const verifyCodeButton = style({
-  padding: '14px 16px',
+export const confirmCodeButton = style({
+  padding: '12px 10px',
   whiteSpace: 'nowrap',
-  background: 'transparent',
-  color: button,
-  border: `3px solid ${button}`,
+  backgroundColor: darker_bg,
+  color: '#0ea5e9',
+  border: '1px solid #a5d8e6',
   borderRadius: 8,
   fontSize: 16,
   fontWeight: '500',
@@ -977,7 +983,12 @@ export const verifyCodeButton = style({
   transition: 'all 0.3s ease',
   letterSpacing: '0.05em',
   ':hover': {
-    backgroundColor: darker_bg,
+    backgroundColor: dark_bg,
+  },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '14px 10px',
+    },
   },
 });
 
@@ -996,11 +1007,12 @@ export const redemptionsList = style({
 export const redemptionCard = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1rem',
-  padding: '1rem',
+  gap: 12,
+  padding: 16,
   borderRadius: 8,
-  border: `1px solid ${text_primary}`,
+  border: `1px solid ${text_secondary}`,
   marginTop: 12,
+  backgroundColor: darker_bg,
   '@media': {
     'screen and (min-width: 768px)': {
       flexDirection: 'row',
@@ -1059,7 +1071,7 @@ export const redemptionCodeDisplay = style({
   justifyContent: 'center',
   padding: '0.625rem 1rem',
   backgroundColor: '#f0f9ff',
-  border: '2px solid #0ea5e9',
+  border: "3px dashed #0ea5e9",
   borderRadius: '0.375rem',
 });
 
@@ -1083,13 +1095,13 @@ export const confirmButton = style({
   fontSize: 16,
   fontWeight: '500',
   backgroundColor: 'transparent',
-  color: button,
-  border: `2px solid ${button}`,
-  borderRadius: '0.375rem',
+  color: '#0ea5e9',
+  border: '1px solid #a5d8e6',
+  borderRadius: 4,
   cursor: 'pointer',
   transition: 'all 0.2s',
   ':hover': {
-    backgroundColor: darker_bg,
+    backgroundColor: dark_bg,
   },
 });
 
@@ -1099,14 +1111,13 @@ export const rejectButton = style({
   fontWeight: '500',
   backgroundColor: 'transparent',
   color: '#ef4444',
-  border: '2px solid #ef4444',
-  borderRadius: '0.375rem',
+  border: '1px solid #e5a3a3',
+  borderRadius: 4,
   cursor: 'pointer',
   transition: 'all 0.2s',
   ':hover': {
-    borderColor: '#ef4444',
     color: '#ef4444',
-    backgroundColor: darker_bg,
+    backgroundColor: dark_bg,
   },
 });
 

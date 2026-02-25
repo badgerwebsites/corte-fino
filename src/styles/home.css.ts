@@ -484,7 +484,7 @@ export const contactInfo = style({
 
 export const contactText = style({
   fontSize: 15,
-  color: '#7fb8ff',
+  color: '#0ea5e9',
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 20,
@@ -495,20 +495,21 @@ export const contactText = style({
 export const contactIcon = style({
   width: 18,
   height: 18,
-  color: '#7fb8ff',
+  color: '#0ea5e9',
   "@media": {
     "screen and (min-width: 768px)": {
       width: 24,
-      height: 24,    },
+      height: 24,    
+    },
   },
 });
 
 export const contactLink = style({
   textDecoration: "none",
   transition: "opacity 0.2s ease",
-  color: '#4da3ff',
+  color: '#0ea5e9',
   ":hover": {
-    opacity: 0.7,
+    opacity: 0.75,
   },
 });
 

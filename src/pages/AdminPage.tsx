@@ -660,9 +660,6 @@ export default function AdminPage() {
     <>
       <Navigation />
       <View className={styles.container}>
-      {/* <View className={styles.header}>
-        <Text className={styles.title}>Admin Dashboard</Text>
-      </View> */}
 
       <View className={styles.tabs}>
         <button
@@ -939,10 +936,9 @@ export default function AdminPage() {
         <View className={styles.section}>
           <div className={styles.adminSplitLayout}>
             <div className={styles.adminLeftColumn}>
-            {barbers.map((barber) => (
-              <View key={barber.id} className={styles.barberCard}>
-                <View className={styles.barberInfo}>
-                  <View className={styles.barberHeader}>
+              {barbers.map((barber) => (
+                <View key={barber.id} className={styles.barberCard}>
+                  <View className={styles.barberInfo}>
                     <View className={styles.barberNameRow}>
                       <Text className={styles.barberName}>{barber.name}</Text>
                         <button
@@ -956,7 +952,6 @@ export default function AdminPage() {
                           {barber.is_active ? '✓ Active' : 'Inactive'}
                         </button>
                       </View>
-                    </View>
                   </View>
                 <View className={styles.barberActions}>
                   <button
@@ -1173,7 +1168,7 @@ export default function AdminPage() {
                 <Text className={styles.subsectionTitle}>Navigation Logos (Carousel)</Text>
               </View>
                 <Text className={styles.sectionDescription}>
-                  These logos rotate in the navigation bar. Use "Hide" to remove a logo from the carousel. Note: Refresh the page after making changes to see updates in the navigation.
+                  These logos rotate in the navigation bar. Refresh the page after making changes to see updates in the navigation.
                 </Text>
 
               <View className={styles.logoGrid}>
@@ -1291,10 +1286,10 @@ export default function AdminPage() {
                 maxLength={6}
               />
               <button
-                className={styles.verifyCodeButton}
+                className={styles.confirmCodeButton}
                 onClick={handleVerifyCode}
               >
-                Verify & Confirm
+                Confirm
               </button>
             </View>
 

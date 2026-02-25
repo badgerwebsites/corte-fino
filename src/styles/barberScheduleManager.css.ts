@@ -76,8 +76,8 @@ export const saveButton = style({
   color: dark_bg,
   border: 'none',
   borderRadius: 4,
-  fontSize: 14,
-  fontWeight: 500,
+  fontSize: 15,
+  fontWeight: 600,
   cursor: 'pointer',
 });
 
@@ -177,7 +177,7 @@ export const addBreakButton = style({
   border: 'none',
   borderRadius: 4,
   fontSize: 14,
-  fontWeight: 500,
+  fontWeight: 600,
   cursor: 'pointer',
   ':hover': {
     backgroundColor: '#fcb3b3',
@@ -289,8 +289,8 @@ export const deleteTimeOffButton = style({
   color: '#dc2626',
   border: 'none',
   borderRadius: 4,
-  fontSize: 14,
-  fontWeight: 500,
+  fontSize: 15,
+  fontWeight: 600,
   cursor: 'pointer',
   ':hover': {
     backgroundColor: '#fcb3b3',
