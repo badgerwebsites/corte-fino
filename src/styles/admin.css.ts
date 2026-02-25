@@ -518,7 +518,8 @@ export const submitButton = style({
     },
   },
   ':hover': {
-    backgroundColor: '#7fbccd',
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
   },
 });
 
@@ -540,13 +541,10 @@ export const cancelButton = style({
     },
   },
   ':hover': {
-    backgroundColor: '#fcb3b3',
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
   },
 });
-
-// export const barbersList = style({
-//   // marginTop: 4,
-// });
 
 export const barberCard = style({
   display: 'flex',
@@ -922,7 +920,7 @@ export const tabBadge = style({
       fontSize: 16,
       minWidth: 24,
       height: 24,
-      transform: 'translateY(-3px)',
+      transform: 'translateY(-2.5px)',
     },
   },
 });

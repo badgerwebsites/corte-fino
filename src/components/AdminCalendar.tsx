@@ -690,7 +690,7 @@ const getBarberColors = (booking: BookingWithDetails) => {
             >
               <span className={styles.plusIcon}>+</span>
               <span className={styles.mobileOnlyText}>
-                Book Appointment
+                Add Appointment
               </span>
             </button>
         </View>
