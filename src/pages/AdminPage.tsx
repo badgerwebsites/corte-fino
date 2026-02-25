@@ -704,16 +704,14 @@ export default function AdminPage() {
       </View>
 
       {activeTab === 'calendar' && (
-        // <View className={styles.section}>
-          <AdminCalendar
-            barbers={barbers}
-            services={services}
-            pricing={pricing}
-            availability={availability}
-            timeOff={timeOff}
-            onBookingUpdate={loadData}
-          />
-        // </View>
+        <AdminCalendar
+          barbers={barbers}
+          services={services}
+          pricing={pricing}
+          availability={availability}
+          timeOff={timeOff}
+          onBookingUpdate={loadData}
+        />
       )}
 
       {activeTab === 'pricing' && (
@@ -1173,8 +1171,6 @@ export default function AdminPage() {
 
               <View className={styles.logoGrid}>
                 <View className={styles.logoGridItem}>
-                  <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                </View>
                   {siteSettings?.nav_logo_1_url !== 'HIDDEN' && (
                     <ImageUpload
                       currentImageUrl={siteSettings?.nav_logo_1_url && siteSettings.nav_logo_1_url !== 'HIDDEN' ? siteSettings.nav_logo_1_url : undefined}
@@ -1186,8 +1182,6 @@ export default function AdminPage() {
                 </View>
 
                 <View className={styles.logoGridItem}>
-                  <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                </View>
                   {siteSettings?.nav_logo_2_url !== 'HIDDEN' && (
                     <ImageUpload
                       currentImageUrl={siteSettings?.nav_logo_2_url && siteSettings.nav_logo_2_url !== 'HIDDEN' ? siteSettings.nav_logo_2_url : undefined}
@@ -1199,8 +1193,6 @@ export default function AdminPage() {
                 </View>
 
                 <View className={styles.logoGridItem}>
-                  <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                </View>
                   {siteSettings?.nav_logo_3_url !== 'HIDDEN' && (
                     <ImageUpload
                       currentImageUrl={siteSettings?.nav_logo_3_url && siteSettings.nav_logo_3_url !== 'HIDDEN' ? siteSettings.nav_logo_3_url : undefined}
