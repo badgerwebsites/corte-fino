@@ -607,9 +607,12 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                 />
               </View>
 
+            <View className={scheduleStyles.centerButton}>
               <button type="submit" className={styles.submitButton}>
                 Add Time Off
               </button>
+            </View>
+
             </form>
 
             {timeOff.length > 0 && (

@@ -116,10 +116,10 @@ export const timeLabel = style({
 export const timeInput = style({
   backgroundColor: darker_bg,
   color: text_primary,
-  border: '1px solid #1a1a1a',
+  border: `1px solid ${text_muted}`,
   boxSizing: 'border-box',
   padding: '0.625rem',
-  borderRadius: 4,
+  borderRadius: 8,
   fontSize: '0.875rem',
   colorScheme: 'dark',
   '@media': {
@@ -137,6 +137,12 @@ export const timeInput = style({
   '::placeholder': {
     color: text_muted,
   },
+});
+
+export const centerButton = style({
+  display: 'flex',
+  justifyContent: 'center',
+  paddingTop: 8,
 });
 
 export const breaksCard = style({

@@ -942,20 +942,22 @@ export default function AdminPage() {
             {barbers.map((barber) => (
               <View key={barber.id} className={styles.barberCard}>
                 <View className={styles.barberInfo}>
-                  <View className={styles.barberNameRow}>
-                    <Text className={styles.barberName}>{barber.name}</Text>
-                    {barber.is_active && (
-                      <View className={styles.statusBadge}>
-                        <Text>✓ Active</Text>
+                  <View className={styles.barberHeader}>
+                    <View className={styles.barberNameRow}>
+                      <Text className={styles.barberName}>{barber.name}</Text>
+                        <button
+                          className={
+                            barber.is_active
+                              ? styles.activeToggleButton
+                              : styles.inactiveToggleButton
+                          }
+                          onClick={() => handleToggleBarberActive(barber)}
+                        >
+                          {barber.is_active ? '✓ Active' : 'Inactive'}
+                        </button>
                       </View>
-                    )}
-                    {!barber.is_active && (
-                      <View className={styles.statusBadgeInactive}>
-                        <Text>Inactive</Text>
-                      </View>
-                    )}
+                    </View>
                   </View>
-                </View>
                 <View className={styles.barberActions}>
                   <button
                     className={styles.editButton}
@@ -963,12 +965,7 @@ export default function AdminPage() {
                   >
                     Edit
                   </button>
-                  <button
-                    className={styles.toggleButton}
-                    onClick={() => handleToggleBarberActive(barber)}
-                  >
-                    {barber.is_active ? 'Deactivate' : 'Activate'}
-                  </button>
+
                   <button
                     className={styles.deleteButton}
                     onClick={() => handleDeleteBarber(barber.id)}
@@ -1366,22 +1363,21 @@ export default function AdminPage() {
                     <View className={styles.barberInfo}>
                       <View className={styles.barberNameRow}>
                         <Text className={styles.barberName}>{reward.name}</Text>
-                        {reward.is_active ? (
-                          <View className={styles.statusBadge}>
-                            <Text>Active</Text>
-                          </View>
-                        ) : (
-                          <View className={styles.statusBadgeInactive}>
-                            <Text>Inactive</Text>
-                          </View>
-                        )}
+                        <button
+                          className={
+                            reward.is_active
+                              ? styles.activeToggleButton
+                              : styles.inactiveToggleButton
+                          }
+                          onClick={() => handleToggleRewardActive(reward)}
+                        >
+                          {reward.is_active ? '✓ Active' : 'Inactive'}
+                        </button>
                       </View>
                       <Text className={styles.barberDetail}>
-                        {reward.points_required} points •
+                        {reward.points_required} points
+                        {reward.description && ` • ${reward.description}`}
                       </Text>
-                      {reward.description && (
-                        <Text className={styles.barberDetail}>{reward.description}</Text>
-                      )}
                     </View>
                     <View className={styles.barberActions}>
                       <button
@@ -1389,12 +1385,6 @@ export default function AdminPage() {
                         onClick={() => handleEditReward(reward)}
                       >
                         Edit
-                      </button>
-                      <button
-                        className={styles.toggleButton}
-                        onClick={() => handleToggleRewardActive(reward)}
-                      >
-                        {reward.is_active ? 'Deactivate' : 'Activate'}
                       </button>
                       <button
                         className={styles.deleteButton}
@@ -1412,7 +1402,7 @@ export default function AdminPage() {
           <View className={styles.adminRightColumn}>
             <div ref={rewardFormRef} className={styles.sectionHeader}>
               <Text className={styles.sectionTitle}>
-                {editingReward ? 'Edit Reward' : 'Add New Reward'}
+                {editingReward ? 'Edit Reward' : '+ Add Reward'}
               </Text>
             </div>
 

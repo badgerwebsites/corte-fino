@@ -402,6 +402,7 @@ export const form = style({
 });
 
 export const formGroup = style({
+  // marginTop: 8,
   marginBottom: 12,
 });
 
@@ -547,27 +548,26 @@ export const cancelButton = style({
 export const barberCard = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '1rem',
+  gap: 12,
   padding: '1rem',
   background: darker_bg,
-  borderRadius: '0.5rem',
+  borderRadius: 8,
   marginBottom: 12,
   '@media': {
     'screen and (min-width: 768px)': {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '1.5rem',
-      borderRadius: '0.75rem',
+      // flexDirection: 'row',
+      // justifyContent: 'space-between',
+      // alignItems: 'center',
+      padding: 20,
+      borderRadius: 12,
     },
   },
 });
 
 export const barberInfo = style({
-  flex: 1,
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.25rem',
+  gap: 8,
 });
 
 export const barberName = style({
@@ -576,14 +576,27 @@ export const barberName = style({
   color: text_primary,
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: 20,
+      fontSize: 22,
     },
   },
 });
 
+export const barberHeader = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 8,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      flexDirection: 'row',
+      gap: 12,
+    },
+  },
+});
+
+
 export const barberDetail = style({
   color: text_secondary,
-  fontSize: '0.8125rem',
+  fontSize: 13,
   '@media': {
     'screen and (min-width: 768px)': {
       fontSize: 14,
@@ -593,12 +606,16 @@ export const barberDetail = style({
 
 export const barberActions = style({
   display: 'flex',
-  flexWrap: 'wrap',
   gap: 12,
+  // '@media': {
+  //   'screen and (min-width: 768px)': {
+  //     flexDirection: 'column',
+  //   },
+  // },
 });
 
 export const editButton = style({
-  padding: '0.5rem 0.875rem',
+  padding: '8px 12px',
   background: 'transparent',
   color: '#0e7490',
   border: '1px solid #a5d8e6',
@@ -610,7 +627,7 @@ export const editButton = style({
   whiteSpace: 'nowrap',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.625rem 1.25rem',
+      padding: '8px 12px',
       fontSize: 16,
     },
   },
@@ -620,7 +637,7 @@ export const editButton = style({
 });
 
 export const deleteButton = style({
-  padding: '0.5rem 0.875rem',
+  padding: '8px 12px',
   background: 'transparent',
   color: '#b91c1c',
   border: '1px solid #e5a3a3',
@@ -632,7 +649,7 @@ export const deleteButton = style({
   transition: 'all 0.2s',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.625rem 1.25rem',
+      padding: '8px 12px',
       fontSize: 16,
     },
   },
@@ -645,61 +662,49 @@ export const deleteButton = style({
 export const barberNameRow = style({
   display: 'flex',
   alignItems: 'center',
-  // alignContent: 'center',
-  gap: '0.75rem',
-  flexWrap: 'wrap',
+  gap: 8,
 });
 
-export const statusBadge = style({
-  display: 'inline-block',
-  padding: '0.2rem 0.6rem',
-  background: button,
-  color: darker_bg,
-  borderRadius: 16,
-  fontSize: 12,
-  fontWeight: '500',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      fontSize: 14,
-    },
-  },
-});
-
-export const statusBadgeInactive = style({
-  display: 'inline-block',
-  padding: '0.2rem 0.6rem',
-  background: text_muted,
-  color: darker_bg,
-  borderRadius: 16,
-  fontSize: 12,
-  fontWeight: '500',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      fontSize: 14,
-    },
-  },
-});
-
-export const toggleButton = style({
-  padding: '0.5rem 0.875rem',
-  background: 'transparent',
-  color: text_secondary,
-  border: '1px solid #b0b0b0',
-  borderRadius: '4px',
-  fontSize: '0.8125rem',
-  fontWeight: '500',
+export const activeToggleButton = style({
+  padding: '4px 8px',
+  borderRadius: 999,
+  border: '2px solid #15803d',
+  backgroundColor: 'rgba(34,197,94,0.15)',
+  color: '#22c55e',
+  fontWeight: 600,
   cursor: 'pointer',
-  whiteSpace: 'nowrap',
   transition: 'all 0.2s',
+  ':hover': {
+    backgroundColor: 'rgba(34,197,94,0.25)',
+  },
+
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.625rem 1.25rem',
-      fontSize: '0.9375rem',
+      padding: '6px 12px',
     },
   },
+});
+
+export const inactiveToggleButton = style({
+  padding: '4px 8px',
+  borderRadius: 999,
+
+  backgroundColor: '#1f2937',
+  border: '2px solid #4b5563',
+
+  color: '#9ca3af',
+  fontWeight: 600,
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+
   ':hover': {
-    background: dark_bg,
-    color: text_primary,
+    backgroundColor: '#374151',
+  },
+
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '6px 12px',
+    },
   },
 });
 
@@ -888,7 +893,7 @@ export const checkboxLabel = style({
   alignItems: 'center',
   gap: 12,
   cursor: 'pointer',
-  // paddingTop: 16,
+  paddingTop: 8,
   marginBottom: 20,
   color: text_primary,
   fontSize: 18,
@@ -1025,12 +1030,12 @@ export const redemptionReward = style({
 });
 
 export const redemptionPoints = style({
-  fontSize: 16,
+  fontSize: 18,
   color: text_secondary,
 });
 
 export const redemptionDate = style({
-  fontSize: 14,
+  fontSize: 16,
   color: text_secondary,
 });
 
@@ -1108,7 +1113,7 @@ export const rejectButton = style({
 // Rewards Management styles
 export const rewardsBorder = style({
   marginTop: 24,
-  paddingTop: 24,
+  paddingTop: 12,
   borderTop: '2px solid #e2e8f0',
 });
 
