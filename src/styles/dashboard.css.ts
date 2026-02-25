@@ -407,7 +407,6 @@ export const rewardsLink = style({
   textDecoration: "none",
   transition: "all 0.15s",
   ':hover': {
-    boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
     color: button,
     borderRadius: 10,
     border: `2px solid ${button}`,
