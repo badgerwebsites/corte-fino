@@ -247,10 +247,10 @@ export const modalTitle = style({
 });
 
 export const modalMessage = style({
-  fontSize: 16,
+  fontSize: 20,
   color: '#9ca3af',
   lineHeight: 1.5,
-  marginBottom: 24,
+  // marginBottom: 24,
 });
 
 export const modalButton = style({
@@ -268,6 +268,7 @@ export const modalButton = style({
     transform: 'translateY(-1px)',
     boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
   },
+  marginTop: 24,
 });
 
 export const success = style({

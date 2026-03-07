@@ -13,20 +13,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      if (data.session?.user) {
-        loadCustomerData(data.session.user.id, data.session.user.email);
+      const session = data.session;
+
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        // Check if user just confirmed email (Supabase returns hash tokens)
+        const hash = window.location.hash;
+
+        if (hash.includes('access_token') || hash.includes('type=signup')) {
+          const pendingBooking = localStorage.getItem('pendingBooking');
+
+          if (pendingBooking) {
+              window.location.replace('/book');
+              history.replaceState(null, '', '/book');
+            return;
+          }
+
+          window.location.replace('/login');
+          return;
+        }
+
+        loadCustomerData(session.user.id, session.user.email);
       } else {
         setLoading(false);
       }
     });
 
     const { data: { subscription } } =
-      supabase.auth.onAuthStateChange((_event, session) => {
+      supabase.auth.onAuthStateChange((event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
+          // Handle email confirmation redirect — getSession() may return null
+          // initially before onAuthStateChange processes the hash tokens
+          if (event === 'SIGNED_IN') {
+            const hash = window.location.hash;
+            if (hash.includes('access_token') || hash.includes('type=signup')) {
+              const pendingBooking = localStorage.getItem('pendingBooking');
+              if (pendingBooking) {
+                window.location.replace('/book');
+                return;
+              }
+              window.location.replace('/login');
+              return;
+            }
+          }
           loadCustomerData(session.user.id, session.user.email);
         } else {
           setCustomer(null);
@@ -50,25 +83,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data) {
         setCustomer(data);
       } else if (userEmail) {
-        // Customer record doesn't exist, create it
-        const { data: newCustomer, error: insertError } = await supabase
+        // Use upsert with ignoreDuplicates to handle race conditions where
+        // multiple loadCustomerData calls run concurrently, or where signUp
+        // already created the record but it wasn't returned by the select above
+        await supabase
           .from('customers')
-          .insert({
-            id: userId,
-            email: userEmail,
-            first_name: '',
-            last_name: '',
-            phone: '',
-            reward_points: 0,
-          })
-          .select()
-          .single();
+          .upsert(
+            {
+              id: userId,
+              email: userEmail,
+              first_name: '',
+              last_name: '',
+              phone: '',
+              reward_points: 0,
+            },
+            { onConflict: 'id', ignoreDuplicates: true }
+          );
 
-        if (insertError) {
-          console.error('Error creating customer record:', insertError);
-        } else {
-          setCustomer(newCustomer);
-        }
+        // Always refetch — ignoreDuplicates won't return the existing record
+        const { data: existing } = await supabase
+          .from('customers')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle();
+        if (existing) setCustomer(existing);
       }
     } catch (error) {
       console.error('Error loading customer data:', error);
@@ -86,9 +124,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     redirectTo?: string
   ) => {
     // Build the email redirect URL - when user clicks confirmation link, they'll be sent here
-    const emailRedirectUrl = redirectTo
-      ? `${window.location.origin}${redirectTo}`
-      : `${window.location.origin}/dashboard`;
+    let emailRedirectUrl = `${window.location.origin}/login`;
+
+    if (redirectTo?.startsWith('/book')) {
+      emailRedirectUrl = `${window.location.origin}/book`;
+    }
 
     const { data, error } = await supabase.auth.signUp({
       email,

@@ -144,25 +144,29 @@ export default function BookingPage() {
   useEffect(() => {
     if (!loading && user && services.length > 0 && barbers.length > 0) {
       const savedState = localStorage.getItem('pendingBooking');
+
       if (savedState) {
         try {
           const bookingState = JSON.parse(savedState);
 
+          // Prevent restoring very old booking states (older than 1 hour)
+          if (Date.now() - bookingState.savedAt > 1000 * 60 * 60) {
+            localStorage.removeItem('pendingBooking');
+            return;
+          }
+
           // Restore service
           if (bookingState.serviceId) {
             const service = services.find(s => s.id === bookingState.serviceId);
-            if (service) {
-              setSelectedService(service);
-            }
+            if (service) setSelectedService(service);
           }
 
           // Restore barber
           if (bookingState.barberId) {
             const barber = barbers.find(b => b.id === bookingState.barberId);
-            if (barber) {
-              setSelectedBarber(barber);
-            }
+            if (barber) setSelectedBarber(barber);
           }
+
           setAnyBarber(bookingState.anyBarber || false);
 
           // Restore date
@@ -180,8 +184,12 @@ export default function BookingPage() {
             setStep(bookingState.step);
           }
 
-          // Clear the saved state so it doesn't persist on future visits
+          // Clear saved booking state
           localStorage.removeItem('pendingBooking');
+
+          // Ensure page scrolls to the top after restore
+          window.scrollTo({ top: 0, behavior: 'instant' });
+
         } catch (e) {
           console.error('Error restoring booking state:', e);
           localStorage.removeItem('pendingBooking');
@@ -297,13 +305,14 @@ export default function BookingPage() {
   // Save booking state to localStorage before redirecting to login
   const saveBookingState = () => {
     const bookingState = {
-      serviceId: selectedService?.id,
-      barberId: selectedBarber?.id,
-      anyBarber,
-      selectedDate: selectedDate?.toISOString(),
-      selectedTime,
-      step,
-    };
+    serviceId: selectedService?.id,
+    barberId: selectedBarber?.id,
+    anyBarber,
+    selectedDate: selectedDate?.toISOString(),
+    selectedTime,
+    step,
+    savedAt: Date.now(),
+  };
     localStorage.setItem('pendingBooking', JSON.stringify(bookingState));
   };
 

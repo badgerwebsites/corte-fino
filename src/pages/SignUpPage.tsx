@@ -23,10 +23,10 @@ export default function SignUpPage() {
   const location = useLocation();
 
   const redirectTo =
-    new URLSearchParams(location.search).get('redirect') || '/dashboard';
+    new URLSearchParams(location.search).get('redirect') || '/login';
 
   // Check if user is coming from booking flow
-  const isFromBooking = redirectTo === '/book';
+  const isFromBooking = redirectTo.startsWith('/book');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,19 +178,19 @@ export default function SignUpPage() {
                 />
               </svg>
             </View>
-            <Text className={styles.modalTitle}>Check Your Email</Text>
+            {/* <Text className={styles.modalTitle}>Check your Email for confirmation link</Text> */}
             <Text className={styles.modalMessage}>
-              We've sent a confirmation link to <strong>{email}</strong>.
+              Check <strong>{email}</strong> for a confirmation link.
               {isFromBooking
-                ? ' Click the link to verify your account and complete your booking.'
-                : ' Click the link to verify your account.'}
+                ? ' Click the link in the email to verify your account and complete your booking.'
+                : ' Click the link in the email to verify your account.'}
             </Text>
-            <button
+            {/* <button
               className={styles.modalButton}
               onClick={() => setShowEmailConfirmation(false)}
             >
               Got it
-            </button>
+            </button> */}
           </View>
         </View>
       )}
