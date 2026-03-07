@@ -34,27 +34,22 @@ function PriceInput({
   placeholder?: string;
 }) {
   const [localValue, setLocalValue] = useState(initialValue > 0 ? initialValue.toString() : '');
-  const lastSavedValue = useRef<number | null>(null);
+  const [lastSavedValue, setLastSavedValue] = useState<number | null>(null);
+  const [prevInitialValue, setPrevInitialValue] = useState(initialValue);
 
-  // Only update from props if it's a genuinely new value (not our pending save catching up)
-  useEffect(() => {
+  // Derived state during render — React re-runs the component immediately with updated state
+  if (prevInitialValue !== initialValue) {
+    setPrevInitialValue(initialValue);
     const currentNumValue = parseFloat(localValue) || 0;
-    // Only sync from props if:
-    // 1. We haven't saved a value yet, OR
-    // 2. The prop matches what we saved (confirming our save), OR
-    // 3. The prop is different from both what we have and what we saved (external change)
-    if (lastSavedValue.current === null) {
-      // Initial mount - sync from props
+    if (lastSavedValue === null) {
       setLocalValue(initialValue > 0 ? initialValue.toString() : '');
-    } else if (initialValue === lastSavedValue.current) {
-      // Our save was confirmed - keep showing our value (no flicker)
-      lastSavedValue.current = null;
-    } else if (initialValue !== currentNumValue && initialValue !== lastSavedValue.current) {
-      // External change - sync from props
+    } else if (initialValue === lastSavedValue) {
+      setLastSavedValue(null);
+    } else if (initialValue !== currentNumValue && initialValue !== lastSavedValue) {
       setLocalValue(initialValue > 0 ? initialValue.toString() : '');
-      lastSavedValue.current = null;
+      setLastSavedValue(null);
     }
-  }, [initialValue]);
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalValue(e.target.value);
@@ -63,9 +58,8 @@ function PriceInput({
   const handleBlur = () => {
     const numValue = parseFloat(localValue) || 0;
     const currentPropValue = initialValue || 0;
-    // Only save if value actually changed
     if (numValue !== currentPropValue) {
-      lastSavedValue.current = numValue;
+      setLastSavedValue(numValue);
       onSave(numValue);
     }
   };
