@@ -1,17 +1,15 @@
-// components/AdminCalendar.tsx
+// components/admin/AdminCalendar.tsx
 import { useState, useEffect, useCallback } from 'react';
 import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isSameDay, isSameMonth, addMonths, subMonths, parseISO } from 'date-fns';
 import { DndContext, DragOverlay, useDraggable, useDroppable, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragStartEvent, DragEndEvent, DragOverEvent } from '@dnd-kit/core';
-import { supabase } from '../lib/supabase';
-import type { Barber, BookingWithDetails, Service, BarberServicePricing, BarberAvailability, BarberTimeOff, Booking } from '../types/database.types';
-import { View } from '../ui/View';
-import { Text } from '../ui/Text';
-import * as styles from '../styles/adminCalendar.css';
-// import * as bookingStyles from '../styles/adminBooking.css';
+import { supabase } from '../../lib/supabase';
+import type { Barber, BookingWithDetails, Service, BarberServicePricing, BarberAvailability, BarberTimeOff, Booking } from '../../types/database.types';
+import { View } from '../../ui/View';
+import { Text } from '../../ui/Text';
+import * as styles from '../../styles/adminCalendar.css';
 import { ChevronLeft, ChevronRight, Check, Ban, Circle } from "lucide-react";
-// import { AdminBookingModal } from './AdminBookingModal';
-import { canRescheduleToSlot, calculateEndTime } from '../utils/bookingHelpers';
+import { canRescheduleToSlot, calculateEndTime } from '../../utils/bookingHelpers';
 import { useNavigate } from 'react-router-dom';
 
 interface AdminCalendarProps {
@@ -460,9 +458,9 @@ const getBarberColors = (booking: BookingWithDetails) => {
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
-  // Generate hourly time slots for display (7 AM to 9 PM)
-  const hourlySlots = Array.from({ length: 14 }, (_, i) => {
-    const hour = 7 + i;
+  // Generate hourly time slots for display (7 AM to 11 PM)
+  const hourlySlots = Array.from({ length: 16 }, (_, i) => {
+    const hour = 8 + i;
     return `${hour.toString().padStart(2, '0')}:00`;
   });
 

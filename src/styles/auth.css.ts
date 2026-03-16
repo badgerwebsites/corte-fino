@@ -1,11 +1,5 @@
 import { style } from '@vanilla-extract/css';
-
-const dark_bg = "#222222";
-const darker_bg = "#101214";
-const text_primary = "#f5f5f5";
-const text_secondary = "#b0b0b0";
-const button =  "#96cfe0";
-const border_subtle = "rgba(255,255,255,0.08)";
+import { darker_bg, dark_bg, button, text_primary, text_secondary, border_subtle } from './globalStyles.css';
 
 export const container = style({
   minHeight: '100dvh',

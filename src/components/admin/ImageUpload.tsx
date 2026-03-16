@@ -1,9 +1,9 @@
 // components/ImageUpload.tsx
 import { useState, useRef, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { View } from '../ui/View';
-import { Text } from '../ui/Text';
-import * as styles from '../styles/imageUpload.css';
+import { supabase } from '../../lib/supabase';
+import { View } from '../../ui/View';
+import { Text } from '../../ui/Text';
+import * as styles from '../../styles/imageUpload.css';
 
 interface ImageUploadProps {
   currentImageUrl?: string;

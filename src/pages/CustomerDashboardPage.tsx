@@ -1,16 +1,18 @@
-// pages/DashboardPage.tsx
+// pages/CustomerDashboardPage.tsx
 import { useEffect, useState, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase.ts';
 import type { BookingWithDetails, SiteSettings } from '../types/database.types.ts';
-import { RECURRENCE_LABELS } from '../types/database.types.ts';
 import { Navigation } from '../components/Navigation.tsx';
 import { View } from '../ui/View.tsx';
-import { Text } from '../ui/Text.tsx';
 import * as styles from '../styles/dashboard.css.ts';
+import { DashboardHeader } from '../components/dashboard/DashboardHeader';
+import { EmptyBookingsState } from '../components/dashboard/EmptyBookingsState';
+import { StandaloneBookingCard } from '../components/dashboard/StandaloneBookingCard';
+import { RecurringBookingCard } from '../components/dashboard/RecurringBookingCard';
+import { CancelBookingModal } from '../components/dashboard/CancelBookingModal';
 
-// Grouped recurring booking type
 interface RecurringBookingGroup {
   groupId: string;
   pattern: string;
@@ -26,28 +28,25 @@ export default function CustomerDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [cancellingBooking, setCancellingBooking] = useState<BookingWithDetails | null>(null);
   const [cancelling, setCancelling] = useState(false);
-    const [expandedRecurring, setExpandedRecurring] = useState<string | null>(null);
+  const [expandedRecurring, setExpandedRecurring] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Group bookings: separate recurring groups from standalone bookings
+  // ─── Derived data ──────────────────────────────────────────────────────────
+
   const { recurringGroups, standaloneBookings } = useMemo(() => {
     const groups: Record<string, BookingWithDetails[]> = {};
     const standalone: BookingWithDetails[] = [];
 
     bookings.forEach(booking => {
       if (booking.recurrence_group_id) {
-        if (!groups[booking.recurrence_group_id]) {
-          groups[booking.recurrence_group_id] = [];
-        }
+        if (!groups[booking.recurrence_group_id]) groups[booking.recurrence_group_id] = [];
         groups[booking.recurrence_group_id].push(booking);
       } else {
         standalone.push(booking);
       }
     });
 
-    // Convert groups to RecurringBookingGroup format
     const recurringGroups: RecurringBookingGroup[] = Object.entries(groups).map(([groupId, bookings]) => {
-      // Sort by date to get the next upcoming one
       const sorted = [...bookings].sort((a, b) =>
         a.booking_date.localeCompare(b.booking_date) || a.start_time.localeCompare(b.start_time)
       );
@@ -60,7 +59,6 @@ export default function CustomerDashboardPage() {
       };
     });
 
-    // Sort recurring groups by next booking date
     recurringGroups.sort((a, b) =>
       a.nextBooking.booking_date.localeCompare(b.nextBooking.booking_date)
     );
@@ -68,81 +66,65 @@ export default function CustomerDashboardPage() {
     return { recurringGroups, standaloneBookings: standalone };
   }, [bookings]);
 
-  // Refresh customer data (including reward points) when dashboard loads
-  useEffect(() => {
-    refreshCustomer();
-  }, [refreshCustomer]);
+  // ─── Effects ───────────────────────────────────────────────────────────────
+
+  useEffect(() => { refreshCustomer(); }, [refreshCustomer]);
 
   useEffect(() => {
     if (loading) return;
-
-    if (customer?.is_admin) {
-      navigate('/admin', { replace: true });
-    }
+    if (customer?.is_admin) navigate('/admin', { replace: true });
   }, [customer, loading, navigate]);
 
   useEffect(() => {
-  if (authLoading) return; // 🔥 WAIT for auth
+    if (authLoading) return;
+    if (!user) { navigate('/login', { replace: true }); return; }
 
-  if (!user) {
-    navigate('/login', { replace: true });
-    return;
-  }
+    const loadData = async () => {
+      try {
+        const currentDate = new Date();
+        const today = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
 
-  const loadData = async () => {
-    try {
-      const currentDate = new Date();
-      const today = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+        const [bookingsRes, settingsRes] = await Promise.all([
+          supabase
+            .from('bookings')
+            .select(`*, barber:barbers(*), service:services(*)`)
+            .eq('customer_id', user.id)
+            .in('status', ['pending', 'confirmed'])
+            .gte('booking_date', today)
+            .order('booking_date', { ascending: true }),
+          supabase.from('site_settings').select('*').single(),
+        ]);
 
-      const [bookingsRes, settingsRes] = await Promise.all([
-        supabase
-          .from('bookings')
-          .select(`
-            *,
-            barber:barbers(*),
-            service:services(*)
-          `)
-          .eq('customer_id', user.id)
-          .in('status', ['pending', 'confirmed'])
-          .gte('booking_date', today)
-          .order('booking_date', { ascending: true }),
-        supabase.from('site_settings').select('*').single(),
-      ]);
+        if (bookingsRes.error) throw bookingsRes.error;
 
-      if (bookingsRes.error) throw bookingsRes.error;
+        const now = new Date();
+        const filtered = (bookingsRes.data || []).filter(booking => {
+          const endDateTime = new Date(`${booking.booking_date}T${booking.end_time}`);
+          return now < new Date(endDateTime.getTime() + 60 * 60 * 1000);
+        });
 
-      const now = new Date();
-      const filtered = (bookingsRes.data || []).filter(booking => {
-        const endDateTime = new Date(`${booking.booking_date}T${booking.end_time}`);
-        const oneHourAfterEnd = new Date(endDateTime.getTime() + 60 * 60 * 1000);
-        return now < oneHourAfterEnd;
-      });
+        setBookings(filtered);
+        setSiteSettings(settingsRes.data || null);
+      } catch (error) {
+        console.error('Error loading bookings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setBookings(filtered);
-      setSiteSettings(settingsRes.data || null);
-    } catch (error) {
-      console.error('Error loading bookings:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    loadData();
+  }, [user, authLoading, navigate]);
 
-  loadData();
-}, [user, authLoading, navigate]);
+  // ─── Data refresh ──────────────────────────────────────────────────────────
 
   const loadBookings = async () => {
     if (!user) return;
     try {
-      // Use local date to avoid UTC timezone issues
       const currentDate = new Date();
       const today = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
       const { data, error } = await supabase
         .from('bookings')
-        .select(`
-          *,
-          barber:barbers(*),
-          service:services(*)
-        `)
+        .select(`*, barber:barbers(*), service:services(*)`)
         .eq('customer_id', user.id)
         .in('status', ['pending', 'confirmed'])
         .gte('booking_date', today)
@@ -150,12 +132,10 @@ export default function CustomerDashboardPage() {
 
       if (error) throw error;
 
-      // Filter out appointments that ended more than 1 hour ago
       const now = new Date();
       const filtered = (data || []).filter(booking => {
         const endDateTime = new Date(`${booking.booking_date}T${booking.end_time}`);
-        const oneHourAfterEnd = new Date(endDateTime.getTime() + 60 * 60 * 1000);
-        return now < oneHourAfterEnd;
+        return now < new Date(endDateTime.getTime() + 60 * 60 * 1000);
       });
 
       setBookings(filtered);
@@ -164,45 +144,22 @@ export default function CustomerDashboardPage() {
     }
   };
 
-  // Check if booking is upcoming and can be modified
-  const isUpcoming = (booking: BookingWithDetails): boolean => {
-    const now = new Date();
-    const bookingDateTime = new Date(`${booking.booking_date}T${booking.start_time}`);
-    return bookingDateTime > now && (booking.status === 'pending' || booking.status === 'confirmed');
-  };
-
-  // Check if cancellation is within 12 hours (fee applies)
-  const isWithin12Hours = (booking: BookingWithDetails): boolean => {
-    const now = new Date();
-    const bookingDateTime = new Date(`${booking.booking_date}T${booking.start_time}`);
-    const hoursUntil = (bookingDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-    return hoursUntil < 12;
-  };
+  // ─── Handlers ─────────────────────────────────────────────────────────────
 
   const handleCancelBooking = async (mode: 'single' | 'all') => {
     if (!cancellingBooking) return;
-
     setCancelling(true);
     try {
       if (mode === 'all' && cancellingBooking.recurrence_group_id) {
-        // Cancel all future appointments in the recurring series
         const { error } = await supabase
-          .from('bookings')
-          .delete()
+          .from('bookings').delete()
           .eq('recurrence_group_id', cancellingBooking.recurrence_group_id)
           .gte('booking_date', cancellingBooking.booking_date);
-
         if (error) throw error;
       } else {
-        // Delete just this booking
-        const { error } = await supabase
-          .from('bookings')
-          .delete()
-          .eq('id', cancellingBooking.id);
-
+        const { error } = await supabase.from('bookings').delete().eq('id', cancellingBooking.id);
         if (error) throw error;
       }
-
       setCancellingBooking(null);
       loadBookings();
     } catch (error) {
@@ -215,12 +172,22 @@ export default function CustomerDashboardPage() {
 
   const handleReschedule = (booking: BookingWithDetails) => {
     navigate('/book', {
-      state: {
-        rescheduleFrom: booking.id,
-        serviceId: booking.service_id,
-        barberId: booking.barber_id,
-      }
+      state: { rescheduleFrom: booking.id, serviceId: booking.service_id, barberId: booking.barber_id },
     });
+  };
+
+  // ─── Helpers ───────────────────────────────────────────────────────────────
+
+  const isUpcoming = (booking: BookingWithDetails): boolean => {
+    const now = new Date();
+    const bookingDateTime = new Date(`${booking.booking_date}T${booking.start_time}`);
+    return bookingDateTime > now && (booking.status === 'pending' || booking.status === 'confirmed');
+  };
+
+  const isWithin12Hours = (booking: BookingWithDetails): boolean => {
+    const now = new Date();
+    const bookingDateTime = new Date(`${booking.booking_date}T${booking.start_time}`);
+    return (bookingDateTime.getTime() - now.getTime()) / (1000 * 60 * 60) < 12;
   };
 
   const formatTime = (time: string): string => {
@@ -230,7 +197,6 @@ export default function CustomerDashboardPage() {
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
-  // Parse date string to local Date object (avoids UTC timezone issues)
   const parseLocalDate = (dateStr: string): Date => {
     const [year, month, day] = dateStr.split('-').map(Number);
     return new Date(year, month - 1, day);
@@ -238,203 +204,64 @@ export default function CustomerDashboardPage() {
 
   const formatDateShort = (dateStr: string): string => {
     const date = parseLocalDate(dateStr);
-
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-
     if (date.getTime() === today.getTime()) return 'Today';
     if (date.getTime() === tomorrow.getTime()) return 'Tomorrow';
     return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   };
+
+  // ─── Render ────────────────────────────────────────────────────────────────
+
+  if (loading) return null;
+
+  const rewardsEnabled = siteSettings?.rewards_enabled !== false;
 
   return (
     <>
       <Navigation />
       <View className={styles.container}>
         <View className={styles.content}>
-            <View className={styles.header}>
-              <Text className={styles.greeting}>Welcome back, {customer?.first_name}</Text>
-              {bookings.length > 0 && (
-                <Link to="/book" className={styles.primaryCta}>
-                  Book Appointment
-                </Link>
-              )}
-              {/* Rewards Card */}
-              {siteSettings?.rewards_enabled !== false && (
-                // <View className={styles.section}>
-                  <View className={styles.rewardsCard}>
-                    <View className={styles.rewardsInfo}>
-                      <svg
-                        className={styles.rewardsIcon}
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden
-                      >
-                        <rect x="3" y="8" width="18" height="13" rx="2" />
-                        <line x1="12" y1="8" x2="12" y2="21" />
-                        <line x1="3" y1="12" x2="21" y2="12" />
-                        <path d="M12 8c0-2-1.5-4-3-4-1.5 0-2.5 1-2.5 2.5C6.5 8 9 8 12 8z" />
-                        <path d="M12 8c0-2 1.5-4 3-4 1.5 0 2.5 1 2.5 2.5C17.5 8 15 8 12 8z" />
-                      </svg>
-                      <Text className={styles.rewardsText}>
-                        <span className={styles.rewardsPoints}>{customer?.reward_points || 0}</span> points
-                      </Text>
-                    </View>
-                    <Link to="/rewards" className={styles.rewardsLink}>
-                      Rewards
-                    </Link>
-                  </View>
-                // </View>
-              )}
-            </View>
+          <DashboardHeader
+            firstName={customer?.first_name}
+            hasBookings={bookings.length > 0}
+            rewardsEnabled={rewardsEnabled}
+            rewardPoints={customer?.reward_points || 0}
+          />
 
-          {/* Upcoming Appointments */}
           <View className={styles.section}>
-
             {bookings.length === 0 ? (
-              <View className={styles.emptyState}>
-                <svg
-                  className={styles.emptyStateIcon}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                  <polyline points="9 16 11 18 15 14" />
-                </svg>
-                <Text className={styles.emptyStateTitle}>No upcoming appointments</Text>
-                <Text className={styles.emptyStateText}>
-                  {siteSettings?.rewards_enabled !== false
-                    ? 'Book your first appointment and start earning reward points.'
-                    : 'Book your first appointment today.'}
-                </Text>
-                <Link to="/book" className={styles.emptyStateButton}>
-                  Book Appointment
-                </Link>
-              </View>
+              <EmptyBookingsState rewardsEnabled={rewardsEnabled} />
             ) : (
               <View className={styles.bookingsList}>
-                {/* Recurring Booking Groups */}
                 {recurringGroups.map((group) => (
-                  <View key={group.groupId} className={styles.bookingCard}>
-                    <View className={styles.bookingMain}>
-                      <View className={styles.bookingInfo}>
-                        <Text className={styles.bookingDate}>
-                          {formatDateShort(group.nextBooking.booking_date)}
-                        </Text>
-                        <View className={styles.bookingMeta}>
-                          <Text>
-                            <span className={styles.bookingTime}>{formatTime(group.nextBooking.start_time)}</span>
-                          </Text>
-                          <Text>{group.nextBooking.service?.name}</Text>
-                          {group.nextBooking.barber && <Text>with {group.nextBooking.barber.name}</Text>}
-                        </View>
-                        <Text className={styles.recurringBadge}>
-                          Recurring {RECURRENCE_LABELS[group.pattern as keyof typeof RECURRENCE_LABELS] || group.pattern} ·{" "}
-                          <span className={styles.remainingText}>
-                            {group.remainingCount} remaining
-                          </span>
-                        </Text>
-                      </View>
-                      <View className={styles.bookingRight}>
-                        <Text className={styles.bookingPrice}>
-                          ${group.nextBooking.total_price.toFixed(2)}
-                        </Text>
-                        <View className={`${styles.statusBadge} ${styles[group.nextBooking.status]}`}>
-                          <Text>{group.nextBooking.status}</Text>
-                        </View>
-                      </View>
-                    </View>
-
-                    {/* Expandable list of all appointments in the series */}
-                    {expandedRecurring === group.groupId && (
-                      <View className={styles.recurringList}>
-                        {group.allBookings.map((booking) => (
-                          <View key={booking.id} className={styles.recurringItem}>
-                            <Text className={styles.recurringItemDate}>
-                              {formatDateShort(booking.booking_date)} at {formatTime(booking.start_time)}
-                            </Text>
-                          </View>
-                        ))}
-                      </View>
-                    )}
-
-                    <View className={styles.bookingActions}>
-                      <button
-                        className={styles.actionLink}
-                        onClick={() => setExpandedRecurring(
-                          expandedRecurring === group.groupId ? null : group.groupId
-                        )}
-                      >
-                        {expandedRecurring === group.groupId ? 'Hide dates' : 'View all dates'}
-                      </button>
-                      {isUpcoming(group.nextBooking) && (
-                        <button
-                          className={styles.actionLinkDanger}
-                          onClick={() => setCancellingBooking(group.nextBooking)}
-                        >
-                          Cancel
-                        </button>
-                      )}
-                    </View>
-                  </View>
+                  <RecurringBookingCard
+                    key={group.groupId}
+                    group={group}
+                    isExpanded={expandedRecurring === group.groupId}
+                    isUpcoming={isUpcoming(group.nextBooking)}
+                    formatTime={formatTime}
+                    formatDateShort={formatDateShort}
+                    onToggleExpand={() =>
+                      setExpandedRecurring(
+                        expandedRecurring === group.groupId ? null : group.groupId
+                      )
+                    }
+                    onCancel={() => setCancellingBooking(group.nextBooking)}
+                  />
                 ))}
-
-                {/* Standalone (non-recurring) Bookings */}
                 {standaloneBookings.map((booking) => (
-                  <View key={booking.id} className={styles.bookingCard}>
-                    <View className={styles.bookingMain}>
-                      <View className={styles.bookingInfo}>
-                        <Text className={styles.bookingDate}>
-                          {formatDateShort(booking.booking_date)}
-                        </Text>
-                        <View className={styles.bookingMeta}>
-                          <Text>
-                            <span className={styles.bookingTime}>{formatTime(booking.start_time)}</span>
-                          </Text>
-                          <Text>{booking.service?.name}</Text>
-                          {booking.barber && <Text>with {booking.barber.name}</Text>}
-                        </View>
-                      </View>
-                      <View className={styles.bookingRight}>
-                        <Text className={styles.bookingPrice}>
-                          ${booking.total_price.toFixed(2)}
-                        </Text>
-                        <View className={`${styles.statusBadge} ${styles[booking.status]}`}>
-                          <Text>{booking.status}</Text>
-                        </View>
-                      </View>
-                    </View>
-                    {isUpcoming(booking) && (
-                      <View className={styles.bookingActions}>
-                        <button
-                          className={styles.actionLink}
-                          onClick={() => handleReschedule(booking)}
-                        >
-                          Reschedule
-                        </button>
-                        <button
-                          className={styles.actionLinkDanger}
-                          onClick={() => setCancellingBooking(booking)}
-                        >
-                          Cancel
-                        </button>
-                      </View>
-                    )}
-                  </View>
+                  <StandaloneBookingCard
+                    key={booking.id}
+                    booking={booking}
+                    isUpcoming={isUpcoming(booking)}
+                    formatTime={formatTime}
+                    formatDateShort={formatDateShort}
+                    onReschedule={() => handleReschedule(booking)}
+                    onCancel={() => setCancellingBooking(booking)}
+                  />
                 ))}
               </View>
             )}
@@ -442,94 +269,16 @@ export default function CustomerDashboardPage() {
         </View>
       </View>
 
-      {/* Cancel Confirmation Modal */}
       {cancellingBooking && (
-        <div className={styles.modalOverlay} onClick={() => setCancellingBooking(null)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalTitleRow}>
-              <Text className={styles.modalTitle}>Cancel appointment?</Text>
-            </div>
-            <View className={styles.modalBookingInfo}>
-              <Text className={styles.modalBookingDate}>
-                {parseLocalDate(cancellingBooking.booking_date).toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </Text>
-              <Text className={styles.modalBookingTime}>
-                {formatTime(cancellingBooking.start_time)} · {cancellingBooking.service?.name}
-              </Text>
-              {cancellingBooking.recurrence_group_id && (
-                <Text className={styles.recurringBadge}>
-                  Recurring {RECURRENCE_LABELS[cancellingBooking.recurrence_pattern as keyof typeof RECURRENCE_LABELS] || 'appointment'}
-                </Text>
-              )}
-            </View>
-
-            {isWithin12Hours(cancellingBooking) ? (
-              <View className={styles.feeWarning}>
-                <Text className={styles.feeWarningTitle}>Cancellation fee applies</Text>
-                <Text className={styles.feeWarningText}>
-                  A 50% fee (${(cancellingBooking.total_price * 0.5).toFixed(2)}) applies for cancellations within 12 hours.
-                </Text>
-              </View>
-            ) : (
-              <View className={styles.nofeeWarning}>
-                <Text className={styles.nofeeText}>
-                  No fee if canceled at least 12 hours in advance.
-                </Text>
-              </View>
-            )}
-
-            {/* Show options for recurring bookings */}
-            {cancellingBooking.recurrence_group_id ? (
-              <View className={styles.cancelOptions}>
-                <button
-                  className={styles.cancelOptionButton}
-                  onClick={() => handleCancelBooking('single')}
-                  disabled={cancelling}
-                >
-                  <span className={styles.cancelOptionLabel}>Cancel this appointment only</span>
-                  <span className={styles.cancelOptionDesc}>Other appointments in the series will remain</span>
-                </button>
-                <button
-                  className={styles.cancelOptionButtonDanger}
-                  onClick={() => handleCancelBooking('all')}
-                  disabled={cancelling}
-                >
-                  <span className={styles.cancelOptionLabel}>Cancel all future appointments</span>
-                  <span className={styles.cancelOptionDesc}>Cancel this and all remaining appointments in the series</span>
-                </button>
-                <button
-                  className={styles.modalKeepButton}
-                  onClick={() => setCancellingBooking(null)}
-                  disabled={cancelling}
-                  style={{ marginTop: 8 }}
-                >
-                  Keep appointments
-                </button>
-              </View>
-            ) : (
-              <View className={styles.modalActions}>
-                <button
-                  className={styles.modalKeepButton}
-                  onClick={() => setCancellingBooking(null)}
-                  disabled={cancelling}
-                >
-                  Keep
-                </button>
-                <button
-                  className={styles.modalCancelButton}
-                  onClick={() => handleCancelBooking('single')}
-                  disabled={cancelling}
-                >
-                  {cancelling ? 'Cancelling...' : 'Delete'}
-                </button>
-              </View>
-            )}
-          </div>
-        </div>
+        <CancelBookingModal
+          booking={cancellingBooking}
+          cancelling={cancelling}
+          isWithin12Hours={isWithin12Hours(cancellingBooking)}
+          parseLocalDate={parseLocalDate}
+          formatTime={formatTime}
+          onClose={() => setCancellingBooking(null)}
+          onConfirm={handleCancelBooking}
+        />
       )}
     </>
   );

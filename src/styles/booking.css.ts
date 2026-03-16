@@ -1,12 +1,5 @@
 import { style, keyframes } from "@vanilla-extract/css";
-
-const darker_bg = "#101214";
-const dark_bg = "#222222";
-const button =  "#96cfe0";
-const text_primary = "#f5f5f5";
-const text_secondary = "#b0b0b0";
-const text_muted = "#8a8a8a";
-const border_subtle = "rgba(255,255,255,0.08)";
+import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_subtle } from './globalStyles.css';
 
 const fadeIn = keyframes({
   from: { opacity: 0 },
@@ -629,6 +622,7 @@ export const confirmButton = style({
     "screen and (min-width: 768px)": {
       padding: "16px 32px",
       fontSize: 20,
+      marginTop: 4,
     },
   },
 });
@@ -783,15 +777,12 @@ export const confirmationPrimaryButton = style({
 export const guestChoiceSection = style({
   display: "flex",
   flexDirection: "column",
-  gap: 16,
-  marginTop: 20,
-  padding: 20,
-  backgroundColor: darker_bg,
-  borderRadius: 12,
+  gap: 12,
+  padding: "8px 12px",
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: 24,
-      gap: 20,
+      padding: "8px 24px",
+      gap: 16,
     },
   },
 });
@@ -828,7 +819,7 @@ export const orDivider = style({
   alignItems: "center",
   gap: 16,
   color: text_muted,
-  fontSize: 14,
+  fontSize: 20,
   fontWeight: 500,
   "::before": {
     content: '""',
@@ -846,7 +837,7 @@ export const orDivider = style({
 
 export const guestButton = style({
   padding: "14px 24px",
-  fontSize: 16,
+  fontSize: 20,
   fontWeight: 500,
   backgroundColor: "transparent",
   color: text_primary,
@@ -857,7 +848,7 @@ export const guestButton = style({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  gap: 4,
+  gap: 6,
   ":hover": {
     borderColor: button,
     color: button,
@@ -868,18 +859,18 @@ export const guestButton = style({
   "@media": {
     "screen and (min-width: 768px)": {
       padding: "16px 32px",
-      fontSize: 18,
+      fontSize: 22,
     },
   },
 });
 
 export const guestButtonSubtext = style({
-  fontSize: 12,
+  fontSize: 14,
   color: text_muted,
   fontWeight: 400,
   "@media": {
     "screen and (min-width: 768px)": {
-      fontSize: 13,
+      fontSize: 16,
     },
   },
 });
@@ -920,13 +911,14 @@ export const guestInputGroup = style({
 });
 
 export const guestInputLabel = style({
-  fontSize: 14,
+  fontSize: 16,
   color: text_secondary,
   fontWeight: 500,
+  textAlign: "left",
 });
 
 export const guestInput = style({
-  padding: "12px 14px",
+  padding: "12px 12px",
   fontSize: 16,
   borderRadius: 8,
   backgroundColor: dark_bg,
@@ -946,13 +938,13 @@ export const guestInput = style({
 export const guestFormButtons = style({
   display: "flex",
   flexDirection: "column",
-  gap: 12,
-  marginTop: 8,
+  gap: 16,
+  marginTop: 4,
 });
 
 export const guestBackLink = style({
-  fontSize: 14,
-  color: text_muted,
+  fontSize: 20,
+  color: text_secondary,
   textAlign: "center",
   cursor: "pointer",
   transition: "color 0.2s ease",

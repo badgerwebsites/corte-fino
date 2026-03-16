@@ -9,7 +9,7 @@ globalStyle('html, body', {
   height: '100%',
   lineHeight: 1.5,
   color: '#111',
-  backgroundColor: '#fff',
+  backgroundColor: '#101214',
 
   overflow: 'auto',
 });

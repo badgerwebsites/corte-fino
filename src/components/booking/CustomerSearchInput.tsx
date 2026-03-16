@@ -1,8 +1,8 @@
 // components/CustomerSearchInput.tsx
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '../lib/supabase';
-import type { Customer } from '../types/database.types';
-import * as styles from '../styles/customerSearch.css';
+import { supabase } from '../../lib/supabase';
+import type { Customer } from '../../types/database.types';
+import * as styles from '../../styles/customerSearch.css';
 
 interface CustomerSearchInputProps {
   onSelect: (customer: Customer) => void;

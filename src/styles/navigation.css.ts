@@ -1,8 +1,6 @@
 // styles/navigation.css.ts
 import { style } from '@vanilla-extract/css';
-
-const button =  "#96cfe0";
-const text_primary = "#f5f5f5";
+import { button, text_primary } from './globalStyles.css';
 
 export const nav = style({
   position: 'fixed',
@@ -23,7 +21,7 @@ export const nav = style({
 
 export const navContainer = style({
   maxWidth: 1200,
-  margin: '0 auto',
+  margin: '0 12px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',

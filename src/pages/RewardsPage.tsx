@@ -5,11 +5,13 @@ import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
 import type { Reward, RewardRedemptionWithDetails } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
+import { HowItWorksSteps } from '../components/rewards/HowItWorksSteps';
+import { RedemptionCodeModal } from '../components/rewards/RedemptionCodeModal';
+import { PendingRedemptions } from '../components/rewards/PendingRedemptions';
+import { RewardCard } from '../components/rewards/RewardCard';
 import { View } from '../ui/View';
-import { Text } from '../ui/Text';
 import * as styles from '../styles/rewards.css';
 
-// Generate a random 6-character alphanumeric code
 const generateRedemptionCode = (): string => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
@@ -28,7 +30,6 @@ export default function RewardsPage() {
   const [activeCode, setActiveCode] = useState<string | null>(null);
   const [rewardsEnabled, setRewardsEnabled] = useState<boolean | null>(null);
 
-  // Check if rewards are enabled
   useEffect(() => {
     const checkRewardsEnabled = async () => {
       const { data } = await supabase.from('site_settings').select('rewards_enabled').single();
@@ -41,7 +42,6 @@ export default function RewardsPage() {
     checkRewardsEnabled();
   }, [navigate, user]);
 
-  // Refetch rewards and customer data when navigating to this page
   useEffect(() => {
     if (rewardsEnabled === false) return;
     loadRewards();
@@ -64,26 +64,22 @@ export default function RewardsPage() {
   };
 
   const loadPendingRedemptions = useCallback(async () => {
-  if (!user) return;
+    if (!user) return;
 
-  try {
-    const { data, error } = await supabase
-      .from('reward_redemptions')
-      .select(`
-        *,
-        reward:rewards(*)
-      `)
-      .eq('customer_id', user.id)
-      .eq('fulfilled', false)
-      .order('redeemed_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('reward_redemptions')
+        .select(`*, reward:rewards(*)`)
+        .eq('customer_id', user.id)
+        .eq('fulfilled', false)
+        .order('redeemed_at', { ascending: false });
 
-    if (error) throw error;
-    setPendingRedemptions(data || []);
-  } catch (error) {
-    console.error('Error loading pending redemptions:', error);
-  }
-}, [user]);
-
+      if (error) throw error;
+      setPendingRedemptions(data || []);
+    } catch (error) {
+      console.error('Error loading pending redemptions:', error);
+    }
+  }, [user]);
 
   const handleRedeem = async (rewardId: string, pointsRequired: number) => {
     if (!user || !customer) {
@@ -99,7 +95,6 @@ export default function RewardsPage() {
     const redemptionCode = generateRedemptionCode();
 
     try {
-      // Deduct points immediately
       const newPoints = customer.reward_points - pointsRequired;
       const { error: pointsError } = await supabase
         .from('customers')
@@ -108,7 +103,6 @@ export default function RewardsPage() {
 
       if (pointsError) throw pointsError;
 
-      // Create pending redemption
       const { error } = await supabase.from('reward_redemptions').insert({
         customer_id: user.id,
         reward_id: rewardId,
@@ -118,7 +112,6 @@ export default function RewardsPage() {
       });
 
       if (error) {
-        // Refund points if redemption creation fails
         await supabase
           .from('customers')
           .update({ reward_points: customer.reward_points })
@@ -126,13 +119,8 @@ export default function RewardsPage() {
         throw error;
       }
 
-      // Show the code to the customer
       setActiveCode(redemptionCode);
-
-      // Refresh customer data to update points in UI
       await refreshCustomer();
-
-      // Reload pending redemptions
       loadPendingRedemptions();
     } catch (error) {
       console.error('Error redeeming reward:', error);
@@ -144,14 +132,12 @@ export default function RewardsPage() {
     if (!confirm('Cancel this redemption request? Your points will be refunded.')) return;
 
     try {
-      // Find the redemption to get points_spent
       const redemption = pendingRedemptions.find(r => r.id === redemptionId);
       if (!redemption) {
         alert('Redemption not found');
         return;
       }
 
-      // Delete the redemption
       const { error } = await supabase
         .from('reward_redemptions')
         .delete()
@@ -160,15 +146,12 @@ export default function RewardsPage() {
 
       if (error) throw error;
 
-      // Refund points to customer
       if (user && customer) {
         const newPoints = customer.reward_points + redemption.points_spent;
         await supabase
           .from('customers')
           .update({ reward_points: newPoints })
           .eq('id', user.id);
-
-        // Refresh customer data to update points in UI
         await refreshCustomer();
       }
 
@@ -179,7 +162,6 @@ export default function RewardsPage() {
     }
   };
 
-  // Don't render until we know rewards are enabled
   if (rewardsEnabled === null || rewardsEnabled === false) {
     return null;
   }
@@ -193,129 +175,29 @@ export default function RewardsPage() {
             ← Back
           </Link>
         </View>
-        <View className={styles.howItWorks}>
-          <View className={styles.stepsList}>
-            <View className={styles.step}>
-              <Text className={styles.stepNumber}>1</Text>
-              <Text className={styles.stepText}>Book through our website</Text>
-            </View>
-            <View className={styles.step}>
-              <Text className={styles.stepNumber}>2</Text>
-              <Text className={styles.stepText}>Earn points with each visit</Text>
-            </View>
-            <View className={styles.step}>
-              <Text className={styles.stepNumber}>3</Text>
-              <Text className={styles.stepText}>Redeem points for rewards</Text>
-            </View>
-          </View>
+
+        <HowItWorksSteps />
+
+        {activeCode && (
+          <RedemptionCodeModal code={activeCode} onClose={() => setActiveCode(null)} />
+        )}
+
+        <PendingRedemptions
+          redemptions={pendingRedemptions}
+          onCancel={handleCancelRedemption}
+        />
+
+        <View className={styles.rewardsGrid}>
+          {rewards.map((reward) => (
+            <RewardCard
+              key={reward.id}
+              reward={reward}
+              customerPoints={customer?.reward_points}
+              onRedeem={handleRedeem}
+            />
+          ))}
         </View>
-
-      {/* Redemption Code Modal */}
-      {activeCode && (
-        <View className={styles.codeModal}>
-          <View className={styles.codeModalContent}>
-            <Text className={styles.codeModalTitle}>Redemption Code</Text>
-            {/* <Text className={styles.codeModalTitle}>
-              Show this code to your barber to claim your reward
-            </Text> */}
-            <View className={styles.codeDisplay}>
-              <Text className={styles.codeText}>{activeCode}</Text>
-            </View>
-            <Text className={styles.codeModalHint}>
-              Show this code to your barber to claim your reward
-            </Text>
-            <button
-              className={styles.codeModalButton}
-              onClick={() => setActiveCode(null)}
-            >
-              Got It
-            </button>
-          </View>
-        </View>
-      )}
-
-      {/* Pending Redemptions */}
-      {pendingRedemptions.length > 0 && (
-        <View className={styles.pendingSection}>
-          <Text className={styles.pendingTitle}>Pending Redemptions</Text>
-          <View className={styles.pendingList}>
-            {pendingRedemptions.map((redemption) => (
-              <View key={redemption.id} className={styles.pendingCard}>
-                <View className={styles.pendingInfo}>
-                  <Text className={styles.pendingReward}>
-                    {redemption.reward?.name || 'Reward'}
-                  </Text>
-                  <Text className={styles.pendingPoints}>
-                    {redemption.points_spent} points
-                  </Text>
-                </View>
-                <View className={styles.pendingCodeBox}>
-                  <Text className={styles.pendingCode}>{redemption.redemption_code}</Text>
-                </View>
-                <button
-                  className={styles.cancelButton}
-                  onClick={() => handleCancelRedemption(redemption.id)}
-                >
-                  Cancel
-                </button>
-              </View>
-            ))}
-          </View>
-        </View>
-      )}
-
-      <View className={styles.rewardsGrid}>
-        {rewards.map((reward) => {
-          const canRedeem = customer && customer.reward_points >= reward.points_required;
-          const progress = customer
-            ? Math.min((customer.reward_points / reward.points_required) * 100, 100)
-            : 0;
-
-          return (
-            <View key={reward.id} className={styles.rewardCard}>
-              <View className={styles.rewardHeader}>
-                <Text className={styles.rewardName}>{reward.name}</Text>
-                <View className={styles.pointsBadge}>
-                  <Text>{reward.points_required} pts</Text>
-                </View>
-              </View>
-
-              <Text className={styles.rewardDescription}>
-                {reward.description}
-              </Text>
-
-              {customer && (
-                <>
-                  <View className={styles.progressBar}>
-                    <View
-                      className={styles.progressFill}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </View>
-                  <Text className={styles.progressText}>
-                    {customer.reward_points} / {reward.points_required} points
-                  </Text>
-                </>
-              )}
-
-              <button
-                className={`${styles.redeemButton} ${!canRedeem ? styles.disabled : ''}`}
-                onClick={() => handleRedeem(reward.id, reward.points_required)}
-                disabled={!canRedeem}
-              >
-                {canRedeem ? 'Redeem Now' : 'Not Enough Points'}
-              </button>
-            </View>
-          );
-        })}
       </View>
-
-      {/* <View className={styles.backLink}>
-        <Link to={user ? '/dashboard' : '/'} className={styles.link}>
-          ← Back
-        </Link>
-      </View> */}
-    </View>
     </>
   );
 }

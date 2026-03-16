@@ -1,21 +1,32 @@
 // pages/BookingPage.tsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { DayPicker } from 'react-day-picker';
-import { addMonths, format, isBefore, startOfDay, getDay } from 'date-fns';
+import { addMonths, format, getDay, startOfDay } from 'date-fns';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
-import type { Barber, Service, BarberServicePricing, BarberAvailability, BarberTimeOff, Booking, ShopSettings, RecurrencePattern } from '../types/database.types';
-import { RECURRENCE_LABELS } from '../types/database.types';
+import type {
+  Barber,
+  BarberAvailability,
+  BarberServicePricing,
+  BarberTimeOff,
+  Booking,
+  RecurrencePattern,
+  Service,
+  ShopSettings,
+} from '../types/database.types';
+import type { Customer } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { View } from '../ui/View';
-import { Text } from '../ui/Text';
 import * as styles from '../styles/booking.css';
-import * as calendarStyles from '../styles/calendar.css';
-import { CustomerSearchInput } from '../components/CustomerSearchInput';
-import type { Customer } from '../types/database.types';
 import { generateRecurringDates, checkRecurringAvailability, type DateAvailabilityResult } from '../utils/bookingHelpers';
-import { ChevronDown } from "lucide-react";
+import { BookingProgressBar } from '../components/booking/BookingProgressBar';
+import { StepCustomerSelect } from '../components/booking/StepCustomerSelect';
+import { StepServiceSelect } from '../components/booking/StepServiceSelect';
+import { StepBarberSelect } from '../components/booking/StepBarberSelect';
+import { StepDateTimeSelect } from '../components/booking/StepDateTimeSelect';
+import { StepConfirm, type GuestInfo } from '../components/booking/StepConfirm';
+import { BookingConfirmationModal } from '../components/booking/BookingConfirmationModal';
+import { Text } from '../ui/Text';
 
 type BookingStep = 0 | 1 | 2 | 3 | 4;
 
@@ -34,8 +45,6 @@ export default function BookingPage() {
   const isAdminMode = location.state?.adminMode;
   const isAdmin = isAdminMode || !!customer?.is_admin;
 
-
-  // Check if this is a reschedule
   const rescheduleFromId = locationState?.rescheduleFrom;
   const isReschedule = !!rescheduleFromId;
 
@@ -52,7 +61,7 @@ export default function BookingPage() {
     rewardPoints: number;
   } | null>(null);
 
-  // Data from database
+  // Database data
   const [services, setServices] = useState<Service[]>([]);
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
@@ -68,155 +77,101 @@ export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState('');
 
-  // Guest booking state
+  // Guest booking
   const [showGuestForm, setShowGuestForm] = useState(false);
-  const [guestInfo, setGuestInfo] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-  });
+  const [guestInfo, setGuestInfo] = useState<GuestInfo>({ firstName: '', lastName: '', phone: '' });
 
-  // Recurring appointment state (admin only)
+  // Recurring appointments (admin only)
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern>('weekly');
   const [recurrenceCount, setRecurrenceCount] = useState(8);
   const [recurringAvailability, setRecurringAvailability] = useState<DateAvailabilityResult[]>([]);
 
+  // ─── Effects ───────────────────────────────────────────────────────────────
+
   useEffect(() => {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, [step]);
-  
+
   useEffect(() => {
     loadData();
   }, []);
 
-  // Fetch existing bookings when date changes
   useEffect(() => {
-    if (!selectedDate) {
-      setExistingBookings([]);
-      return;
-    }
-
+    if (!selectedDate) { setExistingBookings([]); return; }
     const fetchExistingBookings = async () => {
       const dateString = format(selectedDate, 'yyyy-MM-dd');
       const { data, error } = await supabase
-        .from('bookings')
-        .select('*')
-        .eq('booking_date', dateString)
-        .neq('status', 'cancelled');
-
-      if (error) {
-        console.error('Error fetching existing bookings:', error);
-        return;
-      }
-
+        .from('bookings').select('*').eq('booking_date', dateString).neq('status', 'cancelled');
+      if (error) { console.error('Error fetching existing bookings:', error); return; }
       setExistingBookings(data || []);
     };
-
     fetchExistingBookings();
   }, [selectedDate]);
 
-  // Pre-select service and barber if rescheduling
   useEffect(() => {
     if (!loading && locationState) {
       if (locationState.serviceId) {
         const service = services.find(s => s.id === locationState.serviceId);
-        if (service) {
-          setSelectedService(service);
-          setStep(2);
-        }
+        if (service) { setSelectedService(service); setStep(2); }
       }
       if (locationState.barberId) {
         const barber = barbers.find(b => b.id === locationState.barberId);
         if (barber) {
           setSelectedBarber(barber);
           setAnyBarber(false);
-          if (locationState.serviceId) {
-            setStep(3); // Go straight to date/time selection
-          }
+          if (locationState.serviceId) setStep(3);
         }
       }
     }
   }, [loading, locationState, services, barbers]);
 
-  // Restore booking state after login (if user was redirected from booking flow)
   useEffect(() => {
     if (!loading && user && services.length > 0 && barbers.length > 0) {
       const savedState = localStorage.getItem('pendingBooking');
-
-      if (savedState) {
-        try {
-          const bookingState = JSON.parse(savedState);
-
-          // Prevent restoring very old booking states (older than 1 hour)
-          if (Date.now() - bookingState.savedAt > 1000 * 60 * 60) {
-            localStorage.removeItem('pendingBooking');
-            return;
-          }
-
-          // Restore service
-          if (bookingState.serviceId) {
-            const service = services.find(s => s.id === bookingState.serviceId);
-            if (service) setSelectedService(service);
-          }
-
-          // Restore barber
-          if (bookingState.barberId) {
-            const barber = barbers.find(b => b.id === bookingState.barberId);
-            if (barber) setSelectedBarber(barber);
-          }
-
-          setAnyBarber(bookingState.anyBarber || false);
-
-          // Restore date
-          if (bookingState.selectedDate) {
-            setSelectedDate(new Date(bookingState.selectedDate));
-          }
-
-          // Restore time
-          if (bookingState.selectedTime) {
-            setSelectedTime(bookingState.selectedTime);
-          }
-
-          // Restore step
-          if (bookingState.step) {
-            setStep(bookingState.step);
-          }
-
-          // Clear saved booking state
+      if (!savedState) return;
+      try {
+        const bookingState = JSON.parse(savedState);
+        if (Date.now() - bookingState.savedAt > 1000 * 60 * 60) {
           localStorage.removeItem('pendingBooking');
-
-          // Ensure page scrolls to the top after restore
-          window.scrollTo({ top: 0, behavior: 'instant' });
-
-        } catch (e) {
-          console.error('Error restoring booking state:', e);
-          localStorage.removeItem('pendingBooking');
+          return;
         }
+        if (bookingState.serviceId) {
+          const service = services.find(s => s.id === bookingState.serviceId);
+          if (service) setSelectedService(service);
+        }
+        if (bookingState.barberId) {
+          const barber = barbers.find(b => b.id === bookingState.barberId);
+          if (barber) setSelectedBarber(barber);
+        }
+        setAnyBarber(bookingState.anyBarber || false);
+        if (bookingState.selectedDate) setSelectedDate(new Date(bookingState.selectedDate));
+        if (bookingState.selectedTime) setSelectedTime(bookingState.selectedTime);
+        if (bookingState.step) setStep(bookingState.step);
+        localStorage.removeItem('pendingBooking');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } catch (e) {
+        console.error('Error restoring booking state:', e);
+        localStorage.removeItem('pendingBooking');
       }
     }
   }, [loading, user, services, barbers]);
 
-  // Check recurring availability when recurring options change
   useEffect(() => {
     if (!isRecurring || !selectedDate || !selectedTime || !selectedBarber || !selectedService) {
       setRecurringAvailability([]);
       return;
     }
-
     const dates = generateRecurringDates(selectedDate, recurrencePattern, recurrenceCount);
     const results = checkRecurringAvailability(
-      dates,
-      selectedTime,
-      selectedBarber.id,
-      selectedService.duration_minutes,
-      availability,
-      timeOff,
-      existingBookings
+      dates, selectedTime, selectedBarber.id, selectedService.duration_minutes,
+      availability, timeOff, existingBookings
     );
     setRecurringAvailability(results);
   }, [isRecurring, selectedDate, selectedTime, selectedBarber, selectedService, recurrencePattern, recurrenceCount, availability, timeOff, existingBookings]);
+
+  // ─── Data loading ──────────────────────────────────────────────────────────
 
   const loadData = async () => {
     try {
@@ -247,12 +202,14 @@ export default function BookingPage() {
     }
   };
 
+  // ─── Selection handlers ────────────────────────────────────────────────────
+
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
     setStep(2);
   };
 
-  const handleBarberSelect = (barber: Barber | null, anyAvailable: boolean = false) => {
+  const handleBarberSelect = (barber: Barber | null, anyAvailable = false) => {
     setSelectedBarber(barber);
     setAnyBarber(anyAvailable);
     setStep(3);
@@ -260,7 +217,7 @@ export default function BookingPage() {
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
-    setSelectedTime(''); // Reset time when date changes
+    setSelectedTime('');
   };
 
   const handleTimeSelect = (time: string) => {
@@ -268,130 +225,235 @@ export default function BookingPage() {
     setStep(4);
   };
 
+  // ─── Price & availability helpers ─────────────────────────────────────────
+
   const getTimePeriod = (time: string, barber: Barber): 'regular' | 'evening' => {
-    // Convert time to minutes for easier comparison
     const [hours, minutes] = time.split(':').map(Number);
     const timeInMinutes = hours * 60 + minutes;
-
     const [eveningHours, eveningMinutes] = barber.evening_hours_start.split(':').map(Number);
     const eveningStartMinutes = eveningHours * 60 + eveningMinutes;
-
     const [eveningEndHours, eveningEndMins] = barber.evening_hours_end.split(':').map(Number);
     const eveningEndMinutes = eveningEndHours * 60 + eveningEndMins;
-
-    if (timeInMinutes >= eveningStartMinutes && timeInMinutes < eveningEndMinutes) {
-      return 'evening';
-    }
-    return 'regular';
+    return (timeInMinutes >= eveningStartMinutes && timeInMinutes < eveningEndMinutes) ? 'evening' : 'regular';
   };
 
   const calculatePrice = (): number => {
     if (!selectedService || !selectedBarber || !selectedTime || !selectedDate) return 0;
-
     const timePeriod = getTimePeriod(selectedTime, selectedBarber);
-    const dayOfWeek = getDay(selectedDate); // 0=Sun, 1=Mon, ..., 6=Sat
-
-    // Look for day-specific price
+    const dayOfWeek = getDay(selectedDate);
     const priceEntry = pricing.find(
       p => p.barber_id === selectedBarber.id &&
            p.service_id === selectedService.id &&
            p.time_period === timePeriod &&
            p.day_of_week === dayOfWeek
     );
-
     return priceEntry?.price || 0;
   };
 
-  // Save booking state to localStorage before redirecting to login
+  const isDateAvailable = (date: Date): boolean => {
+    const dayOfWeek = getDay(date);
+    const dateString = format(date, 'yyyy-MM-dd');
+
+    if (!selectedBarber && anyBarber) {
+      return barbers.some(barber => {
+        const hasAvailability = availability.some(
+          a => a.barber_id === barber.id && a.day_of_week === dayOfWeek && a.is_available
+        );
+        const hasTimeOff = timeOff.some(
+          t => t.barber_id === barber.id && dateString >= t.start_date && dateString <= t.end_date
+        );
+        return hasAvailability && !hasTimeOff;
+      });
+    }
+
+    if (!selectedBarber) return true;
+
+    const hasAvailability = availability.some(
+      a => a.barber_id === selectedBarber.id && a.day_of_week === dayOfWeek && a.is_available
+    );
+    if (!hasAvailability) return false;
+
+    const hasTimeOff = timeOff.some(
+      t => t.barber_id === selectedBarber.id && dateString >= t.start_date && dateString <= t.end_date
+    );
+    return !hasTimeOff;
+  };
+
+  const isSlotBooked = (time: string, barberId: string, serviceDuration: number): boolean => {
+    const [slotHours, slotMins] = time.split(':').map(Number);
+    const newStart = slotHours * 60 + slotMins;
+    const newEnd = newStart + serviceDuration;
+
+    return existingBookings.some(booking => {
+      if (booking.barber_id !== barberId) return false;
+      const [startHours, startMins] = booking.start_time.split(':').map(Number);
+      const [endHours, endMins] = booking.end_time.split(':').map(Number);
+      const bookingStart = startHours * 60 + startMins;
+      const bookingEnd = endHours * 60 + endMins;
+      return newStart < bookingEnd && newEnd > bookingStart;
+    });
+  };
+
+  const filterPastTimeSlots = (slots: string[]): string[] => {
+    if (!selectedDate) return slots;
+    const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
+    const now = new Date();
+    const todayStr = format(now, 'yyyy-MM-dd');
+    if (selectedDateStr !== todayStr) return slots;
+    const cutoffTime = now.getHours() * 60 + now.getMinutes() + 15;
+    return slots.filter(slot => {
+      const [hours, mins] = slot.split(':').map(Number);
+      return hours * 60 + mins >= cutoffTime;
+    });
+  };
+
+  const getAvailableTimeSlots = (): string[] => {
+    if (!selectedDate) return [];
+    const dayOfWeek = getDay(selectedDate);
+    const dateString = format(selectedDate, 'yyyy-MM-dd');
+
+    if (!selectedBarber && anyBarber) {
+      const slotAvailability = new Map<string, boolean>();
+      barbers.forEach(barber => {
+        const hasAvailability = availability.some(
+          a => a.barber_id === barber.id && a.day_of_week === dayOfWeek && a.is_available
+        );
+        const hasTimeOff = timeOff.some(
+          t => t.barber_id === barber.id && dateString >= t.start_date && dateString <= t.end_date
+        );
+        if (hasAvailability && !hasTimeOff) {
+          availability
+            .filter(a => a.barber_id === barber.id && a.day_of_week === dayOfWeek && a.is_available)
+            .forEach(avail => {
+              const [startHour, startMin] = avail.start_time.split(':').map(Number);
+              const [endHour, endMin] = avail.end_time.split(':').map(Number);
+              const startMinutes = startHour * 60 + startMin;
+              const endMinutes = endHour * 60 + endMin;
+              const serviceDuration = selectedService?.duration_minutes || 0;
+              for (let m = startMinutes; m + serviceDuration <= endMinutes; m += 15) {
+                const timeSlot = `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
+                if (selectedService && !isSlotBooked(timeSlot, barber.id, selectedService.duration_minutes)) {
+                  slotAvailability.set(timeSlot, true);
+                }
+              }
+            });
+        }
+      });
+      return filterPastTimeSlots(Array.from(slotAvailability.keys()).sort());
+    }
+
+    if (!selectedBarber) return [];
+
+    const barberAvailability = availability.filter(
+      a => a.barber_id === selectedBarber.id && a.day_of_week === dayOfWeek && a.is_available
+    );
+    if (barberAvailability.length === 0) return [];
+
+    const slots: string[] = [];
+    barberAvailability.forEach(avail => {
+      const [startHour, startMin] = avail.start_time.split(':').map(Number);
+      const [endHour, endMin] = avail.end_time.split(':').map(Number);
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+      const serviceDuration = selectedService?.duration_minutes || 0;
+      for (let m = startMinutes; m + serviceDuration <= endMinutes; m += 15) {
+        const timeSlot = `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
+        if (selectedService && !isSlotBooked(timeSlot, selectedBarber.id, selectedService.duration_minutes)) {
+          slots.push(timeSlot);
+        }
+      }
+    });
+    return filterPastTimeSlots(slots.sort());
+  };
+
+  // ─── Formatting helpers ────────────────────────────────────────────────────
+
+  const formatDate = (date: Date | string): string => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  };
+
+  const formatTimeTo12Hour = (time: string): string => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
+
+  // ─── Round-robin barber selection ─────────────────────────────────────────
+
+  const resolveAnyBarber = (dateString: string, dayOfWeek: number): Barber | null => {
+    const availableBarbers = barbers.filter(barber => {
+      const hasAvailability = availability.some(
+        a => a.barber_id === barber.id && a.day_of_week === dayOfWeek && a.is_available
+      );
+      const hasTimeOff = timeOff.some(
+        t => t.barber_id === barber.id && dateString >= t.start_date && dateString <= t.end_date
+      );
+      const isBooked = selectedService
+        ? isSlotBooked(selectedTime, barber.id, selectedService.duration_minutes)
+        : false;
+      return hasAvailability && !hasTimeOff && !isBooked;
+    });
+
+    if (availableBarbers.length === 0) return null;
+
+    const lastBarberId = shopSettings?.last_rotation_barber_id;
+    if (availableBarbers.length === 1 || !lastBarberId) return availableBarbers[0];
+
+    const lastIndex = barbers.findIndex(b => b.id === lastBarberId);
+    for (let i = 1; i <= barbers.length; i++) {
+      const nextBarber = barbers[(lastIndex + i) % barbers.length];
+      if (availableBarbers.some(ab => ab.id === nextBarber.id)) return nextBarber;
+    }
+    return availableBarbers[0];
+  };
+
+  const updateRotation = async (barberId: string) => {
+    if (!shopSettings?.id) return;
+    await supabase.from('shop_settings').update({ last_rotation_barber_id: barberId }).eq('id', shopSettings.id);
+    setShopSettings(prev => prev ? { ...prev, last_rotation_barber_id: barberId } : prev);
+  };
+
+  // ─── Booking state persistence ────────────────────────────────────────────
+
   const saveBookingState = () => {
-    const bookingState = {
-    serviceId: selectedService?.id,
-    barberId: selectedBarber?.id,
-    anyBarber,
-    selectedDate: selectedDate?.toISOString(),
-    selectedTime,
-    step,
-    savedAt: Date.now(),
+    localStorage.setItem('pendingBooking', JSON.stringify({
+      serviceId: selectedService?.id,
+      barberId: selectedBarber?.id,
+      anyBarber,
+      selectedDate: selectedDate?.toISOString(),
+      selectedTime,
+      step,
+      savedAt: Date.now(),
+    }));
   };
-    localStorage.setItem('pendingBooking', JSON.stringify(bookingState));
-  };
+
+  // ─── Guest booking ─────────────────────────────────────────────────────────
 
   const handleGuestBooking = async () => {
     if (!guestInfo.firstName || !guestInfo.lastName || !guestInfo.phone) {
       alert('Please fill in all guest information fields');
       return;
     }
-
     if (!selectedService || !selectedDate || !selectedTime) {
       alert('Please complete all booking selections');
       return;
     }
 
     setBookingInProgress(true);
-
     try {
-      // If "any barber" was selected, use round-robin to pick the next available barber
       let bookingBarber = selectedBarber;
       if (anyBarber && !selectedBarber) {
         const dayOfWeek = getDay(selectedDate);
         const dateString = format(selectedDate, 'yyyy-MM-dd');
-
-        // Get all barbers who are available for this date/time slot
-        const availableBarbers = barbers.filter(barber => {
-          const hasAvailability = availability.some(
-            a => a.barber_id === barber.id &&
-                 a.day_of_week === dayOfWeek &&
-                 a.is_available
-          );
-          const hasTimeOff = timeOff.some(
-            t => t.barber_id === barber.id &&
-                 dateString >= t.start_date &&
-                 dateString <= t.end_date
-          );
-          const isBooked = selectedService
-            ? isSlotBooked(selectedTime, barber.id, selectedService.duration_minutes)
-            : false;
-
-          return hasAvailability && !hasTimeOff && !isBooked;
-        });
-
-        if (availableBarbers.length === 0) {
+        bookingBarber = resolveAnyBarber(dateString, dayOfWeek);
+        if (!bookingBarber) {
           alert('No barber available for this time slot. Please select a different time.');
           setBookingInProgress(false);
           return;
         }
-
-        // Round-robin logic
-        const lastBarberId = shopSettings?.last_rotation_barber_id;
-
-        if (availableBarbers.length === 1) {
-          bookingBarber = availableBarbers[0];
-        } else if (!lastBarberId) {
-          bookingBarber = availableBarbers[0];
-        } else {
-          const lastIndex = barbers.findIndex(b => b.id === lastBarberId);
-          let found = false;
-          for (let i = 1; i <= barbers.length; i++) {
-            const nextIndex = (lastIndex + i) % barbers.length;
-            const nextBarber = barbers[nextIndex];
-            if (availableBarbers.some(ab => ab.id === nextBarber.id)) {
-              bookingBarber = nextBarber;
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            bookingBarber = availableBarbers[0];
-          }
-        }
-
-        if (bookingBarber && shopSettings?.id) {
-          await supabase
-            .from('shop_settings')
-            .update({ last_rotation_barber_id: bookingBarber.id })
-            .eq('id', shopSettings.id);
-          setShopSettings(prev => prev ? { ...prev, last_rotation_barber_id: bookingBarber!.id } : prev);
-        }
+        await updateRotation(bookingBarber.id);
       }
 
       if (!bookingBarber) {
@@ -400,43 +462,33 @@ export default function BookingPage() {
         return;
       }
 
-      // Calculate end time
       const [startHours, startMins] = selectedTime.split(':').map(Number);
       const totalMinutes = startHours * 60 + startMins + selectedService.duration_minutes;
-      const endHours = Math.floor(totalMinutes / 60);
-      const endMins = totalMinutes % 60;
-      const endTime = `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
+      const endTime = `${Math.floor(totalMinutes / 60).toString().padStart(2, '0')}:${(totalMinutes % 60).toString().padStart(2, '0')}`;
 
-      // Calculate price
       const timePeriod = getTimePeriod(selectedTime, bookingBarber);
       const priceEntry = pricing.find(
-        p => p.barber_id === bookingBarber!.id &&
-             p.service_id === selectedService.id &&
-             p.time_period === timePeriod
+        p => p.barber_id === bookingBarber!.id && p.service_id === selectedService.id && p.time_period === timePeriod
       );
       const totalPrice = priceEntry?.price || selectedService.base_price;
 
-      // Create guest booking
-      const { error: bookingError } = await supabase
-        .from('bookings')
-        .insert({
-          customer_id: null,
-          barber_id: bookingBarber.id,
-          service_id: selectedService.id,
-          booking_date: format(selectedDate, 'yyyy-MM-dd'),
-          start_time: selectedTime,
-          end_time: endTime,
-          total_price: totalPrice,
-          status: 'confirmed',
-          cancellation_fee_charged: false,
-          reminder_sent: false,
-          review_request_sent: false,
-          is_guest: true,
-          guest_first_name: guestInfo.firstName,
-          guest_last_name: guestInfo.lastName,
-          guest_phone: guestInfo.phone,
-        });
-
+      const { error: bookingError } = await supabase.from('bookings').insert({
+        customer_id: null,
+        barber_id: bookingBarber.id,
+        service_id: selectedService.id,
+        booking_date: format(selectedDate, 'yyyy-MM-dd'),
+        start_time: selectedTime,
+        end_time: endTime,
+        total_price: totalPrice,
+        status: 'confirmed',
+        cancellation_fee_charged: false,
+        reminder_sent: false,
+        review_request_sent: false,
+        is_guest: true,
+        guest_first_name: guestInfo.firstName,
+        guest_last_name: guestInfo.lastName,
+        guest_phone: guestInfo.phone,
+      });
       if (bookingError) throw bookingError;
 
       setConfirmedBookingDetails({
@@ -445,12 +497,10 @@ export default function BookingPage() {
         date: formatDate(selectedDate),
         time: formatTimeTo12Hour(selectedTime),
         price: totalPrice,
-        rewardPoints: 0, // Guests don't earn points
+        rewardPoints: 0,
       });
-
       setShowConfirmation(true);
       setShowGuestForm(false);
-
     } catch (error) {
       console.error('Error creating guest booking:', error);
       alert('Failed to create booking. Please try again.');
@@ -459,102 +509,32 @@ export default function BookingPage() {
     }
   };
 
-  const handleBooking = async () => {
-    if (!user || !customer) {
-      // Don't redirect to login anymore - guest choice will be shown in UI
-      return;
-    }
+  // ─── Authenticated booking ─────────────────────────────────────────────────
 
+  const handleBooking = async () => {
+    if (!user || !customer) return;
     if (!selectedService || !selectedDate || !selectedTime) {
       alert('Please complete all booking selections');
       return;
     }
-
     if (isAdmin && !selectedCustomer) {
-      alert("Please select a customer.");
+      alert('Please select a customer.');
       return;
     }
 
     setBookingInProgress(true);
-
     try {
-      // If "any barber" was selected, use round-robin to pick the next available barber
       let bookingBarber = selectedBarber;
       if (anyBarber && !selectedBarber) {
         const dayOfWeek = getDay(selectedDate);
         const dateString = format(selectedDate, 'yyyy-MM-dd');
-
-        // Get all barbers who are available for this date/time slot
-        const availableBarbers = barbers.filter(barber => {
-          // Check if barber works on this day
-          const hasAvailability = availability.some(
-            a => a.barber_id === barber.id &&
-                 a.day_of_week === dayOfWeek &&
-                 a.is_available
-          );
-          // Check if barber has time off
-          const hasTimeOff = timeOff.some(
-            t => t.barber_id === barber.id &&
-                 dateString >= t.start_date &&
-                 dateString <= t.end_date
-          );
-          // Check if barber is already booked at this time
-          const isBooked = selectedService
-            ? isSlotBooked(selectedTime, barber.id, selectedService.duration_minutes)
-            : false;
-
-          return hasAvailability && !hasTimeOff && !isBooked;
-        });
-
-        if (availableBarbers.length === 0) {
+        bookingBarber = resolveAnyBarber(dateString, dayOfWeek);
+        if (!bookingBarber) {
           alert('No barber available for this time slot. Please select a different time.');
           setBookingInProgress(false);
           return;
         }
-
-        // Round-robin logic: find the next barber in rotation
-        const lastBarberId = shopSettings?.last_rotation_barber_id;
-
-        if (availableBarbers.length === 1) {
-          // Only one available, use them
-          bookingBarber = availableBarbers[0];
-        } else if (!lastBarberId) {
-          // No previous rotation, start with the first available barber
-          bookingBarber = availableBarbers[0];
-        } else {
-          // Find the index of the last assigned barber in the full barbers list
-          const lastIndex = barbers.findIndex(b => b.id === lastBarberId);
-
-          // Find the next available barber in rotation order
-          let found = false;
-          for (let i = 1; i <= barbers.length; i++) {
-            const nextIndex = (lastIndex + i) % barbers.length;
-            const nextBarber = barbers[nextIndex];
-            if (availableBarbers.some(ab => ab.id === nextBarber.id)) {
-              bookingBarber = nextBarber;
-              found = true;
-              break;
-            }
-          }
-
-          // Fallback to first available if somehow not found
-          if (!found) {
-            bookingBarber = availableBarbers[0];
-          }
-        }
-
-        // Update the rotation tracker in the database AND local state
-        if (bookingBarber && shopSettings?.id) {
-          const { error: rotationError } = await supabase
-            .from('shop_settings')
-            .update({ last_rotation_barber_id: bookingBarber.id })
-            .eq('id', shopSettings.id);
-          if (rotationError) {
-            console.error('Error updating barber rotation:', rotationError);
-          }
-          // Update local state so subsequent bookings in the same session use the new rotation
-          setShopSettings(prev => prev ? { ...prev, last_rotation_barber_id: bookingBarber!.id } : prev);
-        }
+        await updateRotation(bookingBarber.id);
       }
 
       if (!bookingBarber) {
@@ -563,51 +543,33 @@ export default function BookingPage() {
         return;
       }
 
-      // Calculate end time based on service duration
       const [startHours, startMins] = selectedTime.split(':').map(Number);
       const totalMinutes = startHours * 60 + startMins + selectedService.duration_minutes;
-      const endHours = Math.floor(totalMinutes / 60);
-      const endMins = totalMinutes % 60;
-      const endTime = `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
+      const endTime = `${Math.floor(totalMinutes / 60).toString().padStart(2, '0')}:${(totalMinutes % 60).toString().padStart(2, '0')}`;
 
-      // Calculate price
       const timePeriod = getTimePeriod(selectedTime, bookingBarber);
       const priceEntry = pricing.find(
-        p => p.barber_id === bookingBarber!.id &&
-             p.service_id === selectedService.id &&
-             p.time_period === timePeriod
+        p => p.barber_id === bookingBarber!.id && p.service_id === selectedService.id && p.time_period === timePeriod
       );
       const totalPrice = priceEntry?.price || selectedService.base_price;
 
-      // If rescheduling, delete the original booking first
       if (rescheduleFromId) {
-        const { error: deleteError } = await supabase
-          .from('bookings')
-          .delete()
-          .eq('id', rescheduleFromId);
-
-        if (deleteError) {
-          console.error('Error deleting original booking:', deleteError);
-          // Continue with new booking even if delete fails
-        }
+        const { error: deleteError } = await supabase.from('bookings').delete().eq('id', rescheduleFromId);
+        if (deleteError) console.error('Error deleting original booking:', deleteError);
       }
 
-      // Create the booking(s)
       if (isRecurring && isAdmin && recurringAvailability.length > 0) {
-        // Create multiple recurring bookings
         const groupId = crypto.randomUUID();
         const availableDates = recurringAvailability.filter(r => r.available);
-
         if (availableDates.length === 0) {
           alert('No available dates for the recurring appointment. Please adjust your selection.');
           setBookingInProgress(false);
           return;
         }
-
         const bookingsToInsert = availableDates.map((result, index) => ({
           customer_id: selectedCustomer?.id,
           created_by_admin: true,
-          barber_id: bookingBarber.id,
+          barber_id: bookingBarber!.id,
           service_id: selectedService.id,
           booking_date: result.dateString,
           start_time: selectedTime,
@@ -621,14 +583,8 @@ export default function BookingPage() {
           recurrence_pattern: recurrencePattern,
           recurrence_index: index,
         }));
-
-        const { error: bookingError } = await supabase
-          .from('bookings')
-          .insert(bookingsToInsert);
-
+        const { error: bookingError } = await supabase.from('bookings').insert(bookingsToInsert);
         if (bookingError) throw bookingError;
-
-        // Store booking details for confirmation screen
         const skippedCount = recurringAvailability.length - availableDates.length;
         setConfirmedBookingDetails({
           serviceName: selectedService.name,
@@ -639,30 +595,21 @@ export default function BookingPage() {
           rewardPoints: selectedService.reward_points * availableDates.length,
         });
       } else {
-        // Create single booking
-        const { error: bookingError } = await supabase
-          .from('bookings')
-          .insert({
-            customer_id: isAdmin
-              ? selectedCustomer?.id
-              : user.id,
-            created_by_admin: isAdmin,
-            barber_id: bookingBarber.id,
-            service_id: selectedService.id,
-            booking_date: format(selectedDate, 'yyyy-MM-dd'),
-            start_time: selectedTime,
-            end_time: endTime,
-            total_price: totalPrice,
-            status: 'confirmed',
-            cancellation_fee_charged: false,
-            reminder_sent: false,
-            review_request_sent: false,
-          });
-
+        const { error: bookingError } = await supabase.from('bookings').insert({
+          customer_id: isAdmin ? selectedCustomer?.id : user.id,
+          created_by_admin: isAdmin,
+          barber_id: bookingBarber.id,
+          service_id: selectedService.id,
+          booking_date: format(selectedDate, 'yyyy-MM-dd'),
+          start_time: selectedTime,
+          end_time: endTime,
+          total_price: totalPrice,
+          status: 'confirmed',
+          cancellation_fee_charged: false,
+          reminder_sent: false,
+          review_request_sent: false,
+        });
         if (bookingError) throw bookingError;
-
-        // Store booking details for confirmation screen
-        // Show actual assigned barber name even if "Any Barber" was selected
         setConfirmedBookingDetails({
           serviceName: selectedService.name,
           barberName: bookingBarber.name,
@@ -673,9 +620,7 @@ export default function BookingPage() {
         });
       }
 
-      // Show confirmation screen
       setShowConfirmation(true);
-
     } catch (error) {
       console.error('Error creating booking:', error);
       alert('Failed to create booking. Please try again.');
@@ -684,212 +629,21 @@ export default function BookingPage() {
     }
   };
 
-  // Check if a date is available for the selected barber
-  const isDateAvailable = (date: Date): boolean => {
-    const dayOfWeek = getDay(date); // 0 = Sunday, 6 = Saturday
-    const dateString = format(date, 'yyyy-MM-dd');
+  // ─── Derived values for StepConfirm ───────────────────────────────────────
 
-    if (!selectedBarber && anyBarber) {
-      // If "any barber", check if ANY barber is available on this day
-      const hasAnyBarberAvailable = barbers.some(barber => {
-        const hasAvailability = availability.some(
-          a => a.barber_id === barber.id &&
-               a.day_of_week === dayOfWeek &&
-               a.is_available
-        );
-
-        const hasTimeOff = timeOff.some(
-          t => t.barber_id === barber.id &&
-               dateString >= t.start_date &&
-               dateString <= t.end_date
-        );
-
-        return hasAvailability && !hasTimeOff;
-      });
-
-      return hasAnyBarberAvailable;
-    }
-
-    if (!selectedBarber) return true;
-
-    // Check if barber has availability for this day of week
-    const hasAvailability = availability.some(
-      a => a.barber_id === selectedBarber.id &&
-           a.day_of_week === dayOfWeek &&
-           a.is_available
-    );
-
-    if (!hasAvailability) return false;
-
-    // Check if barber has time off on this date
-    const hasTimeOff = timeOff.some(
-      t => t.barber_id === selectedBarber.id &&
-           dateString >= t.start_date &&
-           dateString <= t.end_date
-    );
-
-    return !hasTimeOff;
-  };
-
-  // Filter out past time slots if the selected date is today
-  const filterPastTimeSlots = (slots: string[]): string[] => {
-    if (!selectedDate) return slots;
-
-    const now = new Date();
-    // Compare just the date portions (year, month, day) to avoid timezone issues
-    const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
-    const todayStr = format(now, 'yyyy-MM-dd');
-    const isToday = selectedDateStr === todayStr;
-
-    if (!isToday) return slots;
-
-    // Get current time in minutes plus a 15 minute buffer
-    // (people need time to get to the appointment)
-    const currentHour = now.getHours();
-    const currentMinutes = now.getMinutes();
-    const currentTimeInMinutes = currentHour * 60 + currentMinutes;
-    const bufferMinutes = 15;
-    const cutoffTime = currentTimeInMinutes + bufferMinutes;
-
-    // Filter out slots that are in the past or too close to now
-    return slots.filter(slot => {
-      const [hours, mins] = slot.split(':').map(Number);
-      const slotTimeInMinutes = hours * 60 + mins;
-      return slotTimeInMinutes >= cutoffTime;
-    });
-  };
-
-  // Check if a time slot overlaps with any existing booking for a specific barber
-  // Takes into account the full duration of the service being booked
-  const isSlotBooked = (time: string, barberId: string, serviceDuration: number): boolean => {
-    const [slotHours, slotMins] = time.split(':').map(Number);
-    const newStart = slotHours * 60 + slotMins;
-    const newEnd = newStart + serviceDuration;
-
-    return existingBookings.some(booking => {
-      if (booking.barber_id !== barberId) return false;
-
-      const [startHours, startMins] = booking.start_time.split(':').map(Number);
-      const [endHours, endMins] = booking.end_time.split(':').map(Number);
-      const bookingStart = startHours * 60 + startMins;
-      const bookingEnd = endHours * 60 + endMins;
-
-      // Check for interval overlap: two ranges overlap if newStart < bookingEnd AND newEnd > bookingStart
-      return newStart < bookingEnd && newEnd > bookingStart;
-    });
-  };
-
-  // Get available time slots for selected date and barber
-  const getAvailableTimeSlots = (): string[] => {
-    if (!selectedDate) return [];
-
-    const dayOfWeek = getDay(selectedDate);
-    const dateString = format(selectedDate, 'yyyy-MM-dd');
-
-    // If "any barber" selected, collect time slots where at least one barber is available
-    if (!selectedBarber && anyBarber) {
-      const slotAvailability = new Map<string, boolean>();
-
-      barbers.forEach(barber => {
-        // Check if this barber is available on this date
-        const hasAvailability = availability.some(
-          a => a.barber_id === barber.id &&
-               a.day_of_week === dayOfWeek &&
-               a.is_available
-        );
-
-        const hasTimeOff = timeOff.some(
-          t => t.barber_id === barber.id &&
-               dateString >= t.start_date &&
-               dateString <= t.end_date
-        );
-
-        if (hasAvailability && !hasTimeOff) {
-          // Get this barber's availability slots
-          const barberAvailability = availability.filter(
-            a => a.barber_id === barber.id &&
-                 a.day_of_week === dayOfWeek &&
-                 a.is_available
-          );
-
-          barberAvailability.forEach(avail => {
-            const [startHour, startMin] = avail.start_time.split(':').map(Number);
-            const [endHour, endMin] = avail.end_time.split(':').map(Number);
-
-            const startMinutes = startHour * 60 + startMin;
-            const endMinutes = endHour * 60 + endMin;
-            const serviceDuration = selectedService?.duration_minutes || 0;
-
-            // Generate 15-minute slots, but stop where service would extend past availability
-            for (let minutes = startMinutes; minutes + serviceDuration <= endMinutes; minutes += 15) {
-              const hours = Math.floor(minutes / 60);
-              const mins = minutes % 60;
-              const timeSlot = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-
-              // Check if this barber is available for this slot (not already booked)
-              // Must account for the full service duration to avoid overlaps
-              if (selectedService && !isSlotBooked(timeSlot, barber.id, selectedService.duration_minutes)) {
-                slotAvailability.set(timeSlot, true);
-              }
-            }
-          });
-        }
-      });
-
-      return filterPastTimeSlots(Array.from(slotAvailability.keys()).sort());
-    }
-
-    // Specific barber selected
-    if (!selectedBarber) return [];
-
-    const barberAvailability = availability.filter(
-      a => a.barber_id === selectedBarber.id &&
-           a.day_of_week === dayOfWeek &&
-           a.is_available
-    );
-
-    if (barberAvailability.length === 0) return [];
-
-    const slots: string[] = [];
-
-    barberAvailability.forEach(avail => {
-      const [startHour, startMin] = avail.start_time.split(':').map(Number);
-      const [endHour, endMin] = avail.end_time.split(':').map(Number);
-
-      const startMinutes = startHour * 60 + startMin;
-      const endMinutes = endHour * 60 + endMin;
-      const serviceDuration = selectedService?.duration_minutes || 0;
-
-      // Generate 15-minute slots, but stop where service would extend past availability
-      for (let minutes = startMinutes; minutes + serviceDuration <= endMinutes; minutes += 15) {
-        const hours = Math.floor(minutes / 60);
-        const mins = minutes % 60;
-        const timeSlot = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-
-        // Only add if not already booked (accounting for full service duration)
-        if (selectedService && !isSlotBooked(timeSlot, selectedBarber.id, selectedService.duration_minutes)) {
-          slots.push(timeSlot);
-        }
-      }
-    });
-
-    return filterPastTimeSlots(slots.sort());
-  };
-
-  const formatDate = (date: Date | string): string => {
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  };
-
-  const formatTimeTo12Hour = (time: string): string => {
-    const [hours, minutes] = time.split(':').map(Number);
-    const period = hours >= 12 ? 'PM' : 'AM';
-    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-  };
+  const price = calculatePrice();
+  const timePeriodLabel = selectedBarber && selectedTime
+    ? getTimePeriod(selectedTime, selectedBarber) === 'evening'
+      ? `Evening rate (${formatTimeTo12Hour(selectedBarber.evening_hours_start)}-${formatTimeTo12Hour(selectedBarber.evening_hours_end)})`
+      : `Regular rate (${formatTimeTo12Hour(selectedBarber.regular_hours_start)}-${formatTimeTo12Hour(selectedBarber.regular_hours_end)})`
+    : '';
 
   const today = startOfDay(new Date());
   const endMonth = addMonths(today, 6);
+
+  // ─── Render ────────────────────────────────────────────────────────────────
+
+  if (loading) return null;
 
   return (
     <>
@@ -901,548 +655,109 @@ export default function BookingPage() {
           </Link>
         </View>
 
-      {isReschedule && (
-        <View className={styles.rescheduleNoticeWrapper}>
-          <View className={styles.rescheduleNotice}>
-            <Text className={styles.rescheduleNoticeText}>
-              You are rescheduling an appointment
-            </Text>
-          </View>
-        </View>
-      )}
-
-      {/* Progress Indicator */}
-      <View className={styles.progressBar}>
-        {isAdmin && (
-          <>
-            <View className={`${styles.progressStep} ${step >= 0 ? styles.progressStepActive : ''}`}>
-              <View className={styles.progressNumber}>0</View>
-              <Text className={styles.progressLabel}>Customer</Text>
-            </View>
-            <View className={styles.progressLine} />
-          </>
-        )}
-        <View className={`${styles.progressStep} ${step >= 1 ? styles.progressStepActive : ''}`}>
-          <View className={styles.progressNumber}>1</View>
-          <Text className={styles.progressLabel}>Service</Text>
-        </View>
-        <View className={styles.progressLine} />
-        <View className={`${styles.progressStep} ${step >= 2 ? styles.progressStepActive : ''}`}>
-          <View className={styles.progressNumber}>2</View>
-          <Text className={styles.progressLabel}>Barber</Text>
-        </View>
-        <View className={styles.progressLine} />
-        <View className={`${styles.progressStep} ${step >= 3 ? styles.progressStepActive : ''}`}>
-          <View className={styles.progressNumber}>3</View>
-          <Text className={styles.progressLabel}>Time</Text>
-        </View>
-        <View className={styles.progressLine} />
-        <View className={`${styles.progressStep} ${step >= 4 ? styles.progressStepActive : ''}`}>
-          <View className={styles.progressNumber}>4</View>
-          <Text className={styles.progressLabel}>Confirm</Text>
-        </View>
-      </View>
-
-      {/* Step 0: Select Customer (Admin Only) */}
-      {isAdmin && step === 0 && (
-        <View className={styles.stepContainer}>
-          <Text className={styles.stepTitle}>Select Customer</Text>
-
-          <CustomerSearchInput
-            selectedCustomer={selectedCustomer}
-            onSelect={(customer) => {
-              setSelectedCustomer(customer);
-              setStep(1);
-            }}
-            onClear={() => setSelectedCustomer(null)}
-          />
-        </View>
-      )}
-
-      {/* Step 1: Select Service */}
-      {step === 1 && (
-        <View className={styles.stepContainer}>
-          {isAdmin && (
-            <button
-              className={styles.backButton}
-              onClick={() => {
-                setSelectedService(null);
-                setSelectedBarber(null);
-                setSelectedDate(undefined);
-                setSelectedTime('');
-                setStep(0);
-              }}
-            >
-              ← Back to Customer
-            </button>
-          )}
-          {/* <Text className={styles.stepTitle}>Select a Service</Text> */}
-          <View className={styles.serviceGrid}>
-            {services.map((service) => (
-              <View
-                key={service.id}
-                className={styles.serviceCard}
-                onClick={() => handleServiceSelect(service)}
-              >
-                {service.image_url && (
-                  <View className={styles.serviceImageWrapper}>
-                    <img
-                      src={service.image_url}
-                      alt={service.name}
-                      className={styles.serviceImage}
-                    />
-                  </View>
-                )}
-                <View className={styles.serviceCardContent}>
-                  <Text className={styles.serviceName}>{service.name}</Text>
-                  <Text className={styles.serviceDuration}>{service.duration_minutes} minutes</Text>
-                  {service.description && (
-                    <Text className={styles.serviceDescription}>{service.description}</Text>
-                  )}
-                  <Text className={styles.servicePoints}>+{service.reward_points} reward points</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
-      )}
-
-      {/* Step 2: Select Barber */}
-      {step === 2 && (
-        <View className={styles.stepContainer}>
-          {/* <Text className={styles.stepTitle}>Choose Your Barber</Text> */}
-          <button className={styles.backButton} onClick={() => setStep(1)}>
-            ← Back to Service
-          </button>
-          {/* <Text className={styles.stepSubtitle}>
-            Selected: {selectedService?.name}
-          </Text> */}
-
-          <View className={styles.barberGrid}>
-            {barbers.map((barber) => (
-              <View
-                key={barber.id}
-                className={styles.barberCard}
-                onClick={() => handleBarberSelect(barber, false)}
-              >
-                {barber.image_url && (
-                  <View className={styles.barberImageWrapper}>
-                    <img
-                      src={barber.image_url}
-                      alt={barber.name}
-                      className={styles.barberImage}
-                    />
-                  </View>
-                )}
-                <Text className={styles.barberName}>{barber.name}</Text>
-                {barber.bio && (
-                  <Text className={styles.barberBio}>{barber.bio}</Text>
-                )}
-                {barber.instagram_handle && (
-                  <Text className={styles.barberSocial}>@{barber.instagram_handle}</Text>
-                )}
-              </View>
-            ))}
-            <View
-              className={styles.barberCard}
-              onClick={() => handleBarberSelect(null, true)}
-            >
-              <Text className={styles.barberName}>Any Available Barber</Text>
-              <Text className={styles.barberBio}>
-                We'll match you with the first available barber
+        {isReschedule && (
+          <View className={styles.rescheduleNoticeWrapper}>
+            <View className={styles.rescheduleNotice}>
+              <Text className={styles.rescheduleNoticeText}>
+                You are rescheduling an appointment
               </Text>
             </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {step === 3 && (
-        <View className={styles.stepContainer}>
-          <button className={styles.backButton} onClick={() => setStep(2)}>
-            ← Back to Barber
-          </button>
+        <BookingProgressBar step={step} isAdmin={isAdmin} />
 
-          {/* Date + Time Layout */}
-          <View className={calendarStyles.dateTimeLayout}>
-            
-            {/* DATE COLUMN */}
-            <View className={calendarStyles.dateColumn}>
-              <View className={calendarStyles.calendarContainer}>
-                <DayPicker
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={handleDateSelect}
-                  disabled={(date) =>
-                    isBefore(date, today) || !isDateAvailable(date)
-                  }
-                  startMonth={today}
-                  endMonth={endMonth}
-                  modifiers={{
-                    unavailable: (date) => !isDateAvailable(date),
-                  }}
-                  classNames={{
-                    root: calendarStyles.rdpRoot,
-                    caption_label: calendarStyles.captionLabel,
-                    nav: calendarStyles.nav,
-                    day: calendarStyles.day,
-                    day_button: calendarStyles.dayButton,
-                  }}
-                />
-              </View>
-            </View>
+        {isAdmin && step === 0 && (
+          <StepCustomerSelect
+            selectedCustomer={selectedCustomer}
+            onSelect={(c) => { setSelectedCustomer(c); setStep(1); }}
+            onClear={() => setSelectedCustomer(null)}
+          />
+        )}
 
-            {/* TIME COLUMN */}
-            {selectedDate && (
-              <View className={styles.timeColumn}>
-                <View className={calendarStyles.calendarContainer}>
-                  <Text className={styles.timeLabel}>
-                    {selectedDate
-                      ? selectedDate.toLocaleDateString("en-US", {
-                          weekday: "long",
-                          month: "long",
-                          day: "numeric",
-                        })
-                      : "Available Times"}
-                  </Text>
+        {step === 1 && (
+          <StepServiceSelect
+            services={services}
+            isAdmin={isAdmin}
+            onSelect={handleServiceSelect}
+            onBack={() => {
+              setSelectedService(null);
+              setSelectedBarber(null);
+              setSelectedDate(undefined);
+              setSelectedTime('');
+              setStep(0);
+            }}
+          />
+        )}
 
-                  <View className={styles.timeGrid}>
-                    {getAvailableTimeSlots().length > 0 ? (
-                      getAvailableTimeSlots().map((time) => {
-                        const timePeriodLabel = selectedBarber
-                          ? getTimePeriod(time, selectedBarber) === "evening"
-                            ? " (Evening)"
-                            : ""
-                          : "";
+        {step === 2 && (
+          <StepBarberSelect
+            barbers={barbers}
+            onSelect={handleBarberSelect}
+            onBack={() => setStep(1)}
+          />
+        )}
 
-                        return (
-                          <button
-                            key={time}
-                            className={`${styles.timeButton} ${
-                              selectedTime === time ? styles.timeButtonActive : ""
-                            }`}
-                            onClick={() => handleTimeSelect(time)}
-                          >
-                            {formatTimeTo12Hour(time)}
-                            {timePeriodLabel}
-                          </button>
-                        );
-                      })
-                    ) : (
-                      <Text className={styles.noTimesMessage}>
-                        No available times. Please select another date.
-                      </Text>
-                    )}
-                  </View>
-                </View>
-              </View>
-            )}
-          </View>
-        </View>
-      )}
+        {step === 3 && (
+          <StepDateTimeSelect
+            selectedDate={selectedDate}
+            selectedTime={selectedTime}
+            selectedBarber={selectedBarber}
+            today={today}
+            endMonth={endMonth}
+            timeSlots={getAvailableTimeSlots()}
+            isDateAvailable={isDateAvailable}
+            getTimePeriod={getTimePeriod}
+            formatTimeTo12Hour={formatTimeTo12Hour}
+            onDateSelect={handleDateSelect}
+            onTimeSelect={handleTimeSelect}
+            onBack={() => setStep(2)}
+          />
+        )}
 
-      {/* Step 4: Confirm & Pay */}
-      {step === 4 && (
-        <View className={styles.stepContainer}>
-          <View className={styles.confirmContainer}>
-            <button className={styles.backButton} onClick={() => setStep(3)}>
-              ← Back to Date & Time
-            </button>
-            <Text className={styles.stepTitle}>Confirm Your Booking</Text>
+        {step === 4 && (
+          <StepConfirm
+            selectedService={selectedService}
+            selectedBarber={selectedBarber}
+            selectedDate={selectedDate}
+            selectedTime={selectedTime}
+            selectedCustomer={selectedCustomer}
+            anyBarber={anyBarber}
+            isAdmin={isAdmin}
+            isReschedule={isReschedule}
+            price={price}
+            timePeriodLabel={timePeriodLabel}
+            isRecurring={isRecurring}
+            recurrencePattern={recurrencePattern}
+            recurrenceCount={recurrenceCount}
+            recurringAvailability={recurringAvailability}
+            authCustomer={customer}
+            user={user}
+            showGuestForm={showGuestForm}
+            guestInfo={guestInfo}
+            bookingInProgress={bookingInProgress}
+            formatDate={formatDate}
+            formatTimeTo12Hour={formatTimeTo12Hour}
+            getTimePeriod={getTimePeriod}
+            onBack={() => setStep(3)}
+            onConfirm={handleBooking}
+            onGuestConfirm={handleGuestBooking}
+            onLoginToBook={() => { saveBookingState(); navigate('/login?redirect=/book'); }}
+            onShowGuestForm={() => setShowGuestForm(true)}
+            onHideGuestForm={() => setShowGuestForm(false)}
+            onGuestInfoChange={(updates) => setGuestInfo(prev => ({ ...prev, ...updates }))}
+            onRecurringToggle={setIsRecurring}
+            onPatternChange={setRecurrencePattern}
+            onCountChange={setRecurrenceCount}
+          />
+        )}
+      </View>
 
-            <View className={styles.confirmCard}>
-              {isAdmin && selectedCustomer && (
-                <View className={styles.confirmSection}>
-                  <Text className={styles.confirmLabel}>Customer</Text>
-                  <Text className={styles.confirmValue}>
-                    {selectedCustomer.first_name} {selectedCustomer.last_name}
-                  </Text>
-                </View>
-              )}
-              <View className={styles.confirmSection}>
-                <Text className={styles.confirmLabel}>Service</Text>
-                <Text className={styles.confirmValue}>{selectedService?.name}</Text>
-                <Text className={styles.confirmDetail}>
-                  {selectedService?.duration_minutes} minutes
-                </Text>
-              </View>
-
-              <View className={styles.confirmSection}>
-                <Text className={styles.confirmLabel}>Barber</Text>
-                <Text className={styles.confirmValue}>
-                  {anyBarber ? 'Any Available' : selectedBarber?.name}
-                </Text>
-              </View>
-
-              <View className={styles.confirmSection}>
-                <Text className={styles.confirmLabel}>Date & Time</Text>
-                <Text className={styles.confirmValue}>{selectedDate ? formatDate(selectedDate) : ''}</Text>
-                <Text className={styles.confirmValue}>{selectedTime ? formatTimeTo12Hour(selectedTime) : ''}</Text>
-              </View>
-
-              {selectedBarber && (
-                <View className={styles.confirmSection}>
-                  <Text className={styles.confirmLabel}>Price</Text>
-                  <Text className={styles.priceAmount}>${calculatePrice().toFixed(2)}</Text>
-                  <Text className={styles.confirmDetail}>
-                    {getTimePeriod(selectedTime, selectedBarber) === 'evening'
-                      ? `Evening rate (${formatTimeTo12Hour(selectedBarber.evening_hours_start)}-${formatTimeTo12Hour(selectedBarber.evening_hours_end)})`
-                      : `Regular rate (${formatTimeTo12Hour(selectedBarber.regular_hours_start)}-${formatTimeTo12Hour(selectedBarber.regular_hours_end)})`}
-                  </Text>
-                </View>
-              )}
-
-              <View className={styles.policySection}>
-                <Text className={styles.policyText}>
-                  Cancellations within 12 hours will incur a 50% cancellation fee.
-                </Text>
-              </View>
-
-              {/* Recurring appointment option (admin only) */}
-              {isAdmin && !isReschedule && (
-                <View className={styles.recurringSection}>
-                  <label className={styles.recurringCheckboxLabel}>
-                    <input
-                      type="checkbox"
-                      checked={isRecurring}
-                      onChange={(e) => setIsRecurring(e.target.checked)}
-                      className={styles.recurringCheckbox}
-                    />
-                    <Text className={styles.recurringCheckboxText}>Recurring Appointment</Text>
-                  </label>
-
-                  {isRecurring && (
-                    <View className={styles.recurringOptions}>
-                      <View className={styles.recurringOptionGroup}>
-                        <Text className={styles.recurringOptionLabel}>Frequency</Text>
-                        <View className={styles.selectWrapper}>
-                          <select
-                            value={recurrencePattern}
-                            onChange={(e) => setRecurrencePattern(e.target.value as RecurrencePattern)}
-                            className={styles.recurringSelect}
-                          >
-                            <option value="weekly">{RECURRENCE_LABELS['weekly']}</option>
-                            <option value="biweekly">{RECURRENCE_LABELS['biweekly']}</option>
-                            <option value="monthly">{RECURRENCE_LABELS['monthly']}</option>
-                          </select>
-                          <ChevronDown size={18} className={styles.selectIcon} />
-                        </View>
-                      </View>
-
-                      <View className={styles.recurringOptionGroup}>
-                        <Text className={styles.recurringOptionLabel}>Number of appointments</Text>
-                        <View className={styles.selectWrapper}>
-                          <select
-                            value={recurrenceCount}
-                            onChange={(e) => setRecurrenceCount(Number(e.target.value))}
-                            className={styles.recurringSelect}
-                          >
-                            <option value={4}>4 appointments</option>
-                            <option value={8}>8 appointments</option>
-                            <option value={12}>12 appointments</option>
-                          </select>
-                          <ChevronDown size={18} className={styles.selectIcon} />
-                        </View>
-                      </View>
-
-                        {recurringAvailability.length > 0 && (
-                          <View className={styles.recurringDateList}>
-                            {recurringAvailability.map((result, index) => (
-                              <View
-                                key={result.dateString}
-                                className={`${styles.recurringDateItem} ${result.available ? styles.dateAvailable : styles.dateUnavailable}`}
-                              >
-                                <Text className={styles.recurringDateText}>
-                                  {index + 1}. {format(result.date, 'EEE, MMM d, yyyy')}
-                                </Text>
-                                {!result.available && (
-                                  <Text className={styles.recurringDateWarning}>
-                                    {result.reason}
-                                  </Text>
-                                )}
-                              </View>
-                            ))}
-                          {recurringAvailability.some(r => !r.available) && (
-                            <Text className={styles.recurringWarning}>
-                              Some dates are unavailable. These appointments will be skipped.
-                            </Text>
-                          )}
-                        </View>
-                      )}
-                    </View>
-                  )}
-                </View>
-              )}
-
-              {user ? (
-                // Logged in user - show confirm button
-                <View className={styles.buttonGroup}>
-                  <button
-                    className={styles.confirmButton}
-                    onClick={handleBooking}
-                    disabled={bookingInProgress}
-                  >
-                    {bookingInProgress
-                      ? (isReschedule ? 'Rescheduling...' : 'Booking...')
-                      : (isReschedule ? 'Reschedule Booking' : 'Confirm Booking')}
-                  </button>
-                </View>
-              ) : showGuestForm ? (
-                // Guest form - collect guest info
-                <View className={styles.guestFormSection}>
-                  <Text className={styles.guestFormTitle}>Guest Information</Text>
-
-                  <View className={styles.guestInputGroup}>
-                    <label className={styles.guestInputLabel}>First Name</label>
-                    <input
-                      type="text"
-                      className={styles.guestInput}
-                      placeholder="Enter your first name"
-                      value={guestInfo.firstName}
-                      onChange={(e) => setGuestInfo(prev => ({ ...prev, firstName: e.target.value }))}
-                    />
-                  </View>
-
-                  <View className={styles.guestInputGroup}>
-                    <label className={styles.guestInputLabel}>Last Name</label>
-                    <input
-                      type="text"
-                      className={styles.guestInput}
-                      placeholder="Enter your last name"
-                      value={guestInfo.lastName}
-                      onChange={(e) => setGuestInfo(prev => ({ ...prev, lastName: e.target.value }))}
-                    />
-                  </View>
-
-                  <View className={styles.guestInputGroup}>
-                    <label className={styles.guestInputLabel}>Phone Number</label>
-                    <input
-                      type="tel"
-                      className={styles.guestInput}
-                      placeholder="Enter your phone number"
-                      value={guestInfo.phone}
-                      onChange={(e) => setGuestInfo(prev => ({ ...prev, phone: e.target.value }))}
-                    />
-                  </View>
-
-                  <View className={styles.guestFormButtons}>
-                    <button
-                      className={styles.confirmButton}
-                      onClick={handleGuestBooking}
-                      disabled={bookingInProgress}
-                    >
-                      {bookingInProgress ? 'Booking...' : 'Confirm Booking'}
-                    </button>
-                    <span
-                      className={styles.guestBackLink}
-                      onClick={() => setShowGuestForm(false)}
-                    >
-                      ← Back to booking options
-                    </span>
-                  </View>
-                </View>
-              ) : (
-                // Not logged in - show login/guest choice
-                <View className={styles.guestChoiceSection}>
-                  <button
-                    className={styles.loginButton}
-                    onClick={() => {
-                      saveBookingState();
-                      navigate('/login?redirect=/book');
-                    }}
-                  >
-                    Log in to Book
-                  </button>
-
-                  <Text className={styles.orDivider}>or</Text>
-
-                  <button
-                    className={styles.guestButton}
-                    onClick={() => {
-                      setShowGuestForm(true);
-                    }}
-                  >
-                    <span>Book as Guest</span>
-                    <span className={styles.guestButtonSubtext}>(Will not receive rewards points)</span>
-                  </button>
-                </View>
-              )}
-            </View>
-          </View>
-        </View>
-      )}
-    </View>
-
-      {/* Booking Confirmation Modal */}
       {showConfirmation && confirmedBookingDetails && (
-        <div className={styles.confirmationOverlay}>
-          <div className={styles.confirmationModal}>
-            <View className={styles.confirmationIcon}>
-              <svg
-                className={styles.confirmationCheckmark}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </View>
-
-            <Text className={styles.confirmationTitle}>
-              {isReschedule ? 'Booking Rescheduled!' : 'Booking Confirmed!'}
-            </Text>
-
-            {/* <Text className={styles.confirmationMessage}>
-              {isReschedule
-                ? 'Your appointment has been successfully rescheduled.'
-                : `Your appointment is confirmed. You'll earn ${confirmedBookingDetails.rewardPoints} reward points when your appointment is completed!`}
-            </Text> */}
-
-            <View className={styles.confirmationDetails}>
-              <View className={styles.confirmationDetailRow}>
-                <Text className={styles.confirmationDetailLabel}>Service</Text>
-                <Text className={styles.confirmationDetailValue}>
-                  {confirmedBookingDetails.serviceName}
-                </Text>
-              </View>
-              <View className={styles.confirmationDetailRow}>
-                <Text className={styles.confirmationDetailLabel}>Barber</Text>
-                <Text className={styles.confirmationDetailValue}>
-                  {confirmedBookingDetails.barberName}
-                </Text>
-              </View>
-              <View className={styles.confirmationDetailRow}>
-                <Text className={styles.confirmationDetailLabel}>Date</Text>
-                <Text className={styles.confirmationDetailValue}>
-                  {confirmedBookingDetails.date}
-                </Text>
-              </View>
-              <View className={styles.confirmationDetailRow}>
-                <Text className={styles.confirmationDetailLabel}>Time</Text>
-                <Text className={styles.confirmationDetailValue}>
-                  {confirmedBookingDetails.time}
-                </Text>
-              </View>
-              <View className={styles.confirmationDetailRow}>
-                <Text className={styles.confirmationDetailLabel}>Total</Text>
-                <Text className={styles.confirmationDetailValue}>
-                  ${confirmedBookingDetails.price.toFixed(2)}
-                </Text>
-              </View>
-            </View>
-
-            <View className={styles.confirmationButtons}>
-              <Link to="/dashboard" className={styles.confirmationPrimaryButton}>
-                Back to Dashboard
-              </Link>
-            </View>
-          </div>
-        </div>
+        <BookingConfirmationModal
+          details={confirmedBookingDetails}
+          isReschedule={isReschedule}
+        />
       )}
     </>
   );
