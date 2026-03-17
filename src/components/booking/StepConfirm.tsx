@@ -11,6 +11,7 @@ import * as styles from '../../styles/booking.css';
 export interface GuestInfo {
   firstName: string;
   lastName: string;
+  email: string;
   phone: string;
 }
 
@@ -249,6 +250,17 @@ export function StepConfirm({
                   placeholder="Enter your last name"
                   value={guestInfo.lastName}
                   onChange={(e) => onGuestInfoChange({ lastName: e.target.value })}
+                />
+              </View>
+
+              <View className={styles.guestInputGroup}>
+                <label className={styles.guestInputLabel}>Email Address</label>
+                <input
+                  type="email"
+                  className={styles.guestInput}
+                  placeholder="Enter your email address"
+                  value={guestInfo.email}
+                  onChange={(e) => onGuestInfoChange({ email: e.target.value })}
                 />
               </View>
 

@@ -79,7 +79,7 @@ export default function BookingPage() {
 
   // Guest booking
   const [showGuestForm, setShowGuestForm] = useState(false);
-  const [guestInfo, setGuestInfo] = useState<GuestInfo>({ firstName: '', lastName: '', phone: '' });
+  const [guestInfo, setGuestInfo] = useState<GuestInfo>({ firstName: '', lastName: '', email: '', phone: '' });
 
   // Recurring appointments (admin only)
   const [isRecurring, setIsRecurring] = useState(false);
@@ -380,6 +380,68 @@ export default function BookingPage() {
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
 
+  // ─── Email notifications ──────────────────────────────────────────────────
+
+  const sendConfirmationEmail = async (params: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    serviceName: string;
+    barberName: string;
+    date: Date;
+    time: string;
+    price: number;
+    durationMinutes?: number;
+  }) => {
+    const body = {
+      customerEmail: params.email,
+      customerName: `${params.firstName} ${params.lastName}`,
+      serviceName: params.serviceName,
+      barberName: params.barberName,
+      bookingDate: formatDate(params.date),
+      startTime: formatTimeTo12Hour(params.time),
+      totalPrice: params.price,
+      bookingDateRaw: format(params.date, 'yyyy-MM-dd'),
+      startTimeRaw: params.time,
+      durationMinutes: params.durationMinutes,
+    };
+    console.log('[email] invoking send-booking-confirmation with:', body);
+    const { data, error } = await supabase.functions.invoke('send-booking-confirmation', { body });
+    if (error) console.error('[email] send-booking-confirmation error:', error);
+    else console.log('[email] send-booking-confirmation response:', data);
+  };
+
+  const sendRescheduleEmail = async (params: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    serviceName: string;
+    barberName: string;
+    date: Date;
+    time: string;
+    price: number;
+    rescheduledBy: 'customer' | 'admin';
+    durationMinutes?: number;
+  }) => {
+    const body = {
+      customerEmail: params.email,
+      customerName: `${params.firstName} ${params.lastName}`,
+      serviceName: params.serviceName,
+      barberName: params.barberName,
+      bookingDate: formatDate(params.date),
+      startTime: formatTimeTo12Hour(params.time),
+      totalPrice: params.price,
+      rescheduledBy: params.rescheduledBy,
+      bookingDateRaw: format(params.date, 'yyyy-MM-dd'),
+      startTimeRaw: params.time,
+      durationMinutes: params.durationMinutes,
+    };
+    console.log('[email] invoking send-reschedule-notification with:', body);
+    const { data, error } = await supabase.functions.invoke('send-reschedule-notification', { body });
+    if (error) console.error('[email] send-reschedule-notification error:', error);
+    else console.log('[email] send-reschedule-notification response:', data);
+  };
+
   // ─── Round-robin barber selection ─────────────────────────────────────────
 
   const resolveAnyBarber = (dateString: string, dayOfWeek: number): Barber | null => {
@@ -432,7 +494,7 @@ export default function BookingPage() {
   // ─── Guest booking ─────────────────────────────────────────────────────────
 
   const handleGuestBooking = async () => {
-    if (!guestInfo.firstName || !guestInfo.lastName || !guestInfo.phone) {
+    if (!guestInfo.firstName || !guestInfo.lastName || !guestInfo.email || !guestInfo.phone) {
       alert('Please fill in all guest information fields');
       return;
     }
@@ -487,6 +549,7 @@ export default function BookingPage() {
         is_guest: true,
         guest_first_name: guestInfo.firstName,
         guest_last_name: guestInfo.lastName,
+        guest_email: guestInfo.email,
         guest_phone: guestInfo.phone,
       });
       if (bookingError) throw bookingError;
@@ -499,6 +562,20 @@ export default function BookingPage() {
         price: totalPrice,
         rewardPoints: 0,
       });
+
+      // Send confirmation email to guest
+      await sendConfirmationEmail({
+        email: guestInfo.email,
+        firstName: guestInfo.firstName,
+        lastName: guestInfo.lastName,
+        serviceName: selectedService.name,
+        barberName: bookingBarber.name,
+        date: selectedDate,
+        time: selectedTime,
+        price: totalPrice,
+        durationMinutes: selectedService.duration_minutes,
+      });
+
       setShowConfirmation(true);
       setShowGuestForm(false);
     } catch (error) {
@@ -594,6 +671,22 @@ export default function BookingPage() {
           price: totalPrice * availableDates.length,
           rewardPoints: selectedService.reward_points * availableDates.length,
         });
+        // Send recurring confirmation email with all dates
+        if (selectedCustomer?.email && availableDates.length > 0) {
+          const body = {
+            customerEmail: selectedCustomer.email,
+            customerName: `${selectedCustomer.first_name} ${selectedCustomer.last_name}`,
+            serviceName: selectedService.name,
+            barberName: bookingBarber.name,
+            startTime: formatTimeTo12Hour(selectedTime),
+            totalPrice,
+            dates: availableDates.map(r => r.dateString),
+            startTimeRaw: selectedTime,
+            durationMinutes: selectedService.duration_minutes,
+          };
+          const { error: emailError } = await supabase.functions.invoke('send-recurring-confirmation', { body });
+          if (emailError) console.error('[email] send-recurring-confirmation error:', emailError);
+        }
       } else {
         const { error: bookingError } = await supabase.from('bookings').insert({
           customer_id: isAdmin ? selectedCustomer?.id : user.id,
@@ -618,6 +711,36 @@ export default function BookingPage() {
           price: totalPrice,
           rewardPoints: rescheduleFromId ? 0 : selectedService.reward_points,
         });
+        // Send confirmation or reschedule email
+        const targetCustomer = isAdmin ? selectedCustomer : customer;
+        if (targetCustomer?.email) {
+          if (rescheduleFromId) {
+            await sendRescheduleEmail({
+              email: targetCustomer.email,
+              firstName: targetCustomer.first_name,
+              lastName: targetCustomer.last_name,
+              serviceName: selectedService.name,
+              barberName: bookingBarber.name,
+              date: selectedDate,
+              time: selectedTime,
+              price: totalPrice,
+              rescheduledBy: isAdmin ? 'admin' : 'customer',
+              durationMinutes: selectedService.duration_minutes,
+            });
+          } else {
+            await sendConfirmationEmail({
+              email: targetCustomer.email,
+              firstName: targetCustomer.first_name,
+              lastName: targetCustomer.last_name,
+              serviceName: selectedService.name,
+              barberName: bookingBarber.name,
+              date: selectedDate,
+              time: selectedTime,
+              price: totalPrice,
+              durationMinutes: selectedService.duration_minutes,
+            });
+          }
+        }
       }
 
       setShowConfirmation(true);
