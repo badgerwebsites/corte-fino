@@ -273,18 +273,30 @@ const getBarberColors = (booking: BookingWithDetails) => {
 
       if (error) throw error;
 
-      // TODO: Send Twilio SMS notification to customer about reschedule
-      // The notification should include:
-      // - Customer name
-      // - New date and time
-      // - Barber name
-      // - Service name
-      console.log('TODO: Send Twilio notification for reschedule', {
-        customerId: booking.customer_id,
-        customerPhone: booking.customer?.phone || booking.guest_phone,
-        newDate: format(newDate, 'MMMM d, yyyy'),
-        newTime: newTime,
-      });
+      // Send reschedule email notification to customer
+      const customerEmail = booking.customer?.email;
+      if (customerEmail) {
+        const [hours, minutes] = newTime.split(':').map(Number);
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const displayHour = hours % 12 || 12;
+        const displayTime = `${displayHour}:${minutes.toString().padStart(2, '0')} ${period}`;
+
+        await supabase.functions.invoke('send-reschedule-notification', {
+          body: {
+            customerEmail,
+            customerName: `${booking.customer!.first_name} ${booking.customer!.last_name}`,
+            serviceName: booking.service?.name ?? '',
+            barberName: booking.barber?.name ?? '',
+            bookingDate: format(newDate, 'MMMM d, yyyy'),
+            startTime: displayTime,
+            totalPrice: booking.total_price,
+            rescheduledBy: 'admin',
+            bookingDateRaw: format(newDate, 'yyyy-MM-dd'),
+            startTimeRaw: newTime,
+            durationMinutes: serviceDuration,
+          },
+        });
+      }
 
       loadBookings();
       onBookingUpdate?.();
@@ -1209,7 +1221,7 @@ const getBarberColors = (booking: BookingWithDetails) => {
               </div>
 
               <div className={styles.rescheduleNotice}>
-                Customer will be notified via SMS once Twilio is configured.
+                Customer will receive an Email with the updated time 
               </div>
             </div>
 
