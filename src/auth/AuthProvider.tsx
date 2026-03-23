@@ -153,6 +153,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) throw error;
 
+    // Supabase returns an empty identities array when the email is already registered
+    // (it does this silently to prevent email enumeration attacks)
+    if (data.user?.identities?.length === 0) {
+      throw new Error('EMAIL_ALREADY_IN_USE');
+    }
+
     // If user was created, upsert the customer record.
     // Using upsert (not insert) so that if a race condition already created an empty
     // record (e.g. from onAuthStateChange firing during signUp), we overwrite it with

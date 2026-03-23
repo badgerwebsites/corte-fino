@@ -68,8 +68,12 @@ export default function SignUpPage() {
     try {
       await signUp(email, password, firstName, lastName, phone, redirectTo);
       setShowEmailConfirmation(true);
-    } catch {
-      setError('Failed to create account');
+    } catch (err) {
+      if (err instanceof Error && err.message === 'EMAIL_ALREADY_IN_USE') {
+        setError('An account with this email already exists. Please log in.');
+      } else {
+        setError('Failed to create account');
+      }
     } finally {
       setLoading(false);
     }
@@ -202,7 +206,7 @@ export default function SignUpPage() {
           <View className={styles.modal}>
             <button
               onClick={() => setShowEmailConfirmation(false)}
-              style={{ position: 'absolute', top: 12, right: 16, background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#991b1b', lineHeight: 1 }}
+              className={styles.modalCloseButton}
               aria-label="Close"
             >
               ✕

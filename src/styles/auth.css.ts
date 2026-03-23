@@ -330,6 +330,29 @@ export const modalButton = style({
   marginTop: 24,
 });
 
+export const modalCloseButton = style({
+  position: 'absolute',
+  top: 12,
+  right: 12,
+  width: 32,
+  height: 32,
+  borderRadius: '50%',
+  backgroundColor: '#c94a4a',
+  color: darker_bg,
+  border: 'none',
+  fontSize: 16,
+  fontWeight: 1000,
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  transition: 'all 0.2s',
+  ':hover': {
+    backgroundColor: '#b43f3f',
+    transform: 'scale(1.05)',
+  },
+});
+
 export const success = style({
   padding: 12,
   borderRadius: 8,
