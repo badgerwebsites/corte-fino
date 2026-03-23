@@ -36,11 +36,6 @@ export const logoWrapper = style({
   display: 'flex',
   justifyContent: 'center',
   marginBottom: 16,
-  '@media': {
-    'screen and (min-width: 768px)': {
-      // marginBottom: 28,
-    },
-  },
 });
 
 export const pageTitle = style({
