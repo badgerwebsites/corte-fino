@@ -84,31 +84,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
 
-      if (data) {
+      // If the record exists but has empty name fields, it was created by a race
+      // condition before the real data arrived — patch it with user metadata.
+      const needsUpdate = data && !data.first_name && !data.last_name;
+
+      if (data && !needsUpdate) {
         setCustomer(data);
       } else if (userEmail) {
         // Pull name/phone from user metadata saved during signUp
         const { data: { user: authUser } } = await supabase.auth.getUser();
         const meta = authUser?.user_metadata ?? {};
 
-        // Use upsert with ignoreDuplicates to handle race conditions where
-        // multiple loadCustomerData calls run concurrently, or where signUp
-        // already created the record but it wasn't returned by the select above
         await supabase
           .from('customers')
           .upsert(
             {
               id: userId,
               email: userEmail,
-              first_name: meta.first_name ?? '',
-              last_name: meta.last_name ?? '',
-              phone: meta.phone ?? '',
-              reward_points: 0,
+              first_name: meta.first_name ?? data?.first_name ?? '',
+              last_name: meta.last_name ?? data?.last_name ?? '',
+              phone: meta.phone ?? data?.phone ?? '',
+              reward_points: data?.reward_points ?? 0,
             },
-            { onConflict: 'id', ignoreDuplicates: true }
+            { onConflict: 'id' }
           );
 
-        // Always refetch — ignoreDuplicates won't return the existing record
         const { data: existing } = await supabase
           .from('customers')
           .select('*')
@@ -153,23 +153,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) throw error;
 
-    // If user was created, try to create the customer record
-    // Don't throw on customer insert failure - the auth user exists and they need to verify email
+    // If user was created, upsert the customer record.
+    // Using upsert (not insert) so that if a race condition already created an empty
+    // record (e.g. from onAuthStateChange firing during signUp), we overwrite it with
+    // the real name/phone values.
     if (data.user) {
       const { error: customerError } = await supabase
         .from('customers')
-        .insert({
-          id: data.user.id,
-          email,
-          first_name: firstName,
-          last_name: lastName,
-          phone,
-          reward_points: 0,
-        });
+        .upsert(
+          {
+            id: data.user.id,
+            email,
+            first_name: firstName,
+            last_name: lastName,
+            phone,
+            reward_points: 0,
+          },
+          { onConflict: 'id' }
+        );
 
       if (customerError) {
-        // Log but don't throw - auth user was created successfully
-        // Customer record can be created on first login if needed
         console.error('Error creating customer record:', customerError);
       }
     }
