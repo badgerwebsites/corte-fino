@@ -50,6 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
+          setLoading(true);
           loadCustomerData(session.user.id, session.user.email);
         } else {
           setCachedCustomer(null);

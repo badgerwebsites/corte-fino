@@ -46,7 +46,7 @@ export default function AuthCallbackPage() {
           <p style={{ color: '#9ca3af', textAlign: 'center', marginBottom: 24 }}>
             This confirmation link has expired or already been used. Please sign up again to get a new link.
           </p>
-          <Link to="/signup" className={styles.submitButton} style={{ textAlign: 'center', textDecoration: 'none' }}>
+          <Link to="/signup" className={styles.link}>
             Back to Sign Up
           </Link>
         </View>
