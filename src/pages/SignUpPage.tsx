@@ -1,12 +1,12 @@
 // pages/SignUpPage.tsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { Navigation } from '../components/Navigation';
+import { supabase } from '../lib/supabase';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/auth.css';
-import logo from '../assets/BlackLogo.svg';
 
 export default function SignUpPage() {
   const [firstName, setFirstName] = useState('');
@@ -18,6 +18,8 @@ export default function SignUpPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
+  const [logoIndex, setLogoIndex] = useState(0);
+  const [carouselLogos, setCarouselLogos] = useState<string[]>([]);
 
   const { signUp } = useAuth();
   const location = useLocation();
@@ -27,6 +29,30 @@ export default function SignUpPage() {
 
   // Check if user is coming from booking flow
   const isFromBooking = redirectTo.startsWith('/book');
+
+  useEffect(() => {
+    supabase
+      .from('site_settings')
+      .select('nav_logo_1_url, nav_logo_2_url, nav_logo_3_url')
+      .single()
+      .then(({ data }) => {
+        if (!data) return;
+        const logos = [data.nav_logo_1_url, data.nav_logo_2_url, data.nav_logo_3_url]
+          .filter((url): url is string => !!url && url !== 'HIDDEN');
+        setCarouselLogos(logos);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (carouselLogos.length <= 1) return;
+    const INTERVAL_MS = 3000;
+    const updateIndex = () => {
+      setLogoIndex(Math.floor(Date.now() / INTERVAL_MS) % carouselLogos.length);
+    };
+    updateIndex();
+    const interval = setInterval(updateIndex, 100);
+    return () => clearInterval(interval);
+  }, [carouselLogos.length]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,12 +82,23 @@ export default function SignUpPage() {
       <View className={styles.container}>
         <View className={styles.formCard}>
           <View className={styles.logoWrapper}>
-          <img
-            src={logo}
-            alt="Corte Fino"
-            className={styles.logo}
-          />
-        </View>
+            {carouselLogos.length > 0 ? (
+              <View className={styles.carouselContainer}>
+                <View
+                  className={styles.carouselTrack}
+                  style={{ transform: `translateX(-${logoIndex * 100}%)` }}
+                >
+                  {carouselLogos.map((src, i) => (
+                    <View key={i} className={styles.carouselSlide}>
+                      <img src={src} alt={`Logo ${i + 1}`} className={styles.carouselLogoImage} />
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ) : (
+              <Text className={styles.pageTitle}>Sign Up</Text>
+            )}
+          </View>
 
           <form onSubmit={handleSubmit} className={styles.form}>
             {error && (

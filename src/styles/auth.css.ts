@@ -20,14 +20,14 @@ export const container = style({
 export const formCard = style({
   width: '100%',
   maxWidth: 420,
-  padding: 20,
+  padding: 16,
   backgroundColor: darker_bg,
   borderColor: border_subtle,
   borderRadius: 12,
   boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: 32,
+      padding: 24,
     },
   },
 });
@@ -38,7 +38,58 @@ export const logoWrapper = style({
   marginBottom: 16,
   '@media': {
     'screen and (min-width: 768px)': {
-      marginBottom: 28,
+      // marginBottom: 28,
+    },
+  },
+});
+
+export const pageTitle = style({
+  fontSize: 28,
+  fontWeight: 700,
+  color: text_primary,
+  textAlign: 'center',
+  marginBottom: 8,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 36,
+    },
+  },
+});
+
+export const carouselContainer = style({
+  width: 220,
+  height: 70,
+  overflow: 'hidden',
+  position: 'relative',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      width: 300,
+      height: 100,
+    },
+  },
+});
+
+export const carouselTrack = style({
+  display: 'flex',
+  height: '100%',
+  transition: 'transform 0.5s ease-in-out',
+});
+
+export const carouselSlide = style({
+  flex: '0 0 100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
+export const carouselLogoImage = style({
+  height: 70,
+  width: 'auto',
+  maxWidth: '100%',
+  objectFit: 'contain',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      height: 100,
     },
   },
 });
@@ -49,7 +100,7 @@ export const logo = style({
   transition: 'opacity 0.2s ease',
   '@media': {
     'screen and (min-width: 768px)': {
-      height: 72,
+      height: 60,
     },
   },
 });
@@ -176,6 +227,24 @@ export const footerText = style({
     'screen and (min-width: 768px)': {
         fontSize: 28,
     },
+  },
+});
+
+export const forgotPasswordLink = style({
+  fontSize: 22,
+  fontWeight: 700,
+  color: button,
+  textDecoration: 'none',
+  transition: 'color 0.2s ease',
+  display: 'block',
+  textAlign: 'center',
+  '@media': {
+    'screen and (min-width: 768px)': {
+        fontSize: 28,
+    },
+  },
+  ':hover': {
+    color: '#6faec6',
   },
 });
 

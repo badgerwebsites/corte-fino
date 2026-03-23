@@ -1,18 +1,20 @@
 // pages/LoginPage.tsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { Navigation } from '../components/Navigation';
+import { supabase } from '../lib/supabase';
 import { View } from '../ui/View';
 import { Text } from '../ui/Text';
 import * as styles from '../styles/auth.css';
-import logo from '../assets/BlackLogo.svg';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [logoIndex, setLogoIndex] = useState(0);
+  const [carouselLogos, setCarouselLogos] = useState<string[]>([]);
 
   const { signIn } = useAuth();
   const navigate = useNavigate();
@@ -20,6 +22,30 @@ export default function LoginPage() {
 
   const redirectTo =
     new URLSearchParams(location.search).get('redirect') || '/dashboard';
+
+  useEffect(() => {
+    supabase
+      .from('site_settings')
+      .select('nav_logo_1_url, nav_logo_2_url, nav_logo_3_url')
+      .single()
+      .then(({ data }) => {
+        if (!data) return;
+        const logos = [data.nav_logo_1_url, data.nav_logo_2_url, data.nav_logo_3_url]
+          .filter((url): url is string => !!url && url !== 'HIDDEN');
+        setCarouselLogos(logos);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (carouselLogos.length <= 1) return;
+    const INTERVAL_MS = 3000;
+    const updateIndex = () => {
+      setLogoIndex(Math.floor(Date.now() / INTERVAL_MS) % carouselLogos.length);
+    };
+    updateIndex();
+    const interval = setInterval(updateIndex, 100);
+    return () => clearInterval(interval);
+  }, [carouselLogos.length]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,11 +69,22 @@ export default function LoginPage() {
       <View className={styles.container}>
         <View className={styles.formCard}>
         <View className={styles.logoWrapper}>
-          <img
-            src={logo}
-            alt="Corte Fino"
-            className={styles.logo}
-          />
+          {carouselLogos.length > 0 ? (
+            <View className={styles.carouselContainer}>
+              <View
+                className={styles.carouselTrack}
+                style={{ transform: `translateX(-${logoIndex * 100}%)` }}
+              >
+                {carouselLogos.map((src, i) => (
+                  <View key={i} className={styles.carouselSlide}>
+                    <img src={src} alt={`Logo ${i + 1}`} className={styles.carouselLogoImage} />
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : (
+            <Text className={styles.pageTitle}>Login</Text>
+          )}
         </View>
 
           <form onSubmit={handleSubmit} className={styles.form}>
@@ -79,6 +116,12 @@ export default function LoginPage() {
               />
             </View>
 
+            {/* <View> */}
+              <Link to="/forgot-password" className={styles.forgotPasswordLink}>
+                Forgot password?
+              </Link>
+            {/* </View> */}
+
             <button
               type="submit"
               className={styles.submitButton}
@@ -89,6 +132,7 @@ export default function LoginPage() {
           </form>
 
           <View className={styles.footer}>
+
             <View>
               <Text className={styles.footerText}>
                 Don&apos;t have an account?
