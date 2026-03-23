@@ -36,7 +36,7 @@ export const tab = style({
   background: 'none',
   border: 'none',
   color: text_primary,
-  fontSize: 14,
+  fontSize: 16,
   fontWeight: '400',
   cursor: 'pointer',
   borderBottom: '3px solid transparent',

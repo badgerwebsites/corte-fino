@@ -29,5 +29,13 @@ export default function DashboardRouter() {
     }
   }, [user, customer, loading, navigate, location.pathname]);
 
-  return null;
+  return (
+    <div style={{
+      minHeight: '100dvh',
+      backgroundColor: '#101214',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }} />
+  );
 }

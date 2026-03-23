@@ -205,7 +205,7 @@ export default function SignUpPage() {
         <View className={styles.modalOverlay}>
           <View className={styles.modal}>
             <button
-              onClick={() => setShowEmailConfirmation(false)}
+              onClick={() => { setShowEmailConfirmation(false); window.close(); }}
               className={styles.modalCloseButton}
               aria-label="Close"
             >

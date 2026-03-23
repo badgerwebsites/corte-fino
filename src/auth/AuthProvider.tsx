@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
 
           loadCustomerData(session.user.id, session.user.email);
-          window.location.replace('/login');
+          window.location.replace('/dashboard');
           return;
         }
 
@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 return;
               }
               loadCustomerData(session.user.id, session.user.email);
-              window.location.replace('/login');
+              window.location.replace('/dashboard');
               return;
             }
           }
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     redirectTo?: string
   ) => {
     // Build the email redirect URL - when user clicks confirmation link, they'll be sent here
-    let emailRedirectUrl = `${window.location.origin}/login`;
+    let emailRedirectUrl = `${window.location.origin}/dashboard`;
 
     if (redirectTo?.startsWith('/book')) {
       emailRedirectUrl = `${window.location.origin}/book`;

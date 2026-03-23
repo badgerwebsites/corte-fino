@@ -11,5 +11,6 @@ globalStyle('html, body', {
   color: '#111',
   backgroundColor: '#101214',
 
-  overflow: 'auto',
+  overflowX: 'hidden',
+  overflowY: 'auto',
 });
