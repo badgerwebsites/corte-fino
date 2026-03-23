@@ -16,12 +16,18 @@ export default function LoginPage() {
   const [logoIndex, setLogoIndex] = useState(0);
   const [carouselLogos, setCarouselLogos] = useState<string[]>([]);
 
-  const { signIn } = useAuth();
+  const { signIn, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const redirectTo =
     new URLSearchParams(location.search).get('redirect') || '/dashboard';
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate(redirectTo, { replace: true });
+    }
+  }, [user, authLoading, navigate, redirectTo]);
 
   useEffect(() => {
     supabase

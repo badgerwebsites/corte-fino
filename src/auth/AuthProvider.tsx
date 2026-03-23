@@ -5,67 +5,54 @@ import { supabase } from '../lib/supabase';
 import type { Customer } from '../types/database.types';
 import { AuthContext } from './auth.context';
 
+const CUSTOMER_CACHE_KEY = 'cf_customer_cache';
+
+function getCachedCustomer(): Customer | null {
+  try {
+    const raw = localStorage.getItem(CUSTOMER_CACHE_KEY);
+    return raw ? (JSON.parse(raw) as Customer) : null;
+  } catch {
+    return null;
+  }
+}
+
+function setCachedCustomer(c: Customer | null) {
+  if (c) localStorage.setItem(CUSTOMER_CACHE_KEY, JSON.stringify(c));
+  else localStorage.removeItem(CUSTOMER_CACHE_KEY);
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [customer, setCustomer] = useState<Customer | null>(getCachedCustomer);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       const session = data.session;
-
       setSession(session);
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        // Check if user just confirmed email (Supabase returns hash tokens)
-        const hash = window.location.hash;
-
-        if (hash.includes('access_token') || hash.includes('type=signup')) {
-          const pendingBooking = localStorage.getItem('pendingBooking');
-
-          if (pendingBooking) {
-            loadCustomerData(session.user.id, session.user.email);
-            window.location.replace('/book');
-            history.replaceState(null, '', '/book');
-            return;
-          }
-
+        if (getCachedCustomer()) {
+          setLoading(false); // unblock routing immediately — cache has data
+          loadCustomerData(session.user.id, session.user.email); // refresh silently
+        } else {
           loadCustomerData(session.user.id, session.user.email);
-          window.location.replace('/dashboard');
-          return;
         }
-
-        loadCustomerData(session.user.id, session.user.email);
       } else {
         setLoading(false);
       }
     });
 
     const { data: { subscription } } =
-      supabase.auth.onAuthStateChange((event, session) => {
+      supabase.auth.onAuthStateChange((_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          // Handle email confirmation redirect — getSession() may return null
-          // initially before onAuthStateChange processes the hash tokens
-          if (event === 'SIGNED_IN') {
-            const hash = window.location.hash;
-            if (hash.includes('access_token') || hash.includes('type=signup')) {
-              const pendingBooking = localStorage.getItem('pendingBooking');
-              if (pendingBooking) {
-                loadCustomerData(session.user.id, session.user.email);
-                window.location.replace('/book');
-                return;
-              }
-              loadCustomerData(session.user.id, session.user.email);
-              window.location.replace('/dashboard');
-              return;
-            }
-          }
           loadCustomerData(session.user.id, session.user.email);
         } else {
+          setCachedCustomer(null);
           setCustomer(null);
           setLoading(false);
         }
@@ -84,14 +71,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
 
-      // If the record exists but has empty name fields, it was created by a race
-      // condition before the real data arrived — patch it with user metadata.
       const needsUpdate = data && !data.first_name && !data.last_name;
 
       if (data && !needsUpdate) {
+        setCachedCustomer(data);
         setCustomer(data);
       } else if (userEmail) {
-        // Pull name/phone from user metadata saved during signUp
         const { data: { user: authUser } } = await supabase.auth.getUser();
         const meta = authUser?.user_metadata ?? {};
 
@@ -114,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .select('*')
           .eq('id', userId)
           .maybeSingle();
-        if (existing) setCustomer(existing);
+        if (existing) { setCachedCustomer(existing); setCustomer(existing); }
       }
     } catch (error) {
       console.error('Error loading customer data:', error);
@@ -131,38 +116,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     phone: string,
     redirectTo?: string
   ) => {
-    // Build the email redirect URL - when user clicks confirmation link, they'll be sent here
-    let emailRedirectUrl = `${window.location.origin}/dashboard`;
-
-    if (redirectTo?.startsWith('/book')) {
-      emailRedirectUrl = `${window.location.origin}/book`;
-    }
+    const emailRedirectUrl = redirectTo?.startsWith('/book')
+      ? `${window.location.origin}/auth/callback?next=/book`
+      : `${window.location.origin}/auth/callback`;
 
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: emailRedirectUrl,
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          phone,
-        },
+        data: { first_name: firstName, last_name: lastName, phone },
       },
     });
 
     if (error) throw error;
 
-    // Supabase returns an empty identities array when the email is already registered
-    // (it does this silently to prevent email enumeration attacks)
     if (data.user?.identities?.length === 0) {
       throw new Error('EMAIL_ALREADY_IN_USE');
     }
 
-    // If user was created, upsert the customer record.
-    // Using upsert (not insert) so that if a race condition already created an empty
-    // record (e.g. from onAuthStateChange firing during signUp), we overwrite it with
-    // the real name/phone values.
     if (data.user) {
       const { error: customerError } = await supabase
         .from('customers')
@@ -185,14 +157,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
   };
 
   const signOut = async () => {
+    setCachedCustomer(null);
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };
@@ -205,16 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        customer,
-        session,
-        loading,
-        signUp,
-        signIn,
-        signOut,
-        refreshCustomer,
-      }}
+      value={{ user, customer, session, loading, signUp, signIn, signOut, refreshCustomer }}
     >
       {children}
     </AuthContext.Provider>

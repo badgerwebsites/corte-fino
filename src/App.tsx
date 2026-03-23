@@ -12,6 +12,7 @@ import RewardsPage from './pages/RewardsPage';
 import AdminPage from './pages/AdminPage';
 import CustomerDashboardPage from './pages/CustomerDashboardPage';
 import DashboardRouter from './pages/DashboardRouter';
+import AuthCallbackPage from './pages/AuthCallbackPage';
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
           <Route path="/dashboard" element={<DashboardRouter />} />
 

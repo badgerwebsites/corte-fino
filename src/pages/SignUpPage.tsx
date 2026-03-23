@@ -70,7 +70,22 @@ export default function SignUpPage() {
       setShowEmailConfirmation(true);
     } catch (err) {
       if (err instanceof Error && err.message === 'EMAIL_ALREADY_IN_USE') {
-        setError('An account with this email already exists. Please log in.');
+        // Try to resend the confirmation email — succeeds only for unconfirmed accounts
+        const redirectUrl = redirectTo.startsWith('/book')
+          ? `${window.location.origin}/auth/callback?next=/book`
+          : `${window.location.origin}/auth/callback`;
+        const { error: resendError } = await supabase.auth.resend({
+          type: 'signup',
+          email,
+          options: { emailRedirectTo: redirectUrl },
+        });
+        if (!resendError) {
+          // Unconfirmed account — show the confirmation modal with fresh link
+          setShowEmailConfirmation(true);
+        } else {
+          // Already confirmed — direct them to log in
+          setError('An account with this email already exists. Please log in.');
+        }
       } else {
         setError('Failed to create account');
       }

@@ -215,7 +215,7 @@ export default function CustomerDashboardPage() {
 
   // ─── Render ────────────────────────────────────────────────────────────────
 
-  if (loading) return null;
+  if (loading) return <div style={{ minHeight: '100dvh', backgroundColor: '#101214' }} />;
 
   const rewardsEnabled = siteSettings?.rewards_enabled !== false;
 
