@@ -26,11 +26,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const pendingBooking = localStorage.getItem('pendingBooking');
 
           if (pendingBooking) {
-              window.location.replace('/book');
-              history.replaceState(null, '', '/book');
+            loadCustomerData(session.user.id, session.user.email);
+            window.location.replace('/book');
+            history.replaceState(null, '', '/book');
             return;
           }
 
+          loadCustomerData(session.user.id, session.user.email);
           window.location.replace('/login');
           return;
         }
@@ -53,9 +55,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (hash.includes('access_token') || hash.includes('type=signup')) {
               const pendingBooking = localStorage.getItem('pendingBooking');
               if (pendingBooking) {
+                loadCustomerData(session.user.id, session.user.email);
                 window.location.replace('/book');
                 return;
               }
+              loadCustomerData(session.user.id, session.user.email);
               window.location.replace('/login');
               return;
             }
@@ -83,6 +87,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data) {
         setCustomer(data);
       } else if (userEmail) {
+        // Pull name/phone from user metadata saved during signUp
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        const meta = authUser?.user_metadata ?? {};
+
         // Use upsert with ignoreDuplicates to handle race conditions where
         // multiple loadCustomerData calls run concurrently, or where signUp
         // already created the record but it wasn't returned by the select above
@@ -92,9 +100,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             {
               id: userId,
               email: userEmail,
-              first_name: '',
-              last_name: '',
-              phone: '',
+              first_name: meta.first_name ?? '',
+              last_name: meta.last_name ?? '',
+              phone: meta.phone ?? '',
               reward_points: 0,
             },
             { onConflict: 'id', ignoreDuplicates: true }
@@ -135,6 +143,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
       options: {
         emailRedirectTo: emailRedirectUrl,
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          phone,
+        },
       },
     });
 

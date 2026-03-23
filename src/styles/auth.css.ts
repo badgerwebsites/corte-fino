@@ -271,6 +271,7 @@ export const modalOverlay = style({
 });
 
 export const modal = style({
+  position: 'relative',
   backgroundColor: dark_bg,
   borderRadius: 16,
   padding: 32,

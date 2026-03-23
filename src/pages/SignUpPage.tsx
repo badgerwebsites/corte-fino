@@ -200,6 +200,13 @@ export default function SignUpPage() {
       {showEmailConfirmation && (
         <View className={styles.modalOverlay}>
           <View className={styles.modal}>
+            <button
+              onClick={() => setShowEmailConfirmation(false)}
+              style={{ position: 'absolute', top: 12, right: 16, background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#991b1b', lineHeight: 1 }}
+              aria-label="Close"
+            >
+              ✕
+            </button>
             <View className={styles.modalIcon}>
               <svg
                 className={styles.modalIconSvg}
