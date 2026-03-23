@@ -118,8 +118,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     redirectTo?: string
   ) => {
     const emailRedirectUrl = redirectTo?.startsWith('/book')
-      ? `${window.location.origin}/auth/callback?next=/book`
-      : `${window.location.origin}/auth/callback`;
+      ? `https://jstudiosbarbers.com/auth/callback?next=/book`
+      : `https://jstudiosbarbers.com/auth/callback`;
 
     const { data, error } = await supabase.auth.signUp({
       email,

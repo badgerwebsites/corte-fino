@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
       }
 
       const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `https://jstudiosbarbers.com/reset-password`,
       });
 
       if (supabaseError) throw supabaseError;

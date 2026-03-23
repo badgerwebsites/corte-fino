@@ -72,8 +72,8 @@ export default function SignUpPage() {
       if (err instanceof Error && err.message === 'EMAIL_ALREADY_IN_USE') {
         // Try to resend the confirmation email — succeeds only for unconfirmed accounts
         const redirectUrl = redirectTo.startsWith('/book')
-          ? `${window.location.origin}/auth/callback?next=/book`
-          : `${window.location.origin}/auth/callback`;
+          ? `https://jstudiosbarbers.com/auth/callback?next=/book`
+          : `https://jstudiosbarbers.com/auth/callback`;
         const { error: resendError } = await supabase.auth.resend({
           type: 'signup',
           email,
@@ -241,19 +241,21 @@ export default function SignUpPage() {
                 />
               </svg>
             </View>
-            {/* <Text className={styles.modalTitle}>Check your Email for confirmation link</Text> */}
             <Text className={styles.modalMessage}>
               Check <strong>{email}</strong> for a confirmation link.
               {isFromBooking
                 ? ' Click the link in the email to verify your account and complete your booking.'
                 : ' Click the link in the email to verify your account.'}
             </Text>
-            {/* <button
-              className={styles.modalButton}
-              onClick={() => setShowEmailConfirmation(false)}
-            >
-              Got it
-            </button> */}
+            {isFromBooking && (
+              <Link
+                to="/book"
+                className={styles.link}
+                style={{ marginTop: 16, display: 'block', textAlign: 'center' }}
+              >
+                Return to booking
+              </Link>
+            )}
           </View>
         </View>
       )}
