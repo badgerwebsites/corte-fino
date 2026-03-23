@@ -19,7 +19,7 @@ export const container = style({
 
 export const formCard = style({
   width: '100%',
-  maxWidth: 420,
+  maxWidth: 400,
   padding: 16,
   backgroundColor: darker_bg,
   borderColor: border_subtle,
