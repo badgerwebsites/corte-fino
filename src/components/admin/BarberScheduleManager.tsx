@@ -43,10 +43,12 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
   // Schedule state for each day
   const [schedules, setSchedules] = useState<Record<number, DaySchedule>>({});
 
+  const today = new Date().toISOString().split('T')[0];
+
   // Time off form state
   const [timeOffForm, setTimeOffForm] = useState({
-    start_date: '',
-    end_date: '',
+    start_date: today,
+    end_date: today,
     reason: '',
   });
 
@@ -564,10 +566,13 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                     type="date"
                     className={scheduleStyles.timeInput}
                     value={timeOffForm.start_date}
+                    min={today}
                     onChange={(e) =>
                       setTimeOffForm({
                         ...timeOffForm,
                         start_date: e.target.value,
+                        // if end is now before the new start, bump it forward
+                        end_date: timeOffForm.end_date < e.target.value ? e.target.value : timeOffForm.end_date,
                       })
                     }
                     required
@@ -580,6 +585,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                     type="date"
                     className={scheduleStyles.timeInput}
                     value={timeOffForm.end_date}
+                    min={timeOffForm.start_date || today}
                     onChange={(e) =>
                       setTimeOffForm({
                         ...timeOffForm,

@@ -834,19 +834,26 @@ export const pricingTimeLabel = style({
 
 export const timeInput = style({
   width: '100%',
+  minWidth: 0,
   backgroundColor: darker_bg,
   color: text_primary,
+  WebkitTextFillColor: text_primary,
   border: `1px solid ${text_muted}`,
   boxSizing: 'border-box',
   padding: '0.625rem',
+  paddingRight: '0.375rem',
   borderRadius: 8,
   fontSize: '0.875rem',
   colorScheme: 'dark',
+  minHeight: 44,
+  display: 'block',
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '0.75rem',
+      paddingRight: '0.75rem',
       borderRadius: '0.5rem',
       fontSize: '1rem',
+      minHeight: 'auto',
     },
   },
   ':focus': {
