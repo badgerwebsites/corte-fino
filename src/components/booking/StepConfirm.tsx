@@ -31,6 +31,7 @@ interface StepConfirmProps {
   recurrenceCount: number;
   recurringAvailability: DateAvailabilityResult[];
   authCustomer: Customer | null;
+  authLoading: boolean;
   user: User | null;
   showGuestForm: boolean;
   guestInfo: GuestInfo;
@@ -66,6 +67,7 @@ export function StepConfirm({
   recurrenceCount,
   recurringAvailability,
   authCustomer,
+  authLoading,
   user,
   showGuestForm,
   guestInfo,
@@ -220,11 +222,13 @@ export function StepConfirm({
               <button
                 className={styles.confirmButton}
                 onClick={onConfirm}
-                disabled={bookingInProgress}
+                disabled={bookingInProgress || authLoading}
               >
-                {bookingInProgress
-                  ? (isReschedule ? 'Rescheduling...' : 'Booking...')
-                  : (isReschedule ? 'Reschedule Booking' : 'Confirm Booking')}
+                {authLoading
+                  ? 'Loading...'
+                  : bookingInProgress
+                    ? (isReschedule ? 'Rescheduling...' : 'Booking...')
+                    : (isReschedule ? 'Reschedule Booking' : 'Confirm Booking')}
               </button>
             </View>
           ) : showGuestForm ? (

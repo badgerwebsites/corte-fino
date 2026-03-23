@@ -37,7 +37,7 @@ interface LocationState {
 }
 
 export default function BookingPage() {
-  const { user, customer } = useAuth();
+  const { user, customer, loading: authLoading } = useAuth();
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -855,6 +855,7 @@ export default function BookingPage() {
             recurrenceCount={recurrenceCount}
             recurringAvailability={recurringAvailability}
             authCustomer={customer}
+            authLoading={authLoading}
             user={user}
             showGuestForm={showGuestForm}
             guestInfo={guestInfo}
