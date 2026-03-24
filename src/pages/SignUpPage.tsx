@@ -20,6 +20,7 @@ export default function SignUpPage() {
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
   const [logoIndex, setLogoIndex] = useState(0);
   const [carouselLogos, setCarouselLogos] = useState<string[]>([]);
+  const [logosLoading, setLogosLoading] = useState(true);
 
   const { signUp } = useAuth();
   const location = useLocation();
@@ -36,10 +37,12 @@ export default function SignUpPage() {
       .select('nav_logo_1_url, nav_logo_2_url, nav_logo_3_url')
       .single()
       .then(({ data }) => {
-        if (!data) return;
-        const logos = [data.nav_logo_1_url, data.nav_logo_2_url, data.nav_logo_3_url]
-          .filter((url): url is string => !!url && url !== 'HIDDEN');
-        setCarouselLogos(logos);
+        if (data) {
+          const logos = [data.nav_logo_1_url, data.nav_logo_2_url, data.nav_logo_3_url]
+            .filter((url): url is string => !!url && url !== 'HIDDEN');
+          setCarouselLogos(logos);
+        }
+        setLogosLoading(false);
       });
   }, []);
 
@@ -114,9 +117,9 @@ export default function SignUpPage() {
                   ))}
                 </View>
               </View>
-            ) : (
+            ) : !logosLoading ? (
               <Text className={styles.pageTitle}>Sign Up</Text>
-            )}
+            ) : null}
           </View>
 
           <form onSubmit={handleSubmit} className={styles.form}>

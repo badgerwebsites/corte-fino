@@ -13,6 +13,7 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState('');
   const [logoIndex, setLogoIndex] = useState(0);
   const [carouselLogos, setCarouselLogos] = useState<string[]>([]);
+  const [logosLoading, setLogosLoading] = useState(true);
 
   useEffect(() => {
     supabase
@@ -20,10 +21,12 @@ export default function ForgotPasswordPage() {
       .select('nav_logo_1_url, nav_logo_2_url, nav_logo_3_url')
       .single()
       .then(({ data }) => {
-        if (!data) return;
-        const logos = [data.nav_logo_1_url, data.nav_logo_2_url, data.nav_logo_3_url]
-          .filter((url): url is string => !!url && url !== 'HIDDEN');
-        setCarouselLogos(logos);
+        if (data) {
+          const logos = [data.nav_logo_1_url, data.nav_logo_2_url, data.nav_logo_3_url]
+            .filter((url): url is string => !!url && url !== 'HIDDEN');
+          setCarouselLogos(logos);
+        }
+        setLogosLoading(false);
       });
   }, []);
 
@@ -92,9 +95,9 @@ export default function ForgotPasswordPage() {
                   ))}
                 </View>
               </View>
-            ) : (
+            ) : !logosLoading ? (
               <Text className={styles.pageTitle}>Forgot Password</Text>
-            )}
+            ) : null}
           </View>
 
           <form onSubmit={handleSubmit} className={styles.form}>
