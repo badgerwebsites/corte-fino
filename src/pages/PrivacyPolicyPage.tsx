@@ -1,7 +1,12 @@
 // pages/PrivacyPolicyPage.tsx
+import { useEffect } from 'react';
 import { Navigation } from '../components/Navigation';
 
 export default function PrivacyPolicyPage() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <>
       <Navigation />
