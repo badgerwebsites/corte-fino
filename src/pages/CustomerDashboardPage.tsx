@@ -12,6 +12,7 @@ import { EmptyBookingsState } from '../components/dashboard/EmptyBookingsState';
 import { StandaloneBookingCard } from '../components/dashboard/StandaloneBookingCard';
 import { RecurringBookingCard } from '../components/dashboard/RecurringBookingCard';
 import { CancelBookingModal } from '../components/dashboard/CancelBookingModal';
+import { EditProfileModal } from '../components/dashboard/EditProfileModal';
 
 interface RecurringBookingGroup {
   groupId: string;
@@ -29,6 +30,7 @@ export default function CustomerDashboardPage() {
   const [cancellingBooking, setCancellingBooking] = useState<BookingWithDetails | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [expandedRecurring, setExpandedRecurring] = useState<string | null>(null);
+  const [showEditProfile, setShowEditProfile] = useState(false);
   const navigate = useNavigate();
 
   // ─── Derived data ──────────────────────────────────────────────────────────
@@ -229,6 +231,7 @@ export default function CustomerDashboardPage() {
             hasBookings={bookings.length > 0}
             rewardsEnabled={rewardsEnabled}
             rewardPoints={customer?.reward_points || 0}
+            onEditProfile={() => setShowEditProfile(true)}
           />
 
           <View className={styles.section}>
@@ -278,6 +281,18 @@ export default function CustomerDashboardPage() {
           formatTime={formatTime}
           onClose={() => setCancellingBooking(null)}
           onConfirm={handleCancelBooking}
+        />
+      )}
+
+      {showEditProfile && customer && (
+        <EditProfileModal
+          customer={customer}
+          onClose={() => setShowEditProfile(false)}
+          onSaved={() => {
+            refreshCustomer();
+            setShowEditProfile(false);
+          }}
+          onAccountDeleted={() => navigate('/', { replace: true })}
         />
       )}
     </>

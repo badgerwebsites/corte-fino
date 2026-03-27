@@ -47,11 +47,9 @@ export const greeting = style({
   fontWeight: 600,
   color: text_primary,
   letterSpacing: "-0.02em",
-  marginBottom: 8,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 28,
-      marginBottom: 0,
     },
   },
 });
@@ -72,6 +70,14 @@ export const primaryCta = style({
   textDecoration: "none",
   textAlign: "center",
   transition: "all 0.15s",
+  marginTop: 12,
+  marginBottom: 4,
+  "@media": {
+    "screen and (min-width: 768px)": {
+      marginTop: 0,
+      marginBottom: 0,
+    },
+  },
   ':hover': {
     transform: 'translateY(-1px)',
     boxShadow: '0 4px 12px rgba(168,220,232,0.4)',
@@ -406,6 +412,40 @@ export const rewardsLink = style({
   },
   ":active": {
     transform: "translateY(0)",
+  },
+});
+
+export const editProfileButton = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 32,
+  height: 32,
+  borderRadius: '50%',
+  backgroundColor: 'rgba(255,255,255,0.08)',
+  border: '1px solid rgba(255,255,255,0.15)',
+  cursor: 'pointer',
+  flexShrink: 0,
+  transition: 'background-color 0.15s',
+  ':hover': {
+    backgroundColor: 'rgba(255,255,255,0.18)',
+  },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      width: 40,
+      height: 40,
+    },
+  },
+});
+
+export const editProfileIcon = style({
+  width: 16,
+  height: 16,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      width: 20,
+      height: 20,
+    },
   },
 });
 

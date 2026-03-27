@@ -78,7 +78,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setCachedCustomer(data);
         setCustomer(data);
       } else if (userEmail) {
-        const { data: { user: authUser } } = await supabase.auth.getUser();
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+        if (authError || !authUser) return; // session invalid or user deleted
         const meta = authUser?.user_metadata ?? {};
 
         await supabase

@@ -132,6 +132,11 @@ export default function ForgotPasswordPage() {
             </button>
           </form>
 
+          <p style={{ color: '#8a8a8a', fontSize: 13, textAlign: 'center', marginTop: 16 }}>
+            Signed up with Google? Use the Google button on the{' '}
+            <Link to="/login" className={styles.link}>login page</Link> instead.
+          </p>
+
           <View className={styles.footer}>
             <Link to="/login" className={styles.link}>
               Back to Login

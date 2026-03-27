@@ -8,12 +8,25 @@ interface DashboardHeaderProps {
   hasBookings: boolean;
   rewardsEnabled: boolean;
   rewardPoints: number;
+  onEditProfile: () => void;
 }
 
-export function DashboardHeader({ firstName, hasBookings, rewardsEnabled, rewardPoints }: DashboardHeaderProps) {
+export function DashboardHeader({ firstName, hasBookings, rewardsEnabled, rewardPoints, onEditProfile }: DashboardHeaderProps) {
   return (
     <View className={styles.header}>
-      <Text className={styles.greeting}>Welcome back, {firstName}</Text>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span className={styles.greeting} style={{ marginBottom: 0 }}>Hello, {firstName}</span>
+        <button
+          onClick={onEditProfile}
+          aria-label="Edit profile"
+          className={styles.editProfileButton}
+        >
+          <svg className={styles.editProfileIcon} viewBox="0 0 24 24" fill="none" stroke="#f5f5f5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+          </svg>
+        </button>
+      </div>
       {hasBookings && (
         <Link to="/book" className={styles.primaryCta}>
           Book Appointment
