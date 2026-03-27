@@ -29,8 +29,8 @@ export function EmptyBookingsState({ rewardsEnabled }: EmptyBookingsStateProps) 
       <Text className={styles.emptyStateTitle}>No upcoming appointments</Text>
       <Text className={styles.emptyStateText}>
         {rewardsEnabled
-          ? 'Book your first appointment and start earning reward points.'
-          : 'Book your first appointment today.'}
+          ? 'Book an appointment and start earning reward points.'
+          : 'Book an appointment today.'}
       </Text>
       <Link to="/book" className={styles.emptyStateButton}>
         Book Appointment
