@@ -107,7 +107,7 @@ const baseButton = {
   justifyContent: 'center',
   whiteSpace: 'nowrap',
   padding: '4px 8px',
-  fontSize: 15,
+  fontSize: 18,
   fontWeight: 700,
   borderRadius: 6,
   cursor: 'pointer',
@@ -123,7 +123,6 @@ export const loginButton = style({
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '4px 12px',
-      fontSize: 18,
     },
   },
   ':hover': {
@@ -148,7 +147,6 @@ export const logoutButton = style({
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '6px 12px',
-      fontSize: 18,
     },
   },
   ':hover': {
