@@ -533,3 +533,20 @@ export const footerText = style({
     },
   },
 });
+
+export const footerLink = style({
+  fontSize: 14,
+  color: text_muted,
+  display: 'inline-block',
+  textDecoration: 'none',
+  marginBottom: 12,
+  transition: 'color 0.2s ease',
+  "@media": {
+    "screen and (min-width: 768px)": {
+      fontSize: 18,
+    },
+  },
+  ':hover': {
+    color: text_primary,
+  },
+});

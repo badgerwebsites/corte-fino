@@ -33,9 +33,11 @@ export function HomeFooter() {
           </View>
         </a>
       </View>
-      <Link to="/privacy" className={styles.footerText}>
-        Privacy Policy
-      </Link>
+      <View style={{ textAlign: 'center' }}>
+        <Link to="/privacy" className={styles.footerLink}>
+          Privacy Policy
+        </Link>
+      </View>
       <Text className={styles.footerText}>
         © 2026 Corte Fino. All rights reserved.
       </Text>

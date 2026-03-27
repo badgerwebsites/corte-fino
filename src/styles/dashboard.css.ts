@@ -37,19 +37,23 @@ export const header = style({
   "@media": {
     "screen and (min-width: 768px)": {
       flexDirection: "row",
-      justifyContent: "space-between",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 80,
     },
   },
 });
 
 export const greeting = style({
-  fontSize: 24,
+  fontSize: 22,
   fontWeight: 600,
   color: text_primary,
   letterSpacing: "-0.02em",
+  marginTop: 8,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 28,
+      marginTop: 0,
     },
   },
 });
@@ -419,32 +423,34 @@ export const editProfileButton = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: 32,
-  height: 32,
+  width: 36,
+  height: 36,
   borderRadius: '50%',
   backgroundColor: 'rgba(255,255,255,0.08)',
   border: '1px solid rgba(255,255,255,0.15)',
   cursor: 'pointer',
   flexShrink: 0,
   transition: 'background-color 0.15s',
+  marginTop: 8,
   ':hover': {
     backgroundColor: 'rgba(255,255,255,0.18)',
   },
   '@media': {
     'screen and (min-width: 768px)': {
-      width: 40,
-      height: 40,
+      width: 48,
+      height: 48,
+      marginTop: 0,
     },
   },
 });
 
 export const editProfileIcon = style({
-  width: 16,
-  height: 16,
+  width: 18,
+  height: 18,
   '@media': {
     'screen and (min-width: 768px)': {
-      width: 20,
-      height: 20,
+      width: 24,
+      height: 24,
     },
   },
 });
