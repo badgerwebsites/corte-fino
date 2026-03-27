@@ -467,7 +467,7 @@ export const contactInfo = style({
   flexDirection: "column",
   alignItems: "center",
   gap: 16,
-  marginBottom: 24,
+  marginBottom: 18,
   "@media": {
     "screen and (min-width: 768px)": {
       gap: 20,
@@ -524,6 +524,9 @@ export const footer = style({
 export const footerText = style({
   fontSize: 14,
   color: text_muted,
+  display: 'block',
+  textDecoration: 'none',
+  marginBottom: 12,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 18,
