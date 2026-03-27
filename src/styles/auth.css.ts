@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { darker_bg, dark_bg, button, text_primary, text_secondary, border_subtle } from './globalStyles.css';
+import { darker_bg, dark_bg, button, text_primary, text_secondary, border_subtle, text_muted } from './globalStyles.css';
 
 export const container = style({
   minHeight: '100dvh',
@@ -231,8 +231,7 @@ export const forgotPasswordLink = style({
   color: button,
   textDecoration: 'none',
   transition: 'color 0.2s ease',
-  display: 'block',
-  textAlign: 'center',
+  display: 'inline-block',
   '@media': {
     'screen and (min-width: 768px)': {
         fontSize: 28,
@@ -357,24 +356,24 @@ export const divider = style({
   display: 'flex',
   alignItems: 'center',
   gap: 12,
-  marginTop: 8,
-  marginBottom: 8,
+  marginTop: 12,
+  marginBottom: 12,
   ':before': {
     content: '""',
     flex: 1,
     height: 1,
-    backgroundColor: border_subtle,
+    backgroundColor: text_muted,
   },
   ':after': {
     content: '""',
     flex: 1,
     height: 1,
-    backgroundColor: border_subtle,
+    backgroundColor: text_muted,
   },
 });
 
 export const dividerText = style({
-  fontSize: 18,
+  fontSize: 20,
   color: text_secondary,
   whiteSpace: 'nowrap',
 });
@@ -386,20 +385,20 @@ export const googleButton = style({
   gap: 10,
   width: '100%',
   minHeight: 52,
-  fontSize: 16,
+  fontSize: 18,
   fontWeight: 600,
-  backgroundColor: '#ffffff',
-  color: '#1f1f1f',
-  border: '1px solid #d1d5db',
+  backgroundColor: dark_bg,
+  color: text_primary,
+  border: '1px solid #b0b0b0',
   borderRadius: 10,
   cursor: 'pointer',
   transition: 'background-color 0.15s ease, box-shadow 0.15s ease',
   ':hover': {
-    backgroundColor: '#f9fafb',
+    backgroundColor: "#1a1a1a",
     boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
   },
   ':active': {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#1a1a1a',
   },
   ':disabled': {
     opacity: 0.5,
