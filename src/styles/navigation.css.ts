@@ -24,10 +24,15 @@ export const nav = style({
 
 export const navContainer = style({
   maxWidth: 1200,
-  margin: '0 12px',
+  margin: '0 8px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      margin: '0 16px',
+    },
+  },
 });
 
 export const logoLink = style({
@@ -37,8 +42,8 @@ export const logoLink = style({
 });
 
 export const carouselContainer = style({
-  width: 120,
-  height: 36,
+  width: 150,
+  height: 50,
   overflow: 'hidden',
   position: 'relative',
 
@@ -64,14 +69,14 @@ export const carouselSlide = style({
 });
 
 export const logoImage = style({
-  height: 36,
+  height: 50,
   width: 'auto',
   maxWidth: '100%',
   objectFit: 'contain',
 
   '@media': {
     'screen and (min-width: 768px)': {
-      height: 50,
+      height: 60,
     },
   },
 });
