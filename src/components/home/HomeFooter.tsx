@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';
 import * as styles from '../../styles/home.css';
@@ -32,6 +33,9 @@ export function HomeFooter() {
           </View>
         </a>
       </View>
+      <Link to="/privacy" style={{ color: '#8a8a8a', fontSize: 18, marginBottom: 12, display: 'block', textDecoration: 'none' }}>
+        Privacy Policy
+      </Link>
       <Text className={styles.footerText}>
         © 2026 Corte Fino. All rights reserved.
       </Text>

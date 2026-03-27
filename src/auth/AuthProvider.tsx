@@ -87,8 +87,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             {
               id: userId,
               email: userEmail,
-              first_name: meta.first_name ?? data?.first_name ?? '',
-              last_name: meta.last_name ?? data?.last_name ?? '',
+              first_name: meta.first_name ?? meta.full_name?.split(' ')[0] ?? data?.first_name ?? '',
+              last_name: meta.last_name ?? meta.full_name?.split(' ').slice(1).join(' ') ?? data?.last_name ?? '',
               phone: meta.phone ?? data?.phone ?? '',
               reward_points: data?.reward_points ?? 0,
             },
@@ -162,6 +162,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   };
 
+  const signInWithGoogle = async (redirectTo?: string) => {
+    const baseUrl = import.meta.env.DEV
+      ? `http://localhost:${window.location.port || 5173}`
+      : 'https://jstudiosbarbers.com';
+    const redirectUrl = redirectTo?.startsWith('/book')
+      ? `${baseUrl}/auth/callback?next=/book`
+      : `${baseUrl}/auth/callback`;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: redirectUrl },
+    });
+    if (error) throw error;
+  };
+
   const signOut = async () => {
     setCachedCustomer(null);
     const { error } = await supabase.auth.signOut();
@@ -176,7 +190,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, customer, session, loading, signUp, signIn, signOut, refreshCustomer }}
+      value={{ user, customer, session, loading, signUp, signIn, signOut, signInWithGoogle, refreshCustomer }}
     >
       {children}
     </AuthContext.Provider>

@@ -18,6 +18,7 @@ export interface AuthContextType {
   ) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  signInWithGoogle: (redirectTo?: string) => Promise<void>;
   refreshCustomer: () => Promise<void>;
 }
 

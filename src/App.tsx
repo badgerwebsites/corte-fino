@@ -13,6 +13,7 @@ import AdminPage from './pages/AdminPage';
 import CustomerDashboardPage from './pages/CustomerDashboardPage';
 import DashboardRouter from './pages/DashboardRouter';
 import AuthCallbackPage from './pages/AuthCallbackPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/admin" element={<AdminPage />} />
 
           <Route path="/rewards" element={<RewardsPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

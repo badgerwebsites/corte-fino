@@ -1,16 +1,18 @@
 // pages/AuthCallbackPage.tsx
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { View } from '../ui/View';
-import * as styles from '../styles/auth.css';
 
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [expired, setExpired] = useState(false);
-
   useEffect(() => {
+    // If the user cancelled Google OAuth, redirect back to login immediately
+    if (searchParams.get('error')) {
+      navigate('/login', { replace: true });
+      return;
+    }
+
     const next = searchParams.get('next');
     const pendingBooking = localStorage.getItem('pendingBooking');
     const destination = next ?? (pendingBooking ? '/book' : '/dashboard');
@@ -29,8 +31,8 @@ export default function AuthCallbackPage() {
       }
     });
 
-    // Timeout fallback — if nothing resolves in 8 seconds, show expired state
-    const timeout = setTimeout(() => setExpired(true), 8000);
+    // Timeout fallback — if nothing resolves in 8 seconds, redirect to login
+    const timeout = setTimeout(() => navigate('/login', { replace: true }), 8000);
 
     return () => {
       subscription.unsubscribe();
@@ -38,25 +40,9 @@ export default function AuthCallbackPage() {
     };
   }, [navigate, searchParams]);
 
-  if (expired) {
-    return (
-      <View className={styles.container}>
-        <View className={styles.formCard}>
-          <p className={styles.pageTitle}>Link Expired</p>
-          <p style={{ color: '#9ca3af', textAlign: 'center', marginBottom: 24 }}>
-            This confirmation link has expired or already been used. Please sign up again to get a new link.
-          </p>
-          <Link to="/signup" className={styles.link}>
-            Back to Sign Up
-          </Link>
-        </View>
-      </View>
-    );
-  }
-
   return (
     <div style={{ minHeight: '100dvh', backgroundColor: '#101214', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#9ca3af', fontSize: 16 }}>Confirming your email…</p>
+      <p style={{ color: '#9ca3af', fontSize: 16 }}>Signing you in…</p>
     </div>
   );
 }
