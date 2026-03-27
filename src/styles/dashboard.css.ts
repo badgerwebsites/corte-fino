@@ -49,7 +49,7 @@ export const greeting = style({
   fontWeight: 600,
   color: text_primary,
   letterSpacing: "-0.02em",
-  marginTop: 8,
+  marginTop: 12,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 28,
@@ -450,7 +450,7 @@ export const editProfileButton = style({
   cursor: 'pointer',
   flexShrink: 0,
   transition: 'background-color 0.15s',
-  marginTop: 8,
+  marginTop: 12,
   ':hover': {
     backgroundColor: 'rgba(255,255,255,0.18)',
   },

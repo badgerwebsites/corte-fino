@@ -10,7 +10,7 @@ export const nav = style({
   zIndex: 1000,
   backgroundColor: '#101214',
   boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-  padding: '12px 12px',
+  padding: '8px 8px',
   borderBottom: `1px solid ${text_primary}`,
   // Force GPU compositing layer — prevents iOS Safari from scrolling fixed elements
   transform: 'translateZ(0)',
