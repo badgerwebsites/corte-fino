@@ -45,7 +45,7 @@ export const header = style({
 });
 
 export const greeting = style({
-  fontSize: 22,
+  fontSize: 24,
   fontWeight: 600,
   color: text_primary,
   letterSpacing: "-0.02em",
@@ -442,8 +442,8 @@ export const editProfileButton = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: 36,
-  height: 36,
+  width: 40,
+  height: 40,
   borderRadius: '50%',
   backgroundColor: 'rgba(255,255,255,0.08)',
   border: '1px solid rgba(255,255,255,0.15)',

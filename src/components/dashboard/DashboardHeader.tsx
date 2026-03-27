@@ -15,7 +15,7 @@ export function DashboardHeader({ firstName, hasBookings, rewardsEnabled, reward
   return (
     <View className={styles.header}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span className={styles.greeting} style={{ marginBottom: 0 }}>Welcome, {firstName}</span>
+        <span className={styles.greeting}>Welcome, {firstName}</span>
         <button
           onClick={onEditProfile}
           aria-label="Edit profile"
