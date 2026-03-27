@@ -33,7 +33,7 @@ export function HomeFooter() {
           </View>
         </a>
       </View>
-      <Link to="/privacy" style={{ color: '#8a8a8a', fontSize: 18, marginBottom: 12, display: 'block', textDecoration: 'none' }}>
+      <Link to="/privacy" className={styles.footerText}>
         Privacy Policy
       </Link>
       <Text className={styles.footerText}>
