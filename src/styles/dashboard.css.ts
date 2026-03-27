@@ -39,7 +39,7 @@ export const header = style({
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
-      gap: 80,
+      gap: 100,
     },
   },
 });

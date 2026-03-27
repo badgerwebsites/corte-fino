@@ -67,7 +67,7 @@ export function EditProfileModal({ customer, onClose, onSaved, onAccountDeleted 
               style={{
                 position: 'absolute', top: 14, right: 16,
                 background: 'none', border: 'none',
-                color: '#ef4444', fontSize: 16, cursor: 'pointer',
+                color: '#ef4444', fontSize: 18, cursor: 'pointer',
                 padding: 0, transition: 'opacity 0.15s',
               }}
               onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
@@ -76,7 +76,7 @@ export function EditProfileModal({ customer, onClose, onSaved, onAccountDeleted 
               Delete Account
             </button>
             
-            <p style={{ color: '#f5f5f5', fontSize: 20, fontWeight: 700, textAlign: 'center', marginBottom: 20, marginTop: 28 }}>
+            <p style={{ color: '#f5f5f5', fontSize: 24, fontWeight: 700, textAlign: 'center', marginBottom: 20, marginTop: 28 }}>
               Edit Profile
             </p>
 
