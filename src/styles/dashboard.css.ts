@@ -36,10 +36,10 @@ export const header = style({
   marginBottom: 16,
   "@media": {
     "screen and (min-width: 768px)": {
-      flexDirection: "row",
+      flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
-      gap: 100,
+      position: "relative",
     },
   },
 });
@@ -53,7 +53,6 @@ export const greeting = style({
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 28,
-      marginTop: 0,
     },
   },
 });
@@ -74,12 +73,12 @@ export const primaryCta = style({
   textDecoration: "none",
   textAlign: "center",
   transition: "all 0.15s",
-  marginTop: 12,
+  marginTop: 16,
   marginBottom: 4,
   "@media": {
     "screen and (min-width: 768px)": {
-      marginTop: 0,
-      marginBottom: 0,
+      marginTop: 12,
+      marginBottom: 8,
     },
   },
   ':hover': {
@@ -360,24 +359,26 @@ export const actionLinkDanger = style({
 
 export const rewardsCard = style({
   display: "flex",
-  gap: 20,
   alignItems: "center",
-  justifyContent: "center",
-  textAlign: "center",
+  gap: 12,
   marginTop: 16,
-  marginBottom: 4,
+  textDecoration: "none",
+  border: `2px solid ${text_primary}`,
+  borderRadius: 8,
+  padding: "8px 14px",
+  transition: "border-color 0.2s ease, color 0.2s ease",
+  ':hover': {
+    borderColor: button,
+    color: button,
+  },
   "@media": {
     "screen and (min-width: 768px)": {
-      padding: "8px 0px",
+      position: "fixed",
+      top: 94,
+      right: 20,
       margin: 0,
     },
   },
-});
-
-export const rewardsInfo = style({
-  display: "flex",
-  alignItems: "center",
-  gap: 12,
 });
 
 export const rewardsIcon = style({
@@ -385,21 +386,39 @@ export const rewardsIcon = style({
   height: 28,
   color: text_primary,
   marginBottom: 4,
+  transition: "color 0.2s ease",
+  selectors: {
+    [`${rewardsCard}:hover &`]: {
+      color: button,
+    },
+  },
 });
 
 export const rewardsText = style({
   fontSize: 20,
   color: text_primary,
   fontWeight: 400,
+  transition: "color 0.2s ease",
+  selectors: {
+    [`${rewardsCard}:hover &`]: {
+      color: button,
+    },
+  },
 });
 
 export const rewardsPoints = style({
   fontWeight: 600,
   color: text_primary,
+  transition: "color 0.2s ease",
+  selectors: {
+    [`${rewardsCard}:hover &`]: {
+      color: button,
+    },
+  },
 });
 
 export const rewardsLink = style({
-  padding: "8px 16px",
+  padding: "6px 12px",
   fontSize: 14,
   fontWeight: 600,  
   letterSpacing: '0.05em',
@@ -439,7 +458,6 @@ export const editProfileButton = style({
     'screen and (min-width: 768px)': {
       width: 48,
       height: 48,
-      marginTop: 0,
     },
   },
 });
