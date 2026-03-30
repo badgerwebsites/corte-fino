@@ -1,3 +1,4 @@
+// ui/Text.tsx
 import type { ReactNode } from "react";
 
 type TextProps = {

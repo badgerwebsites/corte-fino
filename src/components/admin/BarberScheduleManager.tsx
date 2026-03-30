@@ -1,9 +1,8 @@
-// components/BarberScheduleManager.tsx
+// components/admin/BarberScheduleManager.tsx
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { Barber, BarberAvailability, BarberTimeOff } from '../../types/database.types';
 import { View } from '../../ui/View';
-// import { Text } from '../ui/Text';
 import * as styles from '../../styles/admin.css';
 import * as scheduleStyles from '../../styles/barberScheduleManager.css';
 import { MinusCircle } from "lucide-react";

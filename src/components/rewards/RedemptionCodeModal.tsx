@@ -1,3 +1,4 @@
+// components/rewards/RedemptionCodeModal.tsx
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';
 import * as styles from '../../styles/rewards.css';

@@ -1,3 +1,4 @@
+// components/admin/RewardsTab.tsx
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import type { Reward, RewardRedemptionWithDetails, RewardType, SiteSettings } from '../../types/database.types';

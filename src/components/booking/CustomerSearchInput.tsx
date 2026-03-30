@@ -1,4 +1,4 @@
-// components/CustomerSearchInput.tsx
+// components/booking/CustomerSearchInput.tsx
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { Customer } from '../../types/database.types';

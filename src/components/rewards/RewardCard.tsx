@@ -1,3 +1,4 @@
+// components/rewards/RewardCard.tsx
 import type { Reward } from '../../types/database.types';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';

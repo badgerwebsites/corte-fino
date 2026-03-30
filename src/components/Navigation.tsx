@@ -16,9 +16,9 @@ export function Navigation() {
 
   // Helper to determine logo value: empty string means hidden, null means use default, URL means use that
   const getLogoValue = (dbValue: string | null | undefined, defaultValue: string | null): string | null => {
-    if (dbValue === 'HIDDEN') return null; // explicitly hidden
-    if (dbValue && dbValue.length > 0) return dbValue; // custom URL
-    return defaultValue; // use default (null or undefined in DB)
+    if (dbValue === 'HIDDEN') return null;
+    if (dbValue && dbValue.length > 0) return dbValue; 
+    return defaultValue;
   };
 
   // Fetch site settings for carousel logos
@@ -55,11 +55,10 @@ export function Navigation() {
       setLogoIndex(tick % activeLogos.length);
     };
 
-    // Initial sync
     updateIndex();
 
     // Update on interval
-    const interval = setInterval(updateIndex, 100); // Check frequently for smooth sync
+    const interval = setInterval(updateIndex, 100);
 
     return () => clearInterval(interval);
   }, [activeLogos.length]);

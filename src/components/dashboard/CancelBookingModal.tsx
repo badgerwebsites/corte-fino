@@ -1,3 +1,4 @@
+// components/dashboard/CancelBookingModal.tsx
 import type { BookingWithDetails } from '../../types/database.types';
 import { RECURRENCE_LABELS } from '../../types/database.types';
 import { View } from '../../ui/View';

@@ -1,3 +1,4 @@
+// components/admin/ServicesTab.tsx
 import { useEffect, useRef, useState } from 'react';
 import type { Service } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';

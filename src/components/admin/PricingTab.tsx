@@ -1,3 +1,4 @@
+// components/admin/PricingTab.tsx
 import type { Barber, BarberServicePricing, Service } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 import { View } from '../../ui/View';

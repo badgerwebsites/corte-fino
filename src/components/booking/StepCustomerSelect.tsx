@@ -1,3 +1,4 @@
+// components/booking/StepCustomerSelect.tsx
 import type { Customer } from '../../types/database.types';
 import { CustomerSearchInput } from './CustomerSearchInput';
 import { View } from '../../ui/View';

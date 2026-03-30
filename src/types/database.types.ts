@@ -1,3 +1,4 @@
+// types/database.types.ts
 export interface Customer {
   id: string;
   email: string;

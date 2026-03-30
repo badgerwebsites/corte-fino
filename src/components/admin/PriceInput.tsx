@@ -1,3 +1,4 @@
+// components/admin/PriceInput.tsx
 import { useState } from 'react';
 
 interface PriceInputProps {

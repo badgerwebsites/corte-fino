@@ -1,3 +1,4 @@
+// ui/View.tsx
 import type { ReactNode, CSSProperties } from "react";
 
 type ViewProps = {

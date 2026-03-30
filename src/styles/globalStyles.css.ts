@@ -1,8 +1,5 @@
+// styles/globalStyles.css.ts
 import { style } from '@vanilla-extract/css';
-
-// ─── Design Tokens ───────────────────────────────────────────────────────────
-// Single source of truth for the color palette — import these in every style file
-// instead of re-declaring them locally.
 
 export const darker_bg     = "#101214";
 export const dark_bg       = "#222222";
@@ -12,8 +9,6 @@ export const text_secondary = "#b0b0b0";
 export const text_muted    = "#8a8a8a";
 export const border_subtle = "rgba(255,255,255,0.08)";
 export const border_hover  = "rgba(255,255,255,0.18)";
-
-// ─── Shared Style Classes ────────────────────────────────────────────────────
 
 // Primary action button — button-color background, dark text, uppercase
 export const primaryButton = style({

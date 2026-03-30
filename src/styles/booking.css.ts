@@ -1,3 +1,4 @@
+// styles/booking.css.ts
 import { style, keyframes } from "@vanilla-extract/css";
 import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_subtle } from './globalStyles.css';
 
@@ -14,7 +15,6 @@ const slideInUp = keyframes({
 export const container = style({
   minHeight: "100vh",
   backgroundColor: darker_bg,
-  // color: "#1a1a1a",
   padding: 8,
   paddingTop: 72,
   animation: `${fadeIn} 0.5s ease-out`,
@@ -42,8 +42,6 @@ export const header = style({
 });
 
 export const backLink = style({
-  // margin: "0 auto",
-  // position: "fixed",
   marginBottom: 12,
 });
 
@@ -61,12 +59,10 @@ export const link = style({
 export const rescheduleNoticeWrapper = style({
   display: "flex",
   justifyContent: "center",
-  // marginBottom: 12,
 });
 
 // Reschedule notice
 export const rescheduleNotice = style({
-  // maxWidth: 850,
   display: "inline-block",
   margin: "0 auto 12px",
   padding: "8px 12px",
@@ -102,12 +98,6 @@ export const progressBar = style({
   margin: "0 auto",
   padding: "0 16px",
   animation: `${slideInUp} 0.7s ease-out`,
-  "@media": {
-    "screen and (min-width: 768px)": {
-      // marginBottom: 48,
-      // padding: "0 24px",
-    },
-  },
 });
 
 export const progressStep = style({
@@ -132,7 +122,6 @@ export const progressNumber = style({
   height: 36,
   borderRadius: "50%",
   backgroundColor: text_muted,
-  // border: "2px solid #e5e5e5",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -408,8 +397,8 @@ export const timeLabel = style({
 
 export const timeGrid = style({
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
-  gap: 10,
+  gridTemplateColumns: "repeat(2, 1fr)",
+  gap: 8,
   marginTop: 12,
   marginBottom: 80,
   "@media": {
@@ -453,7 +442,6 @@ export const timeButtonActive = style({
 export const noTimesMessage = style({
   padding: 20,
   textAlign: "center",
-  // backgroundColor: dark_bg,
   borderRadius: 6,
   border: `1px solid ${border_subtle}`,
   color: text_secondary,
@@ -469,7 +457,6 @@ export const confirmContainer = style({
 });
 
 export const confirmCard = style({
-  // marginTop: 12,
   marginBottom: 100,
   padding: 8,
   backgroundColor: dark_bg,
@@ -479,9 +466,7 @@ export const confirmCard = style({
   maxWidth: 600,
   "@media": {
     "screen and (min-width: 768px)": {
-      // marginTop: 24,
       padding: 20,
-      // margin: "32px auto",
     },
   },
 });
@@ -489,7 +474,6 @@ export const confirmCard = style({
 export const confirmSection = style({
   display: "flex",
   flexDirection: "column",
-  // gap: 10,
   paddingBottom: 8,
   marginBottom: 8,
   borderBottom: "1px solid rgba(255,255,255,0.08)",
@@ -508,7 +492,6 @@ export const confirmSection = style({
 export const confirmLabel = style({
   fontSize: 14,
   color: "#999",
-  // marginBottom: 8,
   textTransform: "uppercase",
   letterSpacing: "0.1em",
   fontWeight: 600,
@@ -701,7 +684,6 @@ export const confirmationTitle = style({
 });
 
 export const confirmationDetails = style({
-  // backgroundColor: darker_bg,
   borderRadius: 12,
   border: `1px solid ${text_secondary}`,
   padding: 16,

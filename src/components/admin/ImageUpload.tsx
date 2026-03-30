@@ -1,4 +1,4 @@
-// components/ImageUpload.tsx
+// components/admin/ImageUpload.tsx
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { View } from '../../ui/View';

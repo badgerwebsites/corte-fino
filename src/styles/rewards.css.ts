@@ -1,3 +1,4 @@
+// styles/rewards.css.ts
 import { style } from "@vanilla-extract/css";
 import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_subtle } from './globalStyles.css';
 
@@ -16,7 +17,6 @@ export const container = style({
 
 export const howItWorks = style({
   flex: 1,
-  // padding: 16,
   marginBottom: 20,
 });
 
@@ -376,10 +376,7 @@ export const disabled = style({
 });
 
 export const backLink = style({
-  // maxWidth: 1200,
   margin: "0 auto",
-  // position: "fixed",
-  // textAlign: "center",
 });
 
 export const link = style({

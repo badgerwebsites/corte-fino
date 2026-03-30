@@ -11,9 +11,6 @@ import type {
 } from '../types/database.types';
 import { RECURRENCE_DAYS } from '../types/database.types';
 
-/**
- * Calculate end time from start time and service duration
- */
 export function calculateEndTime(startTime: string, durationMinutes: number): string {
   const [startHours, startMins] = startTime.split(':').map(Number);
   const totalMinutes = startHours * 60 + startMins + durationMinutes;
@@ -21,10 +18,6 @@ export function calculateEndTime(startTime: string, durationMinutes: number): st
   const endMins = totalMinutes % 60;
   return `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
 }
-
-/**
- * Determine if a time falls within regular or evening hours for a barber
- */
 export function getTimePeriod(time: string, barber: Barber): TimePeriod {
   const [hours, minutes] = time.split(':').map(Number);
   const timeInMinutes = hours * 60 + minutes;
@@ -41,9 +34,6 @@ export function getTimePeriod(time: string, barber: Barber): TimePeriod {
   return 'regular';
 }
 
-/**
- * Calculate price based on barber, service, time period, day of week, and pricing table
- */
 export function calculatePrice(
   barberId: string,
   serviceId: string,
@@ -56,7 +46,6 @@ export function calculatePrice(
   const timePeriod = getTimePeriod(time, barber);
   const dayOfWeek = getDay(bookingDate); // 0=Sun, 1=Mon, ..., 6=Sat
 
-  // Look for day-specific price
   const priceEntry = pricing.find(
     p => p.barber_id === barberId &&
          p.service_id === serviceId &&
@@ -67,9 +56,6 @@ export function calculatePrice(
   return priceEntry?.price || defaultPrice;
 }
 
-/**
- * Check if a time slot overlaps with any existing booking for a specific barber
- */
 export function isSlotBooked(
   time: string,
   barberId: string,
@@ -89,14 +75,10 @@ export function isSlotBooked(
     const bookingStart = startHours * 60 + startMins;
     const bookingEnd = endHours * 60 + endMins;
 
-    // Check for interval overlap
     return newStart < bookingEnd && newEnd > bookingStart;
   });
 }
 
-/**
- * Check if a barber is available on a specific date (has availability and no time off)
- */
 export function isBarberAvailableOnDate(
   barberId: string,
   date: Date,
@@ -106,7 +88,6 @@ export function isBarberAvailableOnDate(
   const dayOfWeek = getDay(date);
   const dateString = format(date, 'yyyy-MM-dd');
 
-  // Check if barber has availability for this day of week
   const hasAvailability = availability.some(
     a => a.barber_id === barberId &&
          a.day_of_week === dayOfWeek &&
@@ -115,7 +96,6 @@ export function isBarberAvailableOnDate(
 
   if (!hasAvailability) return false;
 
-  // Check if barber has time off on this date
   const hasTimeOff = timeOff.some(
     t => t.barber_id === barberId &&
          dateString >= t.start_date &&
@@ -125,9 +105,6 @@ export function isBarberAvailableOnDate(
   return !hasTimeOff;
 }
 
-/**
- * Generate array of dates based on recurrence pattern
- */
 export function generateRecurringDates(
   startDate: Date,
   pattern: RecurrencePattern,
@@ -151,9 +128,6 @@ export interface DateAvailabilityResult {
   reason?: string;
 }
 
-/**
- * Check availability for multiple dates (for recurring bookings)
- */
 export function checkRecurringAvailability(
   dates: Date[],
   time: string,
@@ -166,7 +140,6 @@ export function checkRecurringAvailability(
   return dates.map(date => {
     const dateString = format(date, 'yyyy-MM-dd');
 
-    // Check if barber works on this day of week
     const dayOfWeek = getDay(date);
     const hasAvailability = availability.some(
       a => a.barber_id === barberId &&
@@ -183,7 +156,6 @@ export function checkRecurringAvailability(
       };
     }
 
-    // Check if barber has time off
     const hasTimeOff = timeOff.some(
       t => t.barber_id === barberId &&
            dateString >= t.start_date &&
@@ -199,7 +171,6 @@ export function checkRecurringAvailability(
       };
     }
 
-    // Check if slot is already booked on this date
     const dateBookings = existingBookings.filter(
       b => b.booking_date === dateString && b.status !== 'cancelled'
     );
@@ -222,9 +193,6 @@ export function checkRecurringAvailability(
   });
 }
 
-/**
- * Get available time slots for a specific barber on a specific date
- */
 export function getAvailableTimeSlotsForBarber(
   barberId: string,
   date: Date,
@@ -256,7 +224,6 @@ export function getAvailableTimeSlotsForBarber(
     const startMinutes = startHour * 60 + startMin;
     const endMinutes = endHour * 60 + endMin;
 
-    // Generate 15-minute slots
     for (let minutes = startMinutes; minutes + serviceDuration <= endMinutes; minutes += 15) {
       const hours = Math.floor(minutes / 60);
       const mins = minutes % 60;
@@ -270,10 +237,6 @@ export function getAvailableTimeSlotsForBarber(
 
   return slots.sort();
 }
-
-/**
- * Format time from 24h to 12h format
- */
 export function formatTimeTo12Hour(time: string): string {
   const [hours, minutes] = time.split(':').map(Number);
   const period = hours >= 12 ? 'PM' : 'AM';
@@ -281,9 +244,6 @@ export function formatTimeTo12Hour(time: string): string {
   return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
 }
 
-/**
- * Format date to readable string
- */
 export function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -292,10 +252,6 @@ export function formatDate(date: Date): string {
   });
 }
 
-/**
- * Check if an appointment can be rescheduled to a specific slot
- * Returns true if the slot is available, false otherwise
- */
 export function canRescheduleToSlot(
   bookingId: string,
   barberId: string,
@@ -308,17 +264,14 @@ export function canRescheduleToSlot(
 ): { canReschedule: boolean; reason?: string } {
   const dateString = format(targetDate, 'yyyy-MM-dd');
 
-  // Check if barber is available on target date
   if (!isBarberAvailableOnDate(barberId, targetDate, availability, timeOff)) {
     return { canReschedule: false, reason: 'Barber not available on this date' };
   }
 
-  // Filter out the booking being rescheduled from conflict check
   const otherBookings = existingBookings.filter(
     b => b.id !== bookingId && b.booking_date === dateString && b.status !== 'cancelled'
   );
 
-  // Check for conflicts with other bookings
   if (isSlotBooked(targetTime, barberId, serviceDuration, otherBookings)) {
     return { canReschedule: false, reason: 'Time slot conflicts with another booking' };
   }

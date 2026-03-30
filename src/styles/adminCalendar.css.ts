@@ -1,3 +1,4 @@
+// styles/adminCalendar.css.ts
 import { style, globalStyle } from '@vanilla-extract/css';
 import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_hover } from './globalStyles.css';
 

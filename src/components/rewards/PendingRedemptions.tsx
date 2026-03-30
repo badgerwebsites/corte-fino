@@ -1,3 +1,4 @@
+// components/rewards/PendingRedemptions.tsx
 import type { RewardRedemptionWithDetails } from '../../types/database.types';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';

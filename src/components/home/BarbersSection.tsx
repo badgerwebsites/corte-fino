@@ -1,3 +1,4 @@
+// components/home/BarbersSection.tsx
 import type { Barber } from '../../types/database.types';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';

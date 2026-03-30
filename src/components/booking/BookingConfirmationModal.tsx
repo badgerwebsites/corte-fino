@@ -1,3 +1,4 @@
+// components/booking/BookingConfirmationModal.tsx
 import { Link } from 'react-router-dom';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';

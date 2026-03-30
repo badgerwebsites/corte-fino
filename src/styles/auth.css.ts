@@ -1,3 +1,4 @@
+// styles/auth.css.ts
 import { style } from '@vanilla-extract/css';
 import { darker_bg, dark_bg, button, text_primary, text_secondary, border_subtle, text_muted } from './globalStyles.css';
 

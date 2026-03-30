@@ -35,8 +35,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (session?.user) {
         if (getCachedCustomer()) {
-          setLoading(false); // unblock routing immediately — cache has data
-          loadCustomerData(session.user.id, session.user.email); // refresh silently
+          setLoading(false);
+          loadCustomerData(session.user.id, session.user.email);
         } else {
           loadCustomerData(session.user.id, session.user.email);
         }
@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setCustomer(data);
       } else if (userEmail) {
         const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-        if (authError || !authUser) return; // session invalid or user deleted
+        if (authError || !authUser) return;
         const meta = authUser?.user_metadata ?? {};
 
         await supabase

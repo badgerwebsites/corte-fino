@@ -1,5 +1,6 @@
+// styles/barberScheduleManager.css.ts
 import { style } from '@vanilla-extract/css';
-import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted } from './globalStyles.css';
+import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_hover, border_subtle } from './globalStyles.css';
 
 export const headerTitle = style({
   fontSize: 20,
@@ -14,16 +15,16 @@ export const scheduleList = style({
 });
 
 export const dayCard = style({
-//   backgroundColor: dark_bg,
-//   border: `2px solid ${border_subtle}`,
-//   borderRadius: '0.75rem',
-//   padding: '1rem',
-//   transition: 'all 0.2s',
+  backgroundColor: dark_bg,
+  border: `2px solid ${border_subtle}`,
+  borderRadius: '0.75rem',
+  padding: '1rem',
+  transition: 'all 0.2s',
 });
 
 export const dayCardActive = style({
-//   backgroundColor: darker_bg,
-//   borderColor: border_hover,
+  backgroundColor: darker_bg,
+  borderColor: border_hover,
 });
 
 export const dayHeader = style({
@@ -138,10 +139,6 @@ export const centerButton = style({
 });
 
 export const breaksCard = style({
-//   padding: 12,
-//   backgroundColor: darker_bg,
-//   borderRadius: '0.5rem',
-//   border: `1px solid ${border_subtle}`,
   marginTop: 12,
   marginBottom: 12,
 });
@@ -151,7 +148,7 @@ export const breaksHeader = style({
   justifyContent: 'space-between',
   alignItems: 'center',
   marginTop: 16,
-  marginBottom: 12,
+  marginBottom: 16,
 });
 
 export const breaksLabel = style({
@@ -194,13 +191,13 @@ export const breakRow = style({
 export const breakInput = style({
   width: '100%',
   minWidth: 0,
-  backgroundColor: darker_bg,
+  backgroundColor: dark_bg,
   color: text_primary,
-  border: '1px solid #1a1a1a',
+  border: `1px solid ${text_muted}`,
   boxSizing: 'border-box',
   padding: 8,
   borderRadius: 4,
-  fontSize: '0.875rem',
+  fontSize: 14,
   colorScheme: 'dark',
 
   '@media': {
@@ -239,11 +236,15 @@ export const removeBreakButton = style({
 });
 
 export const scheduleSummary = style({
-  padding: 12,
+  marginTop: 16,
   borderRadius: '0.375rem',
-  border: `1px solid ${text_secondary}`,
   fontSize: 16,
   color: text_primary,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 18,
+    },
+  },
 });
 
 export const timeOffCard = style({

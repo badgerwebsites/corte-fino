@@ -1,3 +1,4 @@
+// styles/imageUpload.css.ts
 import { style } from '@vanilla-extract/css';
 import { darker_bg, button, text_primary, text_secondary, text_muted } from './globalStyles.css';
 

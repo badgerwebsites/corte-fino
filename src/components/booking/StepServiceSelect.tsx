@@ -1,3 +1,4 @@
+// components/booking/StepServiceSelect.tsx
 import type { Service } from '../../types/database.types';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';

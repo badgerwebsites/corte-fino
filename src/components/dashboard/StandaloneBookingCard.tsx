@@ -1,3 +1,4 @@
+// components/booking/StandaloneBookingCard.tsx
 import type { BookingWithDetails } from '../../types/database.types';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';

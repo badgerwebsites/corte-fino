@@ -1,3 +1,4 @@
+// components/admin/BarbersTab.tsx
 import { useEffect, useRef, useState } from 'react';
 import type { Barber } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';

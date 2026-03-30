@@ -1,3 +1,4 @@
+// utils/formatPhone.ts
 export function formatPhone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
 

@@ -1,3 +1,4 @@
+// components/booking/StepConfirm.tsx
 import { format } from 'date-fns';
 import { ChevronDown } from 'lucide-react';
 import type { Barber, Barber as BarberType, Customer, RecurrencePattern, Service } from '../../types/database.types';

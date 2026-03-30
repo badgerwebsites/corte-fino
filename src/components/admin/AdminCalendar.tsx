@@ -1128,21 +1128,6 @@ const getBarberColors = (booking: BookingWithDetails) => {
         </div>
       )}
 
-      {/* Admin Booking Modal */}
-      {/* <AdminBookingModal
-        isOpen={showBookingModal}
-        onClose={() => setShowBookingModal(false)}
-        onSuccess={() => {
-          loadBookings();
-          onBookingUpdate?.();
-        }}
-        barbers={barbers}
-        services={services}
-        pricing={pricing}
-        availability={availability}
-        timeOff={timeOff}
-      /> */}
-
       {/* Drag Overlay - shows appointment while dragging */}
       <DragOverlay>
         {draggedBooking ? (

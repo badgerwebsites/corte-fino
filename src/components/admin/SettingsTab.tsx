@@ -1,3 +1,4 @@
+// components/admin/SettingsTab.tsx
 import type { SiteSettings } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 import { ImageUpload } from './ImageUpload';

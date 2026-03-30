@@ -1,3 +1,4 @@
+// styles/calendar.css.ts
 import { style, globalStyle } from "@vanilla-extract/css";
 import { darker_bg, dark_bg, text_primary, text_muted, button as accent, border_hover } from './globalStyles.css';
 
@@ -20,11 +21,6 @@ export const dateColumn = style({
 });
 
 export const calendarContainer = style({
-  // padding: 20,
-  // backgroundColor: darker_bg,
-  // borderRadius: 8,
-  // border: `1px solid ${border_subtle}`,
-  // boxShadow: "0 12px 32px rgba(0,0,0,0.6)",
   marginTop: 12,
   "@media": {
     "screen and (min-width: 768px)": {

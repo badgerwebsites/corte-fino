@@ -1,3 +1,4 @@
+// styles/global.css.ts
 import { globalStyle } from '@vanilla-extract/css';
 
 globalStyle('html, body', {
