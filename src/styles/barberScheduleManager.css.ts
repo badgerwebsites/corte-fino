@@ -179,13 +179,7 @@ export const breakRow = style({
   alignItems: 'center',
   width: '100%',
   minWidth: 0,
-
-  '@media': {
-    'screen and (min-width: 768px)': {
-      gridTemplateColumns: '1fr auto 1fr auto',
-      gap: 4,
-    },
-  },
+  gap: 4,
 });
 
 export const breakInput = style({
@@ -195,9 +189,9 @@ export const breakInput = style({
   color: text_primary,
   border: `1px solid ${text_muted}`,
   boxSizing: 'border-box',
-  padding: '0.625rem',
+  padding: '0.375rem',
   borderRadius: 8,
-  fontSize: '0.875rem',
+  fontSize: '0.8125rem',
   colorScheme: 'dark',
 
   '@media': {
