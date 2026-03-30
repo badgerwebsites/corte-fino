@@ -191,13 +191,13 @@ export const breakRow = style({
 export const breakInput = style({
   width: '100%',
   minWidth: 0,
-  backgroundColor: dark_bg,
+  backgroundColor: darker_bg,
   color: text_primary,
   border: `1px solid ${text_muted}`,
   boxSizing: 'border-box',
-  padding: 8,
-  borderRadius: 4,
-  fontSize: 14,
+  padding: '0.625rem',
+  borderRadius: 8,
+  fontSize: '0.875rem',
   colorScheme: 'dark',
 
   '@media': {
@@ -205,12 +205,16 @@ export const breakInput = style({
       padding: '0.75rem',
       borderRadius: '0.5rem',
       fontSize: '1rem',
+      width: '100%',
     },
   },
 
   ':focus': {
     outline: 'none',
     border: '1px solid #96cfe0',
+  },
+  '::placeholder': {
+    color: text_muted,
   },
 });
 
