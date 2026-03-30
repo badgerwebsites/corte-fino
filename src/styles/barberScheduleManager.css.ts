@@ -175,7 +175,7 @@ export const addBreakButton = style({
 
 export const breakRow = style({
   display: 'grid',
-  gridTemplateColumns: '1fr auto 1fr auto',
+  gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr) auto',
   alignItems: 'center',
   width: '100%',
   minWidth: 0,
