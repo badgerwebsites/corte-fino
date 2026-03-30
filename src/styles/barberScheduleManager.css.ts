@@ -111,13 +111,13 @@ export const timeInput = style({
   color: text_primary,
   border: `1px solid ${text_muted}`,
   boxSizing: 'border-box',
-  padding: '0.625rem',
+  padding: 8,
   borderRadius: 8,
   fontSize: '0.875rem',
   colorScheme: 'dark',
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.75rem',
+      padding: 12,
       borderRadius: '0.5rem',
       fontSize: '1rem',
       width: '100%',
@@ -174,29 +174,33 @@ export const addBreakButton = style({
 });
 
 export const breakRow = style({
-  display: 'grid',
-  gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr) auto',
+  display: 'flex',
   alignItems: 'center',
+  gap: 8,
   width: '100%',
-  minWidth: 0,
+});
+
+export const breakInputGroup = style({
+  display: 'grid',
+  gridTemplateColumns: '1fr auto 1fr',
+  alignItems: 'center',
   gap: 4,
+  flex: 1,
 });
 
 export const breakInput = style({
-  width: '100%',
-  minWidth: 0,
   backgroundColor: darker_bg,
   color: text_primary,
   border: `1px solid ${text_muted}`,
   boxSizing: 'border-box',
-  padding: '0.375rem',
+  padding: 8,
   borderRadius: 8,
-  fontSize: '0.8125rem',
+  fontSize: '0.875rem',
   colorScheme: 'dark',
 
   '@media': {
     'screen and (min-width: 768px)': {
-      padding: '0.75rem',
+      padding: 12,
       borderRadius: '0.5rem',
       fontSize: '1rem',
       width: '100%',

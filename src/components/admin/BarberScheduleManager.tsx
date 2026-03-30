@@ -476,37 +476,35 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                                 key={index}
                                 className={scheduleStyles.breakRow}
                               >
-
-                                <input
-                                  type="time"
-                                  value={brk.startTime}
-                                  onChange={(e) =>
-                                    updateBreak(
-                                      day.value,
-                                      index,
-                                      'startTime',
-                                      e.target.value
-                                    )
-                                  }
-                                  className={scheduleStyles.breakInput}
-                                />
-
-                                <span className={scheduleStyles.breakSeparator}>-</span>
-
-                                <input
-                                  type="time"
-                                  value={brk.endTime}
-                                  onChange={(e) =>
-                                    updateBreak(
-                                      day.value,
-                                      index,
-                                      'endTime',
-                                      e.target.value
-                                    )
-                                  }
-                                  className={scheduleStyles.breakInput}
-                                />
-
+                                <div className={scheduleStyles.breakInputGroup}>
+                                  <input
+                                    type="time"
+                                    value={brk.startTime}
+                                    onChange={(e) =>
+                                      updateBreak(
+                                        day.value,
+                                        index,
+                                        'startTime',
+                                        e.target.value
+                                      )
+                                    }
+                                    className={scheduleStyles.breakInput}
+                                  />
+                                  <span className={scheduleStyles.breakSeparator}>-</span>
+                                  <input
+                                    type="time"
+                                    value={brk.endTime}
+                                    onChange={(e) =>
+                                      updateBreak(
+                                        day.value,
+                                        index,
+                                        'endTime',
+                                        e.target.value
+                                      )
+                                    }
+                                    className={scheduleStyles.breakInput}
+                                  />
+                                </div>
                                 <button
                                   type="button"
                                   onClick={() => removeBreak(day.value, index)}
@@ -514,7 +512,6 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                                 >
                                   <MinusCircle size={22} strokeWidth={2.5} />
                                 </button>
-
                               </div>
                             ))}
                           </div>
