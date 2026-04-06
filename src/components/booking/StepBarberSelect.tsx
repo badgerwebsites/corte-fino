@@ -6,16 +6,19 @@ import * as styles from '../../styles/booking.css';
 
 interface StepBarberSelectProps {
   barbers: Barber[];
+  isAdmin: boolean;
   onSelect: (barber: Barber | null, anyAvailable?: boolean) => void;
   onBack: () => void;
 }
 
-export function StepBarberSelect({ barbers, onSelect, onBack }: StepBarberSelectProps) {
+export function StepBarberSelect({ barbers, isAdmin, onSelect, onBack }: StepBarberSelectProps) {
   return (
     <View className={styles.stepContainer}>
-      <button className={styles.backButton} onClick={onBack}>
-        ← Back to Service
-      </button>
+      {isAdmin && (
+        <button className={styles.backButton} onClick={onBack}>
+          ← Back to Customer
+        </button>
+      )}
       <View className={styles.barberGrid}>
         {barbers.map((barber) => (
           <View

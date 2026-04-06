@@ -181,6 +181,12 @@ export interface TimeSlot {
 
 export type TimePeriod = 'regular' | 'evening';
 
+export interface BarberService {
+  barber_id: string;
+  service_id: string;
+  created_at: string;
+}
+
 export interface BarberServicePricing {
   id: string;
   barber_id: string;

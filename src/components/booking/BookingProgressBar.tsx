@@ -24,12 +24,12 @@ export function BookingProgressBar({ step, isAdmin }: BookingProgressBarProps) {
       )}
       <View className={`${styles.progressStep} ${step >= 1 ? styles.progressStepActive : ''}`}>
         <View className={styles.progressNumber}>1</View>
-        <Text className={styles.progressLabel}>Service</Text>
+        <Text className={styles.progressLabel}>Barber</Text>
       </View>
       <View className={styles.progressLine} />
       <View className={`${styles.progressStep} ${step >= 2 ? styles.progressStepActive : ''}`}>
         <View className={styles.progressNumber}>2</View>
-        <Text className={styles.progressLabel}>Barber</Text>
+        <Text className={styles.progressLabel}>Service</Text>
       </View>
       <View className={styles.progressLine} />
       <View className={`${styles.progressStep} ${step >= 3 ? styles.progressStepActive : ''}`}>

@@ -37,7 +37,6 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
   const [, setAvailability] = useState<BarberAvailability[]>([]);
   const [timeOff, setTimeOff] = useState<BarberTimeOff[]>([]);
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   // Schedule state for each day
   const [schedules, setSchedules] = useState<Record<number, DaySchedule>>({});
@@ -138,15 +137,10 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
   };
 
   // Convert schedule to availability blocks and save
-  const saveSchedule = async (dayOfWeek: number) => {
+  const saveSchedule = async (dayOfWeek: number, schedule: DaySchedule) => {
     if (!selectedBarber) return;
 
-    const schedule = schedules[dayOfWeek];
-    if (!schedule) return;
-
-    setSaving(true);
     try {
-      // Delete existing availability for this day
       const { error: deleteError } = await supabase
         .from('barber_availability')
         .delete()
@@ -156,46 +150,29 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
       if (deleteError) throw deleteError;
 
       if (!schedule.isWorking) {
-        // Not working this day, we're done
-        loadBarberSchedule(selectedBarber.id);
         onUpdate();
-        setSaving(false);
         return;
       }
 
-      // Sort breaks by start time
       const sortedBreaks = [...schedule.breaks].sort((a, b) =>
         a.startTime.localeCompare(b.startTime)
       );
 
-      // Generate availability blocks from schedule
       const blocks: { start_time: string; end_time: string }[] = [];
       let currentStart = schedule.startTime;
 
       for (const brk of sortedBreaks) {
-        // Validate break is within working hours
-        if (brk.startTime < schedule.startTime || brk.endTime > schedule.endTime) {
-          continue; // Skip invalid breaks
-        }
-
+        if (brk.startTime < schedule.startTime || brk.endTime > schedule.endTime) continue;
         if (brk.startTime > currentStart) {
-          blocks.push({
-            start_time: currentStart,
-            end_time: brk.startTime,
-          });
+          blocks.push({ start_time: currentStart, end_time: brk.startTime });
         }
         currentStart = brk.endTime;
       }
 
-      // Add final block after last break
       if (currentStart < schedule.endTime) {
-        blocks.push({
-          start_time: currentStart,
-          end_time: schedule.endTime,
-        });
+        blocks.push({ start_time: currentStart, end_time: schedule.endTime });
       }
 
-      // Insert new availability blocks
       if (blocks.length > 0) {
         const { error: insertError } = await supabase
           .from('barber_availability')
@@ -208,7 +185,6 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
               is_available: true,
             }))
           );
-
         if (insertError) throw insertError;
       }
 
@@ -217,8 +193,6 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
     } catch (error) {
       console.error('Error saving schedule:', error);
       alert('Failed to save schedule');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -236,17 +210,16 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
     const schedule = schedules[dayOfWeek];
     if (!schedule) return;
 
-    // Default new break to middle of the day
     const startMinutes = timeToMinutes(schedule.startTime);
     const endMinutes = timeToMinutes(schedule.endTime);
     const midpoint = Math.floor((startMinutes + endMinutes) / 2);
 
     const newBreakStart = minutesToTime(midpoint);
     const newBreakEnd = minutesToTime(midpoint + 60);
+    const newSchedule = { ...schedule, breaks: [...schedule.breaks, { startTime: newBreakStart, endTime: newBreakEnd }] };
 
-    updateSchedule(dayOfWeek, {
-      breaks: [...schedule.breaks, { startTime: newBreakStart, endTime: newBreakEnd }],
-    });
+    updateSchedule(dayOfWeek, { breaks: newSchedule.breaks });
+    saveSchedule(dayOfWeek, newSchedule);
   };
 
   const updateBreak = (dayOfWeek: number, breakIndex: number, field: 'startTime' | 'endTime', value: string) => {
@@ -263,7 +236,9 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
     if (!schedule) return;
 
     const newBreaks = schedule.breaks.filter((_, i) => i !== breakIndex);
+    const newSchedule = { ...schedule, breaks: newBreaks };
     updateSchedule(dayOfWeek, { breaks: newBreaks });
+    saveSchedule(dayOfWeek, newSchedule);
   };
 
   const timeToMinutes = (time: string): number => {
@@ -346,9 +321,6 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
       {/* Schedule */}
       {selectedBarber && !loading && (
         <>
-          <h3 className={scheduleStyles.headerTitle}>
-            {selectedBarber.name}'s Schedule
-          </h3>
           <div className={scheduleStyles.scheduleList}>
             {DAYS_OF_WEEK.map((day) => {
               const schedule = schedules[day.value] || {
@@ -371,11 +343,11 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                       <input
                         type="checkbox"
                         checked={schedule.isWorking}
-                        onChange={(e) =>
-                          updateSchedule(day.value, {
-                            isWorking: e.target.checked,
-                          })
-                        }
+                        onChange={(e) => {
+                          const newSchedule = { ...schedule, isWorking: e.target.checked };
+                          updateSchedule(day.value, { isWorking: e.target.checked });
+                          saveSchedule(day.value, newSchedule);
+                        }}
                         className={scheduleStyles.dayCheckbox}
                       />
 
@@ -395,18 +367,6 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                         </span>
                       )}
                     </div>
-
-                    {schedule.isWorking && (
-                      <button
-                        onClick={() => saveSchedule(day.value)}
-                        disabled={saving}
-                        className={`${scheduleStyles.saveButton} ${
-                          saving ? scheduleStyles.saveButtonDisabled : ''
-                        }`}
-                      >
-                        {saving ? 'Saving…' : 'Save'}
-                      </button>
-                    )}
                   </div>
 
                   {/* Working Content */}
@@ -422,9 +382,10 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                             type="time"
                             value={schedule.startTime}
                             onChange={(e) =>
-                              updateSchedule(day.value, {
-                                startTime: e.target.value,
-                              })
+                              updateSchedule(day.value, { startTime: e.target.value })
+                            }
+                            onBlur={(e) =>
+                              saveSchedule(day.value, { ...schedule, startTime: e.target.value })
                             }
                             className={scheduleStyles.timeInput}
                           />
@@ -438,9 +399,10 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                             type="time"
                             value={schedule.endTime}
                             onChange={(e) =>
-                              updateSchedule(day.value, {
-                                endTime: e.target.value,
-                              })
+                              updateSchedule(day.value, { endTime: e.target.value })
+                            }
+                            onBlur={(e) =>
+                              saveSchedule(day.value, { ...schedule, endTime: e.target.value })
                             }
                             className={scheduleStyles.timeInput}
                           />
@@ -480,28 +442,22 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                                   <input
                                     type="time"
                                     value={brk.startTime}
-                                    onChange={(e) =>
-                                      updateBreak(
-                                        day.value,
-                                        index,
-                                        'startTime',
-                                        e.target.value
-                                      )
-                                    }
+                                    onChange={(e) => updateBreak(day.value, index, 'startTime', e.target.value)}
+                                    onBlur={(e) => {
+                                      const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: e.target.value } : b);
+                                      saveSchedule(day.value, { ...schedule, breaks: newBreaks });
+                                    }}
                                     className={scheduleStyles.breakInput}
                                   />
                                   <span className={scheduleStyles.breakSeparator}>-</span>
                                   <input
                                     type="time"
                                     value={brk.endTime}
-                                    onChange={(e) =>
-                                      updateBreak(
-                                        day.value,
-                                        index,
-                                        'endTime',
-                                        e.target.value
-                                      )
-                                    }
+                                    onChange={(e) => updateBreak(day.value, index, 'endTime', e.target.value)}
+                                    onBlur={(e) => {
+                                      const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: e.target.value } : b);
+                                      saveSchedule(day.value, { ...schedule, breaks: newBreaks });
+                                    }}
                                     className={scheduleStyles.breakInput}
                                   />
                                 </div>
@@ -534,15 +490,6 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                     </>
                   )}
 
-                  {!schedule.isWorking && (
-                    <button
-                      onClick={() => saveSchedule(day.value)}
-                      disabled={saving}
-                      className={scheduleStyles.saveDayOffButton}
-                    >
-                      {saving ? 'Saving…' : 'Save as Day Off'}
-                    </button>
-                  )}
                 </div>
               );
             })}

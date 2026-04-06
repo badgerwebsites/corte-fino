@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 import type {
   Barber,
   BarberAvailability,
+  BarberService,
   BarberServicePricing,
   BarberTimeOff,
   Booking,
@@ -64,6 +65,7 @@ export default function BookingPage() {
   // Database data
   const [services, setServices] = useState<Service[]>([]);
   const [barbers, setBarbers] = useState<Barber[]>([]);
+  const [barberServices, setBarberServices] = useState<BarberService[]>([]);
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
   const [availability, setAvailability] = useState<BarberAvailability[]>([]);
   const [timeOff, setTimeOff] = useState<BarberTimeOff[]>([]);
@@ -112,16 +114,19 @@ export default function BookingPage() {
 
   useEffect(() => {
     if (!loading && locationState) {
-      if (locationState.serviceId) {
-        const service = services.find(s => s.id === locationState.serviceId);
-        if (service) { setSelectedService(service); setStep(2); }
-      }
       if (locationState.barberId) {
         const barber = barbers.find(b => b.id === locationState.barberId);
         if (barber) {
           setSelectedBarber(barber);
           setAnyBarber(false);
-          if (locationState.serviceId) setStep(3);
+          setStep(2);
+        }
+      }
+      if (locationState.serviceId) {
+        const service = services.find(s => s.id === locationState.serviceId);
+        if (service) {
+          setSelectedService(service);
+          if (locationState.barberId) setStep(3);
         }
       }
     }
@@ -175,9 +180,10 @@ export default function BookingPage() {
 
   const loadData = async () => {
     try {
-      const [servicesRes, barbersRes, pricingRes, availabilityRes, timeOffRes, shopSettingsRes] = await Promise.all([
+      const [servicesRes, barbersRes, barberServicesRes, pricingRes, availabilityRes, timeOffRes, shopSettingsRes] = await Promise.all([
         supabase.from('services').select('*').order('name'),
         supabase.from('barbers').select('*').eq('is_active', true).order('name'),
+        supabase.from('barber_services').select('*'),
         supabase.from('barber_service_pricing').select('*'),
         supabase.from('barber_availability').select('*'),
         supabase.from('barber_time_off').select('*'),
@@ -190,6 +196,7 @@ export default function BookingPage() {
 
       setServices(servicesRes.data || []);
       setBarbers(barbersRes.data || []);
+      setBarberServices(barberServicesRes.data || []);
       setPricing(pricingRes.data || []);
       setAvailability(availabilityRes.data || []);
       setTimeOff(timeOffRes.data || []);
@@ -204,14 +211,15 @@ export default function BookingPage() {
 
   // ─── Selection handlers ────────────────────────────────────────────────────
 
-  const handleServiceSelect = (service: Service) => {
-    setSelectedService(service);
-    setStep(2);
-  };
-
   const handleBarberSelect = (barber: Barber | null, anyAvailable = false) => {
     setSelectedBarber(barber);
     setAnyBarber(anyAvailable);
+    setSelectedService(null);
+    setStep(2);
+  };
+
+  const handleServiceSelect = (service: Service) => {
+    setSelectedService(service);
     setStep(3);
   };
 
@@ -222,6 +230,12 @@ export default function BookingPage() {
 
   const handleTimeSelect = (time: string) => {
     setSelectedTime(time);
+    if (anyBarber && selectedDate) {
+      const dayOfWeek = getDay(selectedDate);
+      const dateString = format(selectedDate, 'yyyy-MM-dd');
+      const resolved = resolveAnyBarber(dateString, dayOfWeek, time);
+      setSelectedBarber(resolved);
+    }
     setStep(4);
   };
 
@@ -312,6 +326,20 @@ export default function BookingPage() {
     const dayOfWeek = getDay(selectedDate);
     const dateString = format(selectedDate, 'yyyy-MM-dd');
 
+    const hasSlotPricing = (barberId: string, timeSlot: string): boolean => {
+      if (!selectedService) return false;
+      const barber = barbers.find(b => b.id === barberId);
+      if (!barber) return false;
+      const timePeriod = getTimePeriod(timeSlot, barber);
+      return pricing.some(
+        p => p.barber_id === barberId &&
+             p.service_id === selectedService.id &&
+             p.time_period === timePeriod &&
+             p.day_of_week === dayOfWeek &&
+             p.price > 0
+      );
+    };
+
     if (!selectedBarber && anyBarber) {
       const slotAvailability = new Map<string, boolean>();
       barbers.forEach(barber => {
@@ -332,7 +360,9 @@ export default function BookingPage() {
               const serviceDuration = selectedService?.duration_minutes || 0;
               for (let m = startMinutes; m + serviceDuration <= endMinutes; m += 15) {
                 const timeSlot = `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
-                if (selectedService && !isSlotBooked(timeSlot, barber.id, selectedService.duration_minutes)) {
+                if (selectedService &&
+                    !isSlotBooked(timeSlot, barber.id, selectedService.duration_minutes) &&
+                    hasSlotPricing(barber.id, timeSlot)) {
                   slotAvailability.set(timeSlot, true);
                 }
               }
@@ -358,7 +388,9 @@ export default function BookingPage() {
       const serviceDuration = selectedService?.duration_minutes || 0;
       for (let m = startMinutes; m + serviceDuration <= endMinutes; m += 15) {
         const timeSlot = `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
-        if (selectedService && !isSlotBooked(timeSlot, selectedBarber.id, selectedService.duration_minutes)) {
+        if (selectedService &&
+            !isSlotBooked(timeSlot, selectedBarber.id, selectedService.duration_minutes) &&
+            hasSlotPricing(selectedBarber.id, timeSlot)) {
           slots.push(timeSlot);
         }
       }
@@ -444,18 +476,53 @@ export default function BookingPage() {
 
   // ─── Round-robin barber selection ─────────────────────────────────────────
 
-  const resolveAnyBarber = (dateString: string, dayOfWeek: number): Barber | null => {
+  const resolveAnyBarber = (dateString: string, dayOfWeek: number, time: string): Barber | null => {
+    const [slotH, slotM] = time.split(':').map(Number);
+    const slotMinutes = slotH * 60 + slotM;
+    const serviceDuration = selectedService?.duration_minutes || 0;
+
     const availableBarbers = barbers.filter(barber => {
-      const hasAvailability = availability.some(
-        a => a.barber_id === barber.id && a.day_of_week === dayOfWeek && a.is_available
-      );
+      // Must offer this service
+      const offersService = selectedService
+        ? barberServices.some(bs => bs.barber_id === barber.id && bs.service_id === selectedService.id)
+        : false;
+      if (!offersService) return false;
+
+      // Must have a price > 0 for this service on this day + time period
+      const timePeriod = getTimePeriod(time, barber);
+      const hasPricing = selectedService
+        ? pricing.some(
+            p => p.barber_id === barber.id &&
+                 p.service_id === selectedService.id &&
+                 p.time_period === timePeriod &&
+                 p.day_of_week === dayOfWeek &&
+                 p.price > 0
+          )
+        : false;
+      if (!hasPricing) return false;
+
+      // Must have the specific time slot within their availability window
+      const timeInWindow = availability.some(a => {
+        if (a.barber_id !== barber.id || a.day_of_week !== dayOfWeek || !a.is_available) return false;
+        const [startH, startM] = a.start_time.split(':').map(Number);
+        const [endH, endM] = a.end_time.split(':').map(Number);
+        const windowStart = startH * 60 + startM;
+        const windowEnd = endH * 60 + endM;
+        return slotMinutes >= windowStart && slotMinutes + serviceDuration <= windowEnd;
+      });
+      if (!timeInWindow) return false;
+
+      // Must not be on time off
       const hasTimeOff = timeOff.some(
         t => t.barber_id === barber.id && dateString >= t.start_date && dateString <= t.end_date
       );
+      if (hasTimeOff) return false;
+
+      // Must not already have a booking at this slot
       const isBooked = selectedService
-        ? isSlotBooked(selectedTime, barber.id, selectedService.duration_minutes)
+        ? isSlotBooked(time, barber.id, selectedService.duration_minutes)
         : false;
-      return hasAvailability && !hasTimeOff && !isBooked;
+      return !isBooked;
     });
 
     if (availableBarbers.length === 0) return null;
@@ -509,7 +576,7 @@ export default function BookingPage() {
       if (anyBarber && !selectedBarber) {
         const dayOfWeek = getDay(selectedDate);
         const dateString = format(selectedDate, 'yyyy-MM-dd');
-        bookingBarber = resolveAnyBarber(dateString, dayOfWeek);
+        bookingBarber = resolveAnyBarber(dateString, dayOfWeek, selectedTime);
         if (!bookingBarber) {
           alert('No barber available for this time slot. Please select a different time.');
           setBookingInProgress(false);
@@ -529,10 +596,20 @@ export default function BookingPage() {
       const endTime = `${Math.floor(totalMinutes / 60).toString().padStart(2, '0')}:${(totalMinutes % 60).toString().padStart(2, '0')}`;
 
       const timePeriod = getTimePeriod(selectedTime, bookingBarber);
+      const dayOfWeekForGuestPrice = getDay(selectedDate);
       const priceEntry = pricing.find(
-        p => p.barber_id === bookingBarber!.id && p.service_id === selectedService.id && p.time_period === timePeriod
+        p => p.barber_id === bookingBarber!.id &&
+             p.service_id === selectedService.id &&
+             p.time_period === timePeriod &&
+             p.day_of_week === dayOfWeekForGuestPrice
       );
       const totalPrice = priceEntry?.price || selectedService.base_price;
+
+      if (totalPrice <= 0) {
+        alert('This service does not have a price set for the selected time. Please choose a different time.');
+        setBookingInProgress(false);
+        return;
+      }
 
       const { error: bookingError } = await supabase.from('bookings').insert({
         customer_id: null,
@@ -605,7 +682,7 @@ export default function BookingPage() {
       if (anyBarber && !selectedBarber) {
         const dayOfWeek = getDay(selectedDate);
         const dateString = format(selectedDate, 'yyyy-MM-dd');
-        bookingBarber = resolveAnyBarber(dateString, dayOfWeek);
+        bookingBarber = resolveAnyBarber(dateString, dayOfWeek, selectedTime);
         if (!bookingBarber) {
           alert('No barber available for this time slot. Please select a different time.');
           setBookingInProgress(false);
@@ -625,10 +702,20 @@ export default function BookingPage() {
       const endTime = `${Math.floor(totalMinutes / 60).toString().padStart(2, '0')}:${(totalMinutes % 60).toString().padStart(2, '0')}`;
 
       const timePeriod = getTimePeriod(selectedTime, bookingBarber);
+      const dayOfWeekForPrice = getDay(selectedDate);
       const priceEntry = pricing.find(
-        p => p.barber_id === bookingBarber!.id && p.service_id === selectedService.id && p.time_period === timePeriod
+        p => p.barber_id === bookingBarber!.id &&
+             p.service_id === selectedService.id &&
+             p.time_period === timePeriod &&
+             p.day_of_week === dayOfWeekForPrice
       );
       const totalPrice = priceEntry?.price || selectedService.base_price;
+
+      if (totalPrice <= 0) {
+        alert('This service does not have a price set for the selected time. Please choose a different time.');
+        setBookingInProgress(false);
+        return;
+      }
 
       if (rescheduleFromId) {
         const { error: deleteError } = await supabase.from('bookings').delete().eq('id', rescheduleFromId);
@@ -799,13 +886,14 @@ export default function BookingPage() {
         )}
 
         {step === 1 && (
-          <StepServiceSelect
-            services={services}
+          <StepBarberSelect
+            barbers={barbers}
             isAdmin={isAdmin}
-            onSelect={handleServiceSelect}
+            onSelect={handleBarberSelect}
             onBack={() => {
-              setSelectedService(null);
               setSelectedBarber(null);
+              setAnyBarber(false);
+              setSelectedService(null);
               setSelectedDate(undefined);
               setSelectedTime('');
               setStep(0);
@@ -814,9 +902,23 @@ export default function BookingPage() {
         )}
 
         {step === 2 && (
-          <StepBarberSelect
-            barbers={barbers}
-            onSelect={handleBarberSelect}
+          <StepServiceSelect
+            services={
+              anyBarber
+                ? services.filter((s) =>
+                    barberServices.some((bs) => bs.service_id === s.id &&
+                      availability.some((a) => a.barber_id === bs.barber_id && a.is_available)
+                    )
+                  )
+                : !selectedBarber
+                  ? services
+                  : services.filter((s) =>
+                      barberServices.some(
+                        (bs) => bs.barber_id === selectedBarber.id && bs.service_id === s.id
+                      )
+                    )
+            }
+            onSelect={handleServiceSelect}
             onBack={() => setStep(1)}
           />
         )}
@@ -845,7 +947,6 @@ export default function BookingPage() {
             selectedDate={selectedDate}
             selectedTime={selectedTime}
             selectedCustomer={selectedCustomer}
-            anyBarber={anyBarber}
             isAdmin={isAdmin}
             isReschedule={isReschedule}
             price={price}
@@ -863,7 +964,10 @@ export default function BookingPage() {
             formatDate={formatDate}
             formatTimeTo12Hour={formatTimeTo12Hour}
             getTimePeriod={getTimePeriod}
-            onBack={() => setStep(3)}
+            onBack={() => {
+              if (anyBarber) setSelectedBarber(null);
+              setStep(3);
+            }}
             onConfirm={handleBooking}
             onGuestConfirm={handleGuestBooking}
             onLoginToBook={() => { saveBookingState(); navigate('/login?redirect=/book'); }}

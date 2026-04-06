@@ -1,6 +1,7 @@
 // components/admin/ServicesTab.tsx
 import { useEffect, useRef, useState } from 'react';
-import type { Service } from '../../types/database.types';
+import { ChevronDown } from 'lucide-react';
+import type { Barber, Service } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 import { ImageUpload } from './ImageUpload';
 import { View } from '../../ui/View';
@@ -24,16 +25,39 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
   const formRef = useRef<HTMLDivElement>(null);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [serviceForm, setServiceForm] = useState(DEFAULT_SERVICE_FORM);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [barbers, setBarbers] = useState<Barber[]>([]);
+  const [selectedBarberIds, setSelectedBarberIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from('barbers')
+      .select('*')
+      .eq('is_active', true)
+      .order('name')
+      .then(({ data }) => setBarbers(data || []));
+  }, []);
 
   useEffect(() => {
     if (editingService) {
-      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      supabase
+        .from('barber_services')
+        .select('barber_id')
+        .eq('service_id', editingService.id)
+        .then(({ data }) => setSelectedBarberIds((data || []).map((r) => r.barber_id)));
     }
   }, [editingService]);
+
+  const toggleBarber = (barberId: string) => {
+    setSelectedBarberIds((prev) =>
+      prev.includes(barberId) ? prev.filter((id) => id !== barberId) : [...prev, barberId]
+    );
+  };
 
   const handleCancel = () => {
     setEditingService(null);
     setServiceForm(DEFAULT_SERVICE_FORM);
+    setSelectedBarberIds([]);
   };
 
   const handleEdit = (service: Service) => {
@@ -50,16 +74,34 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let serviceId: string;
+
       if (editingService) {
         const { error } = await supabase.from('services').update(serviceForm).eq('id', editingService.id);
         if (error) throw error;
-        alert('Service updated successfully!');
+        serviceId = editingService.id;
       } else {
-        const { error } = await supabase.from('services').insert([{ ...serviceForm, base_price: 0 }]);
+        const { data, error } = await supabase
+          .from('services')
+          .insert([{ ...serviceForm, base_price: 0 }])
+          .select('id')
+          .single();
         if (error) throw error;
-        alert('Service added successfully!');
+        serviceId = data.id;
       }
+
+      // Sync barber assignments
+      await supabase.from('barber_services').delete().eq('service_id', serviceId);
+      if (selectedBarberIds.length > 0) {
+        const { error: linkError } = await supabase.from('barber_services').insert(
+          selectedBarberIds.map((barber_id) => ({ barber_id, service_id: serviceId }))
+        );
+        if (linkError) throw linkError;
+      }
+
+      alert(editingService ? 'Service updated successfully!' : 'Service added successfully!');
       setServiceForm(DEFAULT_SERVICE_FORM);
+      setSelectedBarberIds([]);
       setEditingService(null);
       onUpdate();
     } catch (error) {
@@ -112,12 +154,25 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
         {/* Add / Edit form */}
         <div ref={formRef} className={styles.adminRightColumn}>
           <View className={styles.sectionHeader}>
-            <Text className={styles.sectionTitle}>
-              {editingService ? 'Edit Service' : '+ Add Service'}
-            </Text>
+            {editingService ? (
+              <Text className={styles.sectionTitle}>Edit Service</Text>
+            ) : (
+              <button
+                type="button"
+                className={styles.addToggleButton}
+                onClick={() => setShowAddForm((v) => !v)}
+              >
+                + Add Service
+                <ChevronDown
+                  size={20}
+                  className={styles.addToggleChevron}
+                  style={{ transform: showAddForm ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                />
+              </button>
+            )}
           </View>
 
-          <form onSubmit={handleSubmit} className={styles.form}>
+          {(editingService || showAddForm) && <form onSubmit={handleSubmit} className={styles.form}>
             <View className={styles.formGroup}>
               <label className={styles.label}>Service Name *</label>
               <input
@@ -129,6 +184,28 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
                 required
               />
             </View>
+
+            {barbers.length > 0 && (
+              <View className={styles.formGroup}>
+                <label className={styles.label}>Offered By</label>
+                <View style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {barbers.map((barber) => (
+                    <label
+                      key={barber.id}
+                      style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                    >
+                      <input
+                        type="checkbox"
+                        className={styles.checkbox}
+                        checked={selectedBarberIds.includes(barber.id)}
+                        onChange={() => toggleBarber(barber.id)}
+                      />
+                      <span style={{ color: '#fff', fontSize: '18px' }}>{barber.name}</span>
+                    </label>
+                  ))}
+                </View>
+              </View>
+            )}
 
             <View className={styles.formGroup}>
               <label className={styles.label}>Description</label>
@@ -180,16 +257,16 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
             </View>
 
             <View className={styles.formActions}>
-              <button type="submit" className={styles.submitButton}>
-                {editingService ? 'Update' : 'Add Service'}
-              </button>
               {editingService && (
                 <button type="button" className={styles.cancelButton} onClick={handleCancel}>
                   Cancel
                 </button>
               )}
+              <button type="submit" className={styles.submitButton}>
+                {editingService ? 'Save' : 'Add Service'}
+              </button>
             </View>
-          </form>
+          </form>}
         </div>
       </div>
     </View>

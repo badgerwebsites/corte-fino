@@ -1,5 +1,6 @@
 // components/admin/BarbersTab.tsx
 import { useEffect, useRef, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import type { Barber } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 import { BarberScheduleManager } from './BarberScheduleManager';
@@ -31,20 +32,50 @@ interface BarbersTabProps {
 export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
   const formRef = useRef<HTMLDivElement>(null);
   const [editingBarber, setEditingBarber] = useState<Barber | null>(null);
+  const [schedulingBarber, setSchedulingBarber] = useState<Barber | null>(null);
   const [barberForm, setBarberForm] = useState(DEFAULT_BARBER_FORM);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [pricingForm, setPricingForm] = useState({
+    regular_hours_start: '09:00',
+    regular_hours_end: '17:00',
+    evening_hours_start: '17:00',
+    evening_hours_end: '21:00',
+  });
+
+
+  useEffect(() => {}, [editingBarber]);
 
   useEffect(() => {
-    if (editingBarber) {
-      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (schedulingBarber) {
+      setPricingForm({
+        regular_hours_start: schedulingBarber.regular_hours_start,
+        regular_hours_end: schedulingBarber.regular_hours_end,
+        evening_hours_start: schedulingBarber.evening_hours_start,
+        evening_hours_end: schedulingBarber.evening_hours_end,
+      });
     }
-  }, [editingBarber]);
+  }, [schedulingBarber]);
+
+  const handleSavePricing = async (values: typeof pricingForm) => {
+    if (!schedulingBarber) return;
+    try {
+      const { error } = await supabase.from('barbers').update(values).eq('id', schedulingBarber.id);
+      if (error) throw error;
+      onUpdate();
+    } catch (error) {
+      console.error('Error saving pricing:', error);
+      alert('Failed to save pricing');
+    }
+  };
 
   const handleCancel = () => {
     setEditingBarber(null);
+    setSchedulingBarber(null);
     setBarberForm(DEFAULT_BARBER_FORM);
   };
 
   const handleEdit = (barber: Barber) => {
+    setSchedulingBarber(null);
     setEditingBarber(barber);
     setBarberForm({
       name: barber.name,
@@ -76,6 +107,7 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
       }
       setBarberForm(DEFAULT_BARBER_FORM);
       setEditingBarber(null);
+      setSchedulingBarber(null);
       onUpdate();
     } catch (error) {
       console.error('Error saving barber:', error);
@@ -129,6 +161,9 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
                 <button className={styles.editButton} onClick={() => handleEdit(barber)}>
                   Edit
                 </button>
+                <button className={styles.scheduleButton} onClick={() => { setEditingBarber(null); setSchedulingBarber(barber); }}>
+                  Schedule
+                </button>
                 <button className={styles.deleteButton} onClick={() => handleDelete(barber.id)}>
                   Delete
                 </button>
@@ -140,18 +175,82 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
         {/* Add / Edit form */}
         <div ref={formRef} className={styles.adminRightColumn}>
           <View className={styles.sectionHeader}>
-            <Text className={styles.sectionTitle}>
-              {editingBarber ? `Edit ${editingBarber.name}` : '+ Add Barber'}
-            </Text>
+            {editingBarber ? (
+              <Text className={styles.sectionTitle}>Edit {editingBarber.name}</Text>
+            ) : schedulingBarber ? (
+              <Text className={styles.sectionTitle}>Schedule — {schedulingBarber.name}</Text>
+            ) : (
+              <button
+                type="button"
+                className={styles.addToggleButton}
+                onClick={() => setShowAddForm((v) => !v)}
+              >
+                + Add Barber
+                <ChevronDown
+                  size={20}
+                  className={styles.addToggleChevron}
+                  style={{ transform: showAddForm ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                />
+              </button>
+            )}
           </View>
 
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <ImageUpload
-              currentImageUrl={barberForm.image_url || undefined}
-              onImageChange={(url) => setBarberForm({ ...barberForm, image_url: url || '' })}
-              bucket="barber-images"
-              label="Profile Picture"
-            />
+          {schedulingBarber && (
+            <>
+              <View>
+                <span className={styles.pricingPeriodsTitle}>Set Regular and Evening Pricing</span>
+                <View className={styles.pricingTimeline}>
+                  <View className={styles.pricingTimeBlock}>
+                    <label className={styles.pricingTimeLabel}>Regular Starts</label>
+                    <input
+                      type="time"
+                      className={styles.timeInput}
+                      value={pricingForm.regular_hours_start}
+                      onChange={(e) => setPricingForm({ ...pricingForm, regular_hours_start: e.target.value })}
+                      onBlur={(e) => handleSavePricing({ ...pricingForm, regular_hours_start: e.target.value })}
+                    />
+                  </View>
+                  <View className={styles.pricingTimeArrow}>→</View>
+                  <View className={styles.pricingTimeBlock}>
+                    <label className={styles.pricingTimeLabel}>Evening Starts</label>
+                    <input
+                      type="time"
+                      className={styles.timeInput}
+                      value={pricingForm.regular_hours_end}
+                      onChange={(e) => setPricingForm({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
+                      onBlur={(e) => handleSavePricing({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
+                    />
+                  </View>
+                  <View className={styles.pricingTimeArrow}>→</View>
+                  <View className={styles.pricingTimeBlock}>
+                    <label className={styles.pricingTimeLabel}>Evening Ends</label>
+                    <input
+                      type="time"
+                      className={styles.timeInput}
+                      value={pricingForm.evening_hours_end}
+                      onChange={(e) => setPricingForm({ ...pricingForm, evening_hours_end: e.target.value })}
+                      onBlur={(e) => handleSavePricing({ ...pricingForm, evening_hours_end: e.target.value })}
+                    />
+                  </View>
+                </View>
+              </View>
+              <BarberScheduleManager barbers={[schedulingBarber]} onUpdate={onUpdate} />
+            </>
+          )}
+
+          {(editingBarber || showAddForm) && <form onSubmit={handleSubmit} className={styles.form}>
+            
+            <View className={styles.formGroup}>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  className={styles.checkbox}
+                  checked={barberForm.is_active}
+                  onChange={(e) => setBarberForm({ ...barberForm, is_active: e.target.checked })}
+                />
+                <Text>Active (accepting bookings)</Text>
+              </label>
+            </View>
 
             <View className={styles.formGroup}>
               <label className={styles.label}>Name *</label>
@@ -164,6 +263,13 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
                 required
               />
             </View>
+
+            <ImageUpload
+              currentImageUrl={barberForm.image_url || undefined}
+              onImageChange={(url) => setBarberForm({ ...barberForm, image_url: url || '' })}
+              bucket="barber-images"
+              label="Profile Picture"
+            />
 
             <View className={styles.formGroup}>
               <label className={styles.label}>Phone</label>
@@ -222,80 +328,18 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
               />
             </View>
 
-            <View>
-              <Text className={styles.pricingPeriodsTitle}>Set Regular and Evening Pricing</Text>
-              <View className={styles.pricingTimeline}>
-                <View className={styles.pricingTimeBlock}>
-                  <label className={styles.pricingTimeLabel}>Regular Starts</label>
-                  <input
-                    type="time"
-                    className={styles.timeInput}
-                    value={barberForm.regular_hours_start}
-                    onChange={(e) => setBarberForm({ ...barberForm, regular_hours_start: e.target.value })}
-                  />
-                </View>
-
-                <View className={styles.pricingTimeArrow}>→</View>
-
-                <View className={styles.pricingTimeBlock}>
-                  <label className={styles.pricingTimeLabel}>Evening Starts</label>
-                  <input
-                    type="time"
-                    className={styles.timeInput}
-                    value={barberForm.regular_hours_end}
-                    onChange={(e) =>
-                      setBarberForm({
-                        ...barberForm,
-                        regular_hours_end: e.target.value,
-                        evening_hours_start: e.target.value,
-                      })
-                    }
-                  />
-                </View>
-
-                <View className={styles.pricingTimeArrow}>→</View>
-
-                <View className={styles.pricingTimeBlock}>
-                  <label className={styles.pricingTimeLabel}>Evening Ends</label>
-                  <input
-                    type="time"
-                    className={styles.timeInput}
-                    value={barberForm.evening_hours_end}
-                    onChange={(e) => setBarberForm({ ...barberForm, evening_hours_end: e.target.value })}
-                  />
-                </View>
-              </View>
-            </View>
-
-            <View className={styles.formGroup}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  className={styles.checkbox}
-                  checked={barberForm.is_active}
-                  onChange={(e) => setBarberForm({ ...barberForm, is_active: e.target.checked })}
-                />
-                <Text>Active (accepting bookings)</Text>
-              </label>
-            </View>
-
             <View className={styles.formActions}>
-              <button type="submit" className={styles.submitButton}>
-                {editingBarber ? 'Update' : 'Add Barber'}
-              </button>
               {editingBarber && (
                 <button type="button" className={styles.cancelButton} onClick={handleCancel}>
                   Cancel
                 </button>
               )}
+              <button type="submit" className={styles.submitButton}>
+                {editingBarber ? 'Save' : 'Add Barber'}
+              </button>
             </View>
-          </form>
+          </form>}
 
-          {editingBarber && (
-            <View className={styles.adminDivider}>
-              <BarberScheduleManager barbers={[editingBarber]} onUpdate={onUpdate} />
-            </View>
-          )}
         </div>
       </div>
     </View>

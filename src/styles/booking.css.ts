@@ -202,6 +202,14 @@ export const stepTitle = style({
 });
 
 // Service Selection Styles
+export const emptyState = style({
+  color: text_muted,
+  fontSize: 22,
+  fontWeight: 500,
+  textAlign: 'center',
+  padding: '64px 24px',
+});
+
 export const serviceGrid = style({
   display: "grid",
   gridTemplateColumns: "1fr",
@@ -440,12 +448,10 @@ export const timeButtonActive = style({
 });
 
 export const noTimesMessage = style({
-  padding: 20,
   textAlign: "center",
-  borderRadius: 6,
-  border: `1px solid ${border_subtle}`,
   color: text_secondary,
-  fontSize: 14,
+  fontSize: 18,
+  marginTop: 24,
 });
 
 // Confirmation Styles

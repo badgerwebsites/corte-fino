@@ -6,18 +6,18 @@ import * as styles from '../../styles/booking.css';
 
 interface StepServiceSelectProps {
   services: Service[];
-  isAdmin: boolean;
   onSelect: (service: Service) => void;
   onBack: () => void;
 }
 
-export function StepServiceSelect({ services, isAdmin, onSelect, onBack }: StepServiceSelectProps) {
+export function StepServiceSelect({ services, onSelect, onBack }: StepServiceSelectProps) {
   return (
     <View className={styles.stepContainer}>
-      {isAdmin && (
-        <button className={styles.backButton} onClick={onBack}>
-          ← Back to Customer
-        </button>
+      <button className={styles.backButton} onClick={onBack}>
+        ← Back to Barber
+      </button>
+      {services.length === 0 && (
+        <Text className={styles.emptyState}>No services listed</Text>
       )}
       <View className={styles.serviceGrid}>
         {services.map((service) => (

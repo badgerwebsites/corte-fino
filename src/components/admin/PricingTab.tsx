@@ -1,5 +1,5 @@
 // components/admin/PricingTab.tsx
-import type { Barber, BarberServicePricing, Service } from '../../types/database.types';
+import type { Barber, BarberService, BarberServicePricing, Service } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';
@@ -11,11 +11,12 @@ const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 interface PricingTabProps {
   services: Service[];
   barbers: Barber[];
+  barberServices: BarberService[];
   pricing: BarberServicePricing[];
   onUpdate: () => void;
 }
 
-export function PricingTab({ services, barbers, pricing, onUpdate }: PricingTabProps) {
+export function PricingTab({ services, barbers, barberServices, pricing, onUpdate }: PricingTabProps) {
   const getPrice = (
     barberId: string,
     serviceId: string,
@@ -94,8 +95,10 @@ export function PricingTab({ services, barbers, pricing, onUpdate }: PricingTabP
               ))}
             </View>
 
-            {/* Barber rows */}
-            {barbers.map((barber) => (
+            {/* Barber rows — only show barbers assigned to this service */}
+            {barbers.filter((barber) =>
+              barberServices.some((bs) => bs.barber_id === barber.id && bs.service_id === service.id)
+            ).map((barber) => (
               <View key={barber.id} className={styles.dayPricingRow}>
                 <View className={styles.dayPricingBarberName}>{barber.name}</View>
                 {DAY_NAMES.map((_, dayIndex) => (

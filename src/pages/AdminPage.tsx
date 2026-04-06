@@ -5,6 +5,7 @@ import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
 import type {
   Barber,
+  BarberService,
   Service,
   BarberServicePricing,
   BarberAvailability,
@@ -35,6 +36,7 @@ export default function AdminPage() {
 
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [barberServices, setBarberServices] = useState<BarberService[]>([]);
   const [pricing, setPricing] = useState<BarberServicePricing[]>([]);
   const [availability, setAvailability] = useState<BarberAvailability[]>([]);
   const [timeOff, setTimeOff] = useState<BarberTimeOff[]>([]);
@@ -62,11 +64,12 @@ export default function AdminPage() {
   const loadData = async () => {
     try {
       const [
-        barbersRes, servicesRes, pricingRes, availabilityRes, timeOffRes,
+        barbersRes, servicesRes, barberServicesRes, pricingRes, availabilityRes, timeOffRes,
         redemptionsRes, rewardsRes, settingsRes,
       ] = await Promise.all([
         supabase.from('barbers').select('*').order('name'),
         supabase.from('services').select('*').order('name'),
+        supabase.from('barber_services').select('*'),
         supabase.from('barber_service_pricing').select('*'),
         supabase.from('barber_availability').select('*'),
         supabase.from('barber_time_off').select('*'),
@@ -84,6 +87,7 @@ export default function AdminPage() {
 
       setBarbers(barbersRes.data || []);
       setServices(servicesRes.data || []);
+      setBarberServices(barberServicesRes.data || []);
       setPricing(pricingRes.data || []);
       setAvailability(availabilityRes.data || []);
       setTimeOff(timeOffRes.data || []);
@@ -146,6 +150,7 @@ export default function AdminPage() {
           <PricingTab
             services={services}
             barbers={barbers}
+            barberServices={barberServices}
             pricing={pricing}
             onUpdate={loadData}
           />

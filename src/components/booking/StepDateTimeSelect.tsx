@@ -39,7 +39,7 @@ export function StepDateTimeSelect({
   return (
     <View className={styles.stepContainer}>
       <button className={styles.backButton} onClick={onBack}>
-        ← Back to Barber
+        ← Back to Service
       </button>
 
       <View className={calendarStyles.dateTimeLayout}>
@@ -80,9 +80,9 @@ export function StepDateTimeSelect({
                 })}
               </Text>
 
-              <View className={styles.timeGrid}>
-                {timeSlots.length > 0 ? (
-                  timeSlots.map((time) => {
+              {timeSlots.length > 0 && (
+                <View className={styles.timeGrid}>
+                  {timeSlots.map((time) => {
                     const timePeriodLabel = selectedBarber
                       ? getTimePeriod(time, selectedBarber) === 'evening'
                         ? ' (Evening)'
@@ -99,14 +99,16 @@ export function StepDateTimeSelect({
                         {timePeriodLabel}
                       </button>
                     );
-                  })
-                ) : (
-                  <Text className={styles.noTimesMessage}>
-                    No available times. Please select another date.
-                  </Text>
-                )}
-              </View>
+                  })}
+                </View>
+              )}
             </View>
+
+            {timeSlots.length === 0 && (
+              <Text className={styles.noTimesMessage}>
+                No available times. Please select another date.
+              </Text>
+            )}
           </View>
         )}
       </View>

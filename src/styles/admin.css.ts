@@ -89,6 +89,28 @@ export const sectionHeader = style({
   },
 });
 
+export const addToggleButton = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  cursor: 'pointer',
+  fontSize: 18,
+  fontWeight: 500,
+  color: text_primary,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 22,
+    },
+  },
+});
+
+export const addToggleChevron = style({
+  transition: 'transform 0.2s ease',
+});
+
 export const sectionTitle = style({
   fontSize: 18,
   fontWeight: 500,
@@ -595,6 +617,28 @@ export const barberActions = style({
   // },
 });
 
+export const scheduleButton = style({
+  padding: '8px 12px',
+  background: 'transparent',
+  color: '#eab308',
+  border: '1px solid #f5e7a3',
+  borderRadius: 4,
+  fontSize: 14,
+  fontWeight: '500',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  whiteSpace: 'nowrap',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '8px 12px',
+      fontSize: 16,
+    },
+  },
+  ':hover': {
+    background: dark_bg,
+  },
+});
+
 export const editButton = style({
   padding: '8px 12px',
   background: 'transparent',
@@ -965,8 +1009,8 @@ export const confirmCodeButton = style({
   padding: '12px 10px',
   whiteSpace: 'nowrap',
   backgroundColor: darker_bg,
-  color: '#0ea5e9',
-  border: '1px solid #a5d8e6',
+  color: '#22c55e',
+  border: '1px solid #a3e5a3',
   borderRadius: 8,
   fontSize: 16,
   fontWeight: '500',
@@ -1086,8 +1130,8 @@ export const confirmButton = style({
   fontSize: 16,
   fontWeight: '500',
   backgroundColor: 'transparent',
-  color: '#0ea5e9',
-  border: '1px solid #a5d8e6',
+  color: '#22c55e',
+  border: '1px solid #a3e5a3',
   borderRadius: 4,
   cursor: 'pointer',
   transition: 'all 0.2s',

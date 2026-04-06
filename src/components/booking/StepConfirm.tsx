@@ -22,7 +22,6 @@ interface StepConfirmProps {
   selectedDate: Date | undefined;
   selectedTime: string;
   selectedCustomer: Customer | null;
-  anyBarber: boolean;
   isAdmin: boolean;
   isReschedule: boolean;
   price: number;
@@ -58,7 +57,6 @@ export function StepConfirm({
   selectedDate,
   selectedTime,
   selectedCustomer,
-  anyBarber,
   isAdmin,
   isReschedule,
   price,
@@ -117,7 +115,7 @@ export function StepConfirm({
           <View className={styles.confirmSection}>
             <Text className={styles.confirmLabel}>Barber</Text>
             <Text className={styles.confirmValue}>
-              {anyBarber ? 'Any Available' : selectedBarber?.name}
+              {selectedBarber?.name ?? 'Any Available'}
             </Text>
           </View>
 
@@ -135,11 +133,11 @@ export function StepConfirm({
             </View>
           )}
 
-          <View className={styles.policySection}>
+          {/* <View className={styles.policySection}>
             <Text className={styles.policyText}>
               Cancellations within 12 hours will incur a 50% cancellation fee.
             </Text>
-          </View>
+          </View> */}
 
           {/* Recurring appointment option (admin only) */}
           {isAdmin && !isReschedule && (

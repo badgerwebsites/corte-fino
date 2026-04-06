@@ -29,12 +29,9 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
   const [editingReward, setEditingReward] = useState<Reward | null>(null);
   const [rewardForm, setRewardForm] = useState(DEFAULT_REWARD_FORM);
   const [verifyCode, setVerifyCode] = useState('');
+  const [showAddForm, setShowAddForm] = useState(false);
 
-  useEffect(() => {
-    if (editingReward) {
-      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [editingReward]);
+  useEffect(() => {}, [editingReward]);
 
   const handleCancel = () => {
     setEditingReward(null);
@@ -209,16 +206,16 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
                     </View>
                     <View className={styles.redemptionActions}>
                       <button
-                        className={styles.confirmButton}
-                        onClick={() => handleConfirmRedemption(redemption)}
-                      >
-                        Confirm
-                      </button>
-                      <button
                         className={styles.rejectButton}
                         onClick={() => handleRejectRedemption(redemption)}
                       >
                         Reject
+                      </button>
+                      <button
+                        className={styles.confirmButton}
+                        onClick={() => handleConfirmRedemption(redemption)}
+                      >
+                        Confirm
                       </button>
                     </View>
                   </View>
@@ -271,12 +268,36 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
         {/* Right column — add/edit reward form */}
         <View className={styles.adminRightColumn}>
           <div ref={formRef} className={styles.sectionHeader}>
-            <Text className={styles.sectionTitle}>
-              {editingReward ? 'Edit Reward' : '+ Add Reward'}
-            </Text>
+            {editingReward ? (
+              <Text className={styles.sectionTitle}>Edit Reward</Text>
+            ) : (
+              <button
+                type="button"
+                className={styles.addToggleButton}
+                onClick={() => setShowAddForm((v) => !v)}
+              >
+                + Add Reward
+                <ChevronDown
+                  size={20}
+                  className={styles.addToggleChevron}
+                  style={{ transform: showAddForm ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                />
+              </button>
+            )}
           </div>
 
-          <form onSubmit={handleSubmit} className={styles.form}>
+          {(editingReward || showAddForm) && <form onSubmit={handleSubmit} className={styles.form}>
+            <View className={styles.formGroup}>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  className={styles.checkbox}
+                  checked={rewardForm.is_active}
+                  onChange={(e) => setRewardForm({ ...rewardForm, is_active: e.target.checked })}
+                />
+                <Text>Active (visible to customers)</Text>
+              </label>
+            </View>
             <View className={styles.formGroup}>
               <label className={styles.label}>Reward Name *</label>
               <input
@@ -362,29 +383,17 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
               </View>
             </View>
 
-            <View className={styles.formGroup}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  className={styles.checkbox}
-                  checked={rewardForm.is_active}
-                  onChange={(e) => setRewardForm({ ...rewardForm, is_active: e.target.checked })}
-                />
-                <Text>Active (visible to customers)</Text>
-              </label>
-            </View>
-
             <View className={styles.formActions}>
-              <button type="submit" className={styles.submitButton}>
-                {editingReward ? 'Update' : 'Add Reward'}
-              </button>
               {editingReward && (
                 <button type="button" className={styles.cancelButton} onClick={handleCancel}>
                   Cancel
                 </button>
               )}
+              <button type="submit" className={styles.submitButton}>
+                {editingReward ? 'Save' : 'Add Reward'}
+              </button>
             </View>
-          </form>
+          </form>}
         </View>
       </View>
     </View>

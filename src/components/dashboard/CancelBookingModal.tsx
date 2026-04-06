@@ -18,7 +18,7 @@ interface CancelBookingModalProps {
 export function CancelBookingModal({
   booking,
   cancelling,
-  isWithin12Hours,
+  // isWithin12Hours,
   parseLocalDate,
   formatTime,
   onClose,
@@ -48,7 +48,7 @@ export function CancelBookingModal({
           )}
         </View>
 
-        {isWithin12Hours ? (
+        {/* {isWithin12Hours ? (
           <View className={styles.feeWarning}>
             <Text className={styles.feeWarningTitle}>Cancellation fee applies</Text>
             <Text className={styles.feeWarningText}>
@@ -61,7 +61,7 @@ export function CancelBookingModal({
               No fee if canceled at least 12 hours in advance.
             </Text>
           </View>
-        )}
+        )} */}
 
         {booking.recurrence_group_id ? (
           <View className={styles.cancelOptions}>
