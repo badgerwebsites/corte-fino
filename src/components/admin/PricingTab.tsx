@@ -1,10 +1,11 @@
 // components/admin/PricingTab.tsx
-import type { Barber, BarberService, BarberServicePricing, Service } from '../../types/database.types';
+import type { Barber, BarberAvailability, BarberService, BarberServicePricing, Service } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';
 import * as styles from '../../styles/admin.css';
 import { PriceInput } from './PriceInput';
+import { CalendarX } from 'lucide-react';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -13,10 +14,14 @@ interface PricingTabProps {
   barbers: Barber[];
   barberServices: BarberService[];
   pricing: BarberServicePricing[];
+  availability: BarberAvailability[];
   onUpdate: () => void;
 }
 
-export function PricingTab({ services, barbers, barberServices, pricing, onUpdate }: PricingTabProps) {
+export function PricingTab({ services, barbers, barberServices, pricing, availability, onUpdate }: PricingTabProps) {
+  const isScheduled = (barberId: string, dayOfWeek: number): boolean =>
+    availability.some((a) => a.barber_id === barberId && a.day_of_week === dayOfWeek && a.is_available);
+
   const getPrice = (
     barberId: string,
     serviceId: string,
@@ -103,18 +108,26 @@ export function PricingTab({ services, barbers, barberServices, pricing, onUpdat
                 <View className={styles.dayPricingBarberName}>{barber.name}</View>
                 {DAY_NAMES.map((_, dayIndex) => (
                   <View key={dayIndex} className={styles.dayPricingCell}>
-                    <View className={styles.dayPricingInputGroup}>
-                      <PriceInput
-                        initialValue={getPrice(barber.id, service.id, 'regular', dayIndex)}
-                        onSave={(value) => handlePriceUpdate(barber.id, service.id, 'regular', dayIndex, value)}
-                        className={styles.dayPriceInput}
-                      />
-                      <PriceInput
-                        initialValue={getPrice(barber.id, service.id, 'evening', dayIndex)}
-                        onSave={(value) => handlePriceUpdate(barber.id, service.id, 'evening', dayIndex, value)}
-                        className={styles.dayPriceInput}
-                      />
-                    </View>
+                    {isScheduled(barber.id, dayIndex) ? (
+                      <View className={styles.dayPricingInputGroup}>
+                        <PriceInput
+                          initialValue={getPrice(barber.id, service.id, 'regular', dayIndex)}
+                          onSave={(value) => handlePriceUpdate(barber.id, service.id, 'regular', dayIndex, value)}
+                          className={styles.dayPriceInput}
+                        />
+                        <PriceInput
+                          initialValue={getPrice(barber.id, service.id, 'evening', dayIndex)}
+                          onSave={(value) => handlePriceUpdate(barber.id, service.id, 'evening', dayIndex, value)}
+                          className={styles.dayPriceInput}
+                        />
+                      </View>
+                    ) : (
+                      <View className={styles.dayPricingInputGroup}>
+                        <span className={styles.unscheduledDay}>
+                          <CalendarX size={28} />
+                        </span>
+                      </View>
+                    )}
                   </View>
                 ))}
               </View>

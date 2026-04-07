@@ -3,7 +3,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase.ts';
-import type { BookingWithDetails, SiteSettings } from '../types/database.types.ts';
+import type { BookingWithDetails, RewardRedemptionWithDetails, SiteSettings } from '../types/database.types.ts';
 import { Navigation } from '../components/Navigation.tsx';
 import { View } from '../ui/View.tsx';
 import * as styles from '../styles/dashboard.css.ts';
@@ -13,6 +13,7 @@ import { StandaloneBookingCard } from '../components/dashboard/StandaloneBooking
 import { RecurringBookingCard } from '../components/dashboard/RecurringBookingCard';
 import { CancelBookingModal } from '../components/dashboard/CancelBookingModal';
 import { EditProfileModal } from '../components/dashboard/EditProfileModal';
+import { PendingRedemptions } from '../components/rewards/PendingRedemptions';
 
 interface RecurringBookingGroup {
   groupId: string;
@@ -25,6 +26,7 @@ interface RecurringBookingGroup {
 export default function CustomerDashboardPage() {
   const { user, customer, refreshCustomer, loading: authLoading } = useAuth();
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
+  const [pendingRedemptions, setPendingRedemptions] = useState<RewardRedemptionWithDetails[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancellingBooking, setCancellingBooking] = useState<BookingWithDetails | null>(null);
@@ -86,7 +88,7 @@ export default function CustomerDashboardPage() {
         const currentDate = new Date();
         const today = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
 
-        const [bookingsRes, settingsRes] = await Promise.all([
+        const [bookingsRes, settingsRes, redemptionsRes] = await Promise.all([
           supabase
             .from('bookings')
             .select(`*, barber:barbers(*), service:services(*)`)
@@ -95,6 +97,12 @@ export default function CustomerDashboardPage() {
             .gte('booking_date', today)
             .order('booking_date', { ascending: true }),
           supabase.from('site_settings').select('*').single(),
+          supabase
+            .from('reward_redemptions')
+            .select(`*, reward:rewards(*)`)
+            .eq('customer_id', user.id)
+            .eq('fulfilled', false)
+            .order('redeemed_at', { ascending: false }),
         ]);
 
         if (bookingsRes.error) throw bookingsRes.error;
@@ -107,6 +115,7 @@ export default function CustomerDashboardPage() {
 
         setBookings(filtered);
         setSiteSettings(settingsRes.data || null);
+        setPendingRedemptions(redemptionsRes.data || []);
       } catch (error) {
         console.error('Error loading bookings:', error);
       } finally {
@@ -146,7 +155,46 @@ export default function CustomerDashboardPage() {
     }
   };
 
+  const loadPendingRedemptions = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('reward_redemptions')
+      .select(`*, reward:rewards(*)`)
+      .eq('customer_id', user.id)
+      .eq('fulfilled', false)
+      .order('redeemed_at', { ascending: false });
+    setPendingRedemptions(data || []);
+  };
+
   // ─── Handlers ─────────────────────────────────────────────────────────────
+
+  const handleCancelRedemption = async (redemptionId: string) => {
+    if (!confirm('Cancel this redemption request? Your points will be refunded.')) return;
+    try {
+      const redemption = pendingRedemptions.find(r => r.id === redemptionId);
+      if (!redemption) return;
+
+      const { error } = await supabase
+        .from('reward_redemptions')
+        .delete()
+        .eq('id', redemptionId)
+        .eq('fulfilled', false);
+      if (error) throw error;
+
+      if (customer) {
+        await supabase
+          .from('customers')
+          .update({ reward_points: customer.reward_points + redemption.points_spent })
+          .eq('id', user!.id);
+        refreshCustomer();
+      }
+
+      loadPendingRedemptions();
+    } catch (error) {
+      console.error('Error cancelling redemption:', error);
+      alert('Failed to cancel redemption');
+    }
+  };
 
   const handleCancelBooking = async (mode: 'single' | 'all') => {
     if (!cancellingBooking) return;
@@ -232,6 +280,11 @@ export default function CustomerDashboardPage() {
             rewardsEnabled={rewardsEnabled}
             rewardPoints={customer?.reward_points || 0}
             onEditProfile={() => setShowEditProfile(true)}
+          />
+
+          <PendingRedemptions
+            redemptions={pendingRedemptions}
+            onCancel={handleCancelRedemption}
           />
 
           <View className={styles.section}>

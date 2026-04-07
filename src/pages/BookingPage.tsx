@@ -842,11 +842,30 @@ export default function BookingPage() {
   // ─── Derived values for StepConfirm ───────────────────────────────────────
 
   const price = calculatePrice();
-  const timePeriodLabel = selectedBarber && selectedTime
-    ? getTimePeriod(selectedTime, selectedBarber) === 'evening'
-      ? `Evening rate (${formatTimeTo12Hour(selectedBarber.evening_hours_start)}-${formatTimeTo12Hour(selectedBarber.evening_hours_end)})`
-      : `Regular rate (${formatTimeTo12Hour(selectedBarber.regular_hours_start)}-${formatTimeTo12Hour(selectedBarber.regular_hours_end)})`
-    : '';
+  const timePeriodLabel = (() => {
+    if (!selectedBarber || !selectedTime || !selectedDate) return '';
+    if (getTimePeriod(selectedTime, selectedBarber) === 'evening') {
+      return `Evening rate (${formatTimeTo12Hour(selectedBarber.evening_hours_start)}-${formatTimeTo12Hour(selectedBarber.evening_hours_end)})`;
+    }
+    const dayOfWeek = getDay(selectedDate);
+    const dayBlocks = availability.filter(
+      a => a.barber_id === selectedBarber.id && a.day_of_week === dayOfWeek && a.is_available
+    );
+    const workStart = dayBlocks.length > 0
+      ? dayBlocks.reduce((min, a) => a.start_time < min ? a.start_time : min, dayBlocks[0].start_time)
+      : selectedBarber.regular_hours_start;
+    const workEnd = dayBlocks.length > 0
+      ? dayBlocks.reduce((max, a) => a.end_time > max ? a.end_time : max, dayBlocks[0].end_time)
+      : selectedBarber.evening_hours_end;
+    const [h, m] = selectedTime.split(':').map(Number);
+    const timeMinutes = h * 60 + m;
+    const [eh, em] = selectedBarber.evening_hours_start.split(':').map(Number);
+    const eveningStartMinutes = eh * 60 + em;
+    if (timeMinutes < eveningStartMinutes) {
+      return `Regular rate (${formatTimeTo12Hour(workStart)}-${formatTimeTo12Hour(selectedBarber.evening_hours_start)})`;
+    }
+    return `Regular rate (${formatTimeTo12Hour(selectedBarber.evening_hours_end)}-${formatTimeTo12Hour(workEnd)})`;
+  })();
 
   const today = startOfDay(new Date());
   const endMonth = addMonths(today, 6);

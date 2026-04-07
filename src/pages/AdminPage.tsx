@@ -1,5 +1,5 @@
 // pages/AdminPage.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
@@ -45,6 +45,9 @@ export default function AdminPage() {
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollToTop = () => { containerRef.current?.scrollIntoView({ block: 'start' }); };
+
   const [activeTab, setActiveTab] = useState<AdminTab>(() => {
     const saved = localStorage.getItem('adminActiveTab');
     return saved && isAdminTab(saved) ? saved : 'calendar';
@@ -67,15 +70,15 @@ export default function AdminPage() {
         barbersRes, servicesRes, barberServicesRes, pricingRes, availabilityRes, timeOffRes,
         redemptionsRes, rewardsRes, settingsRes,
       ] = await Promise.all([
-        supabase.from('barbers').select('*').order('name'),
-        supabase.from('services').select('*').order('name'),
+        supabase.from('barbers').select('*').order('created_at', { ascending: false }).order('id'),
+        supabase.from('services').select('*').order('created_at', { ascending: false }).order('id'),
         supabase.from('barber_services').select('*'),
         supabase.from('barber_service_pricing').select('*'),
         supabase.from('barber_availability').select('*'),
         supabase.from('barber_time_off').select('*'),
         supabase.from('reward_redemptions').select(`*, customer:customers(*), reward:rewards(*)`)
           .eq('fulfilled', false).order('redeemed_at', { ascending: false }),
-        supabase.from('rewards').select('*').order('sort_order'),
+        supabase.from('rewards').select('*').order('created_at', { ascending: false }).order('id'),
         supabase.from('site_settings').select('*').single(),
       ]);
 
@@ -116,7 +119,7 @@ export default function AdminPage() {
   return (
     <>
       <Navigation />
-      <View className={styles.container}>
+      <div ref={containerRef} className={styles.container}>
 
         {/* Tab bar */}
         <View className={styles.tabs}>
@@ -152,6 +155,7 @@ export default function AdminPage() {
             barbers={barbers}
             barberServices={barberServices}
             pricing={pricing}
+            availability={availability}
             onUpdate={loadData}
           />
         )}
@@ -159,7 +163,10 @@ export default function AdminPage() {
         {activeTab === 'services' && (
           <ServicesTab
             services={services}
+            barbers={barbers}
+            barberServices={barberServices}
             onUpdate={loadData}
+            onScrollToTop={scrollToTop}
           />
         )}
 
@@ -167,6 +174,7 @@ export default function AdminPage() {
           <BarbersTab
             barbers={barbers}
             onUpdate={loadData}
+            onScrollToTop={scrollToTop}
           />
         )}
 
@@ -183,10 +191,11 @@ export default function AdminPage() {
             rewards={rewards}
             siteSettings={siteSettings}
             onUpdate={loadData}
+            onScrollToTop={scrollToTop}
           />
         )}
 
-      </View>
+      </div>
     </>
   );
 }

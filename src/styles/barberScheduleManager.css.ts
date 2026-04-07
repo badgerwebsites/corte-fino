@@ -11,6 +11,7 @@ export const headerTitle = style({
 export const scheduleList = style({
   display: 'flex',
   flexDirection: 'column',
+  paddingTop: 8,
   gap: 16,
 });
 

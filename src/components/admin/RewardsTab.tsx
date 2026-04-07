@@ -22,9 +22,10 @@ interface RewardsTabProps {
   rewards: Reward[];
   siteSettings: SiteSettings | null;
   onUpdate: () => void;
+  onScrollToTop: () => void;
 }
 
-export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate }: RewardsTabProps) {
+export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate, onScrollToTop }: RewardsTabProps) {
   const formRef = useRef<HTMLDivElement>(null);
   const [editingReward, setEditingReward] = useState<Reward | null>(null);
   const [rewardForm, setRewardForm] = useState(DEFAULT_REWARD_FORM);
@@ -36,9 +37,11 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
   const handleCancel = () => {
     setEditingReward(null);
     setRewardForm(DEFAULT_REWARD_FORM);
+    onScrollToTop();
   };
 
   const handleEdit = (reward: Reward) => {
+    setShowAddForm(false);
     setEditingReward(reward);
     setRewardForm({
       name: reward.name,
@@ -59,7 +62,7 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
         .update({ fulfilled: true, fulfilled_at: new Date().toISOString() })
         .eq('id', redemption.id);
       if (error) throw error;
-      alert('Redemption confirmed!');
+      // alert('Redemption confirmed!');
       onUpdate();
     } catch (error) {
       console.error('Error confirming redemption:', error);
@@ -103,14 +106,14 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
         const { data, error } = await supabase.from('rewards').update(rewardForm).eq('id', editingReward.id).select();
         if (error) throw error;
         if (!data || data.length === 0) throw new Error('Update failed - no rows were modified. Check database permissions.');
-        alert('Reward updated successfully!');
       } else {
         const { error } = await supabase.from('rewards').insert([rewardForm]);
         if (error) throw error;
-        alert('Reward added successfully!');
       }
       setRewardForm(DEFAULT_REWARD_FORM);
       setEditingReward(null);
+      setShowAddForm(false);
+      onScrollToTop();
       onUpdate();
     } catch (error) {
       console.error('Error saving reward:', error);
@@ -123,7 +126,7 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
     try {
       const { error } = await supabase.from('rewards').delete().eq('id', rewardId);
       if (error) throw error;
-      alert('Reward deleted successfully!');
+      // alert('Reward deleted successfully!');
       onUpdate();
     } catch (error) {
       console.error('Error deleting reward:', error);
@@ -182,9 +185,11 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
           </View>
 
           {/* Pending redemptions */}
+          {pendingRedemptions.length > 0 && (
           <Text className={styles.subsectionTitle}>
             Pending Redemptions ({pendingRedemptions.length})
           </Text>
+          )}
 
           {pendingRedemptions.length > 0 && (
             <View className={styles.redemptionsList}>
@@ -226,7 +231,8 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
 
           {/* Rewards enabled toggle + rewards list */}
           <View className={styles.rewardsBorder} />
-          <label className={styles.checkboxLabel}>
+          
+          <label className={styles.checkboxLabel} style={{ marginBottom: 16 }}>
             <input
               type="checkbox"
               className={styles.checkbox}
@@ -236,6 +242,7 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
             <Text>Enable rewards program</Text>
           </label>
 
+          <View className={styles.cardList}>
           {rewards.map((reward) => (
             <View key={reward.id} className={styles.barberCard}>
               <View className={styles.barberInfo}>
@@ -254,7 +261,16 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
                 </Text>
               </View>
               <View className={styles.barberActions}>
-                <button className={styles.editButton} onClick={() => handleEdit(reward)}>
+                <button
+                  className={editingReward?.id === reward.id ? styles.editButtonActive : styles.editButton}
+                  onClick={() => {
+                    if (editingReward?.id === reward.id) {
+                      handleCancel();
+                    } else {
+                      handleEdit(reward);
+                    }
+                  }}
+                >
                   Edit
                 </button>
                 <button className={styles.deleteButton} onClick={() => handleDelete(reward.id)}>
@@ -263,6 +279,7 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
               </View>
             </View>
           ))}
+          </View>
         </View>
 
         {/* Right column — add/edit reward form */}

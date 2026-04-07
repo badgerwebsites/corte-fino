@@ -1,5 +1,5 @@
 // components/admin/BarbersTab.tsx
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import type { Barber } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
@@ -27,10 +27,10 @@ const DEFAULT_BARBER_FORM = {
 interface BarbersTabProps {
   barbers: Barber[];
   onUpdate: () => void;
+  onScrollToTop: () => void;
 }
 
-export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
-  const formRef = useRef<HTMLDivElement>(null);
+export function BarbersTab({ barbers, onUpdate, onScrollToTop }: BarbersTabProps) {
   const [editingBarber, setEditingBarber] = useState<Barber | null>(null);
   const [schedulingBarber, setSchedulingBarber] = useState<Barber | null>(null);
   const [barberForm, setBarberForm] = useState(DEFAULT_BARBER_FORM);
@@ -72,10 +72,12 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
     setEditingBarber(null);
     setSchedulingBarber(null);
     setBarberForm(DEFAULT_BARBER_FORM);
+    onScrollToTop();
   };
 
   const handleEdit = (barber: Barber) => {
     setSchedulingBarber(null);
+    setShowAddForm(false);
     setEditingBarber(barber);
     setBarberForm({
       name: barber.name,
@@ -99,15 +101,15 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
       if (editingBarber) {
         const { error } = await supabase.from('barbers').update(barberForm).eq('id', editingBarber.id);
         if (error) throw error;
-        alert('Barber updated successfully!');
       } else {
         const { error } = await supabase.from('barbers').insert([{ ...barberForm, base_price_multiplier: 1.0 }]);
         if (error) throw error;
-        alert('Barber added successfully!');
       }
       setBarberForm(DEFAULT_BARBER_FORM);
       setEditingBarber(null);
       setSchedulingBarber(null);
+      setShowAddForm(false);
+      onScrollToTop();
       onUpdate();
     } catch (error) {
       console.error('Error saving barber:', error);
@@ -120,7 +122,7 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
     try {
       const { error } = await supabase.from('barbers').delete().eq('id', barberId);
       if (error) throw error;
-      alert('Barber deleted successfully!');
+      // alert('Barber deleted successfully!');
       onUpdate();
     } catch (error) {
       console.error('Error deleting barber:', error);
@@ -141,9 +143,10 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
 
   return (
     <View className={styles.section}>
-      <div className={styles.adminSplitLayout}>
+      <View className={styles.adminSplitLayout}>
         {/* Barber list */}
-        <div className={styles.adminLeftColumn}>
+        <View className={styles.adminLeftColumn}>
+          <View className={styles.cardList}>
           {barbers.map((barber) => (
             <View key={barber.id} className={styles.barberCard}>
               <View className={styles.barberInfo}>
@@ -158,10 +161,30 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
                 </View>
               </View>
               <View className={styles.barberActions}>
-                <button className={styles.editButton} onClick={() => handleEdit(barber)}>
+                <button
+                  className={editingBarber?.id === barber.id ? styles.editButtonActive : styles.editButton}
+                  onClick={() => {
+                    if (editingBarber?.id === barber.id) {
+                      handleCancel();
+                    } else {
+                      handleEdit(barber);
+                    }
+                  }}
+                >
                   Edit
                 </button>
-                <button className={styles.scheduleButton} onClick={() => { setEditingBarber(null); setSchedulingBarber(barber); }}>
+                <button
+                  className={schedulingBarber?.id === barber.id ? styles.scheduleButtonActive : styles.scheduleButton}
+                  onClick={() => {
+                    if (schedulingBarber?.id === barber.id) {
+                      handleCancel();
+                    } else {
+                      setEditingBarber(null);
+                      setShowAddForm(false);
+                      setSchedulingBarber(barber);
+                    }
+                  }}
+                >
                   Schedule
                 </button>
                 <button className={styles.deleteButton} onClick={() => handleDelete(barber.id)}>
@@ -170,10 +193,11 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
               </View>
             </View>
           ))}
-        </div>
+          </View>
+        </View>
 
         {/* Add / Edit form */}
-        <div ref={formRef} className={styles.adminRightColumn}>
+        <View className={styles.adminRightColumn}>
           <View className={styles.sectionHeader}>
             {editingBarber ? (
               <Text className={styles.sectionTitle}>Edit {editingBarber.name}</Text>
@@ -198,25 +222,14 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
           {schedulingBarber && (
             <>
               <View>
-                <span className={styles.pricingPeriodsTitle}>Set Regular and Evening Pricing</span>
+                <span className={styles.pricingPeriodsTitle}>Set Evening Premium Pricing</span>
                 <View className={styles.pricingTimeline}>
-                  <View className={styles.pricingTimeBlock}>
-                    <label className={styles.pricingTimeLabel}>Regular Starts</label>
-                    <input
-                      type="time"
-                      className={styles.timeInput}
-                      value={pricingForm.regular_hours_start}
-                      onChange={(e) => setPricingForm({ ...pricingForm, regular_hours_start: e.target.value })}
-                      onBlur={(e) => handleSavePricing({ ...pricingForm, regular_hours_start: e.target.value })}
-                    />
-                  </View>
-                  <View className={styles.pricingTimeArrow}>→</View>
                   <View className={styles.pricingTimeBlock}>
                     <label className={styles.pricingTimeLabel}>Evening Starts</label>
                     <input
                       type="time"
                       className={styles.timeInput}
-                      value={pricingForm.regular_hours_end}
+                      value={pricingForm.evening_hours_start}
                       onChange={(e) => setPricingForm({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
                       onBlur={(e) => handleSavePricing({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
                     />
@@ -317,7 +330,7 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
               </View>
             </View>
 
-            <View className={styles.formGroup}>
+            <View className={styles.formGroupWide}>
               <label className={styles.label}>Facebook URL</label>
               <input
                 type="url"
@@ -340,8 +353,8 @@ export function BarbersTab({ barbers, onUpdate }: BarbersTabProps) {
             </View>
           </form>}
 
-        </div>
-      </div>
+        </View>
+      </View>
     </View>
   );
 }

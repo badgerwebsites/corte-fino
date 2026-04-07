@@ -29,6 +29,11 @@ const DAYS_OF_WEEK = [
   { value: 6, label: 'Saturday', short: 'Sat' },
 ];
 
+const localDate = (dateStr: string) => {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString();
+};
+
 const DEFAULT_START = '09:00';
 const DEFAULT_END = '21:00';
 
@@ -63,8 +68,8 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
     }
   }, [selectedBarber]);
 
-  const loadBarberSchedule = async (barberId: string) => {
-    setLoading(true);
+  const loadBarberSchedule = async (barberId: string, silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const [availabilityRes, timeOffRes] = await Promise.all([
         supabase
@@ -188,7 +193,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
         if (insertError) throw insertError;
       }
 
-      loadBarberSchedule(selectedBarber.id);
+      loadBarberSchedule(selectedBarber.id, true);
       onUpdate();
     } catch (error) {
       console.error('Error saving schedule:', error);
@@ -286,9 +291,9 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
         reason: '',
       });
 
-      loadBarberSchedule(selectedBarber.id);
+      loadBarberSchedule(selectedBarber.id, true);
       onUpdate();
-      alert('Time off added successfully!');
+      // alert('Time off added successfully!');
     } catch (error) {
       console.error('Error adding time off:', error);
       alert('Failed to add time off');
@@ -307,7 +312,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
       if (error) throw error;
 
       if (selectedBarber) {
-        loadBarberSchedule(selectedBarber.id);
+        loadBarberSchedule(selectedBarber.id, true);
         onUpdate();
       }
     } catch (error) {
@@ -363,7 +368,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
 
                       {!schedule.isWorking && (
                         <span className={scheduleStyles.notWorkingText}>
-                          — Not working
+                          — Not Scheduled
                         </span>
                       )}
                     </div>
@@ -573,9 +578,9 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                   >
                     <div>
                       <div className={scheduleStyles.timeOffDate}>
-                        {new Date(period.start_date).toLocaleDateString()}
+                        {localDate(period.start_date)}
                         {period.start_date !== period.end_date && (
-                          <> — {new Date(period.end_date).toLocaleDateString()}</>
+                          <> — {localDate(period.end_date)}</>
                         )}
                       </div>
 

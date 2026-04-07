@@ -1,13 +1,12 @@
 // pages/RewardsPage.tsx
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { supabase } from '../lib/supabase';
-import type { Reward, RewardRedemptionWithDetails } from '../types/database.types';
+import type { Reward } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { HowItWorksSteps } from '../components/rewards/HowItWorksSteps';
 import { RedemptionCodeModal } from '../components/rewards/RedemptionCodeModal';
-import { PendingRedemptions } from '../components/rewards/PendingRedemptions';
 import { RewardCard } from '../components/rewards/RewardCard';
 import { View } from '../ui/View';
 import * as styles from '../styles/rewards.css';
@@ -26,7 +25,6 @@ export default function RewardsPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [rewards, setRewards] = useState<Reward[]>([]);
-  const [pendingRedemptions, setPendingRedemptions] = useState<RewardRedemptionWithDetails[]>([]);
   const [activeCode, setActiveCode] = useState<string | null>(null);
   const [rewardsEnabled, setRewardsEnabled] = useState<boolean | null>(null);
 
@@ -48,6 +46,7 @@ export default function RewardsPage() {
     refreshCustomer();
   }, [location.key, refreshCustomer, rewardsEnabled]);
 
+
   const loadRewards = async () => {
     try {
       const { data, error } = await supabase
@@ -62,24 +61,6 @@ export default function RewardsPage() {
       console.error('Error loading rewards:', error);
     }
   };
-
-  const loadPendingRedemptions = useCallback(async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('reward_redemptions')
-        .select(`*, reward:rewards(*)`)
-        .eq('customer_id', user.id)
-        .eq('fulfilled', false)
-        .order('redeemed_at', { ascending: false });
-
-      if (error) throw error;
-      setPendingRedemptions(data || []);
-    } catch (error) {
-      console.error('Error loading pending redemptions:', error);
-    }
-  }, [user]);
 
   const handleRedeem = async (rewardId: string, pointsRequired: number) => {
     if (!user || !customer) {
@@ -121,44 +102,9 @@ export default function RewardsPage() {
 
       setActiveCode(redemptionCode);
       await refreshCustomer();
-      loadPendingRedemptions();
     } catch (error) {
       console.error('Error redeeming reward:', error);
       alert('Failed to redeem reward: ' + (error instanceof Error ? error.message : 'Check database permissions'));
-    }
-  };
-
-  const handleCancelRedemption = async (redemptionId: string) => {
-    if (!confirm('Cancel this redemption request? Your points will be refunded.')) return;
-
-    try {
-      const redemption = pendingRedemptions.find(r => r.id === redemptionId);
-      if (!redemption) {
-        alert('Redemption not found');
-        return;
-      }
-
-      const { error } = await supabase
-        .from('reward_redemptions')
-        .delete()
-        .eq('id', redemptionId)
-        .eq('fulfilled', false);
-
-      if (error) throw error;
-
-      if (user && customer) {
-        const newPoints = customer.reward_points + redemption.points_spent;
-        await supabase
-          .from('customers')
-          .update({ reward_points: newPoints })
-          .eq('id', user.id);
-        await refreshCustomer();
-      }
-
-      loadPendingRedemptions();
-    } catch (error) {
-      console.error('Error cancelling redemption:', error);
-      alert('Failed to cancel redemption');
     }
   };
 
@@ -181,11 +127,6 @@ export default function RewardsPage() {
         {activeCode && (
           <RedemptionCodeModal code={activeCode} onClose={() => setActiveCode(null)} />
         )}
-
-        <PendingRedemptions
-          redemptions={pendingRedemptions}
-          onCancel={handleCancelRedemption}
-        />
 
         <View className={styles.rewardsGrid}>
           {rewards.map((reward) => (

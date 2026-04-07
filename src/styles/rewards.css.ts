@@ -141,17 +141,16 @@ export const codeModalButton = style({
 // Pending Redemptions
 export const pendingSection = style({
   maxWidth: 1200,
-  margin: "0 auto 16px",
+  // margin: "0 auto 16px",
   padding: 20,
-  backgroundColor: dark_bg,
-  borderRadius: 8,
-  border: `1px solid ${border_subtle}`,
+  // backgroundColor: darker_bg,
+  borderRadius: 16,
+  border: `1px solid ${text_secondary}`,
   boxShadow: "0 12px 32px rgba(0,0,0,0.6)",  
   textAlign: 'center',
+  marginBottom: 20,
   ":hover": {
-    transform: "translateY(-2px)",
-    boxShadow: "0 8px 16px rgba(0,0,0,0.08)",
-    borderColor: text_muted,
+    border: `1px solid ${text_primary}`,
   },
   "@media": {
     "screen and (min-width: 768px)": {
@@ -249,6 +248,11 @@ export const cancelButton = style({
   ":hover": {
     borderColor: "#b91c1c",
     color: "#b91c1c",
+  },
+  "@media": {
+    "screen and (min-width: 768px)": {
+      marginLeft: "auto",
+    },
   },
 });
 

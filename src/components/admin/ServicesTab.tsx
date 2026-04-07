@@ -16,27 +16,25 @@ const DEFAULT_SERVICE_FORM = {
   image_url: '',
 };
 
-interface ServicesTabProps {
-  services: Service[];
-  onUpdate: () => void;
+interface BarberServiceLink {
+  barber_id: string;
+  service_id: string;
 }
 
-export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
+interface ServicesTabProps {
+  services: Service[];
+  barbers: Barber[];
+  barberServices: BarberServiceLink[];
+  onUpdate: () => void;
+  onScrollToTop: () => void;
+}
+
+export function ServicesTab({ services, barbers: allBarbers, barberServices, onUpdate, onScrollToTop }: ServicesTabProps) {
   const formRef = useRef<HTMLDivElement>(null);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [serviceForm, setServiceForm] = useState(DEFAULT_SERVICE_FORM);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [barbers, setBarbers] = useState<Barber[]>([]);
   const [selectedBarberIds, setSelectedBarberIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    supabase
-      .from('barbers')
-      .select('*')
-      .eq('is_active', true)
-      .order('name')
-      .then(({ data }) => setBarbers(data || []));
-  }, []);
 
   useEffect(() => {
     if (editingService) {
@@ -58,9 +56,11 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
     setEditingService(null);
     setServiceForm(DEFAULT_SERVICE_FORM);
     setSelectedBarberIds([]);
+    onScrollToTop();
   };
 
   const handleEdit = (service: Service) => {
+    setShowAddForm(false);
     setEditingService(service);
     setServiceForm({
       name: service.name,
@@ -99,10 +99,11 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
         if (linkError) throw linkError;
       }
 
-      alert(editingService ? 'Service updated successfully!' : 'Service added successfully!');
       setServiceForm(DEFAULT_SERVICE_FORM);
       setSelectedBarberIds([]);
       setEditingService(null);
+      setShowAddForm(false);
+      onScrollToTop();
       onUpdate();
     } catch (error) {
       console.error('Error saving service:', error);
@@ -115,7 +116,7 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
     try {
       const { error } = await supabase.from('services').delete().eq('id', serviceId);
       if (error) throw error;
-      alert('Service deleted successfully!');
+      // alert('Service deleted successfully!');
       onUpdate();
     } catch (error) {
       console.error('Error deleting service:', error);
@@ -128,10 +129,20 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
       <div className={styles.adminSplitLayout}>
         {/* Current services list */}
         <div className={styles.adminLeftColumn}>
+          <div className={styles.cardList}>
           {services.map((service) => (
             <View key={service.id} className={styles.barberCard}>
               <View className={styles.barberInfo}>
                 <Text className={styles.barberName}>{service.name}</Text>
+                {(() => {
+                  const names = barberServices
+                    .filter((bs) => bs.service_id === service.id)
+                    .map((bs) => allBarbers.find((b) => b.id === bs.barber_id)?.name)
+                    .filter(Boolean);
+                  return names.length > 0
+                    ? <Text className={styles.barberDetail}>{names.join(' • ')}</Text>
+                    : null;
+                })()}
                 <Text className={styles.barberDetail}>
                   {service.duration_minutes} minutes • {service.reward_points} points
                 </Text>
@@ -140,7 +151,16 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
                 )}
               </View>
               <View className={styles.barberActions}>
-                <button className={styles.editButton} onClick={() => handleEdit(service)}>
+                <button
+                  className={editingService?.id === service.id ? styles.editButtonActive : styles.editButton}
+                  onClick={() => {
+                    if (editingService?.id === service.id) {
+                      handleCancel();
+                    } else {
+                      handleEdit(service);
+                    }
+                  }}
+                >
                   Edit
                 </button>
                 <button className={styles.deleteButton} onClick={() => handleDelete(service.id)}>
@@ -149,6 +169,7 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
               </View>
             </View>
           ))}
+          </div>
         </div>
 
         {/* Add / Edit form */}
@@ -185,11 +206,11 @@ export function ServicesTab({ services, onUpdate }: ServicesTabProps) {
               />
             </View>
 
-            {barbers.length > 0 && (
+            {allBarbers.length > 0 && (
               <View className={styles.formGroup}>
                 <label className={styles.label}>Offered By</label>
                 <View style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {barbers.map((barber) => (
+                  {[...allBarbers].sort((a, b) => a.name.localeCompare(b.name)).map((barber) => (
                     <label
                       key={barber.id}
                       style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}

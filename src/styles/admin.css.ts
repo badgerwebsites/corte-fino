@@ -186,6 +186,12 @@ export const adminLeftColumn = style({
   flex: 1,
 });
 
+export const cardList = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 12,
+});
+
 export const adminRightColumn = style({
   flex: 1,
   borderTop: '2px solid #e2e8f0',
@@ -378,6 +384,40 @@ export const dayPricingInputGroup = style({
   gap: 4,
 });
 
+export const unscheduledDay = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  color: text_muted,
+  cursor: 'default',
+  opacity: 0.5,
+  position: 'relative',
+  selectors: {
+    '&::after': {
+      content: '"Not Scheduled"',
+      position: 'absolute',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      backgroundColor: '#1e2530',
+      color: text_primary,
+      fontSize: 14,
+      fontWeight: 500,
+      whiteSpace: 'nowrap',
+      padding: '4px 8px',
+      borderRadius: 4,
+      border: `1px solid ${border_subtle}`,
+      pointerEvents: 'none',
+      opacity: 0,
+      transition: 'opacity 0s',
+      zIndex: 10,
+    },
+    '&:hover::after': {
+      opacity: 1,
+    },
+  },
+});
+
 export const dayPriceInput = style({
   width: 28,
   backgroundColor: dark_bg,
@@ -417,8 +457,11 @@ export const form = style({
 });
 
 export const formGroup = style({
-  // marginTop: 8,
   marginBottom: 12,
+});
+
+export const formGroupWide = style({
+  marginBottom: 20,
 });
 
 export const formRow = style({
@@ -510,7 +553,7 @@ export const formActions = style({
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: 4,
+  marginTop: 8,
   gap: 20,
 });
 
@@ -568,7 +611,6 @@ export const barberCard = style({
   padding: '1rem',
   background: darker_bg,
   borderRadius: 8,
-  marginBottom: 12,
   '@media': {
     'screen and (min-width: 768px)': {
       // flexDirection: 'row',
@@ -624,7 +666,7 @@ export const scheduleButton = style({
   border: '1px solid #f5e7a3',
   borderRadius: 4,
   fontSize: 14,
-  fontWeight: '500',
+  fontWeight: '600',
   cursor: 'pointer',
   transition: 'all 0.2s',
   whiteSpace: 'nowrap',
@@ -636,6 +678,25 @@ export const scheduleButton = style({
   },
   ':hover': {
     background: dark_bg,
+  },
+});
+
+export const scheduleButtonActive = style({
+  padding: '8px 12px',
+  background: '#eab308',
+  color: '#000',
+  border: '1px solid #eab308',
+  borderRadius: 4,
+  fontSize: 14,
+  fontWeight: '600',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  whiteSpace: 'nowrap',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '8px 12px',
+      fontSize: 16,
+    },
   },
 });
 
@@ -646,7 +707,7 @@ export const editButton = style({
   border: '1px solid #a5d8e6',
   borderRadius: 4,
   fontSize: 14,
-  fontWeight: '500',
+  fontWeight: '600',
   cursor: 'pointer',
   transition: 'all 0.2s',
   whiteSpace: 'nowrap',
@@ -661,6 +722,25 @@ export const editButton = style({
   },
 });
 
+export const editButtonActive = style({
+  padding: '8px 12px',
+  background: '#0ea5e9',
+  color: '#000',
+  border: '1px solid #0ea5e9',
+  borderRadius: 4,
+  fontSize: 14,
+  fontWeight: '600',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  whiteSpace: 'nowrap',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '8px 12px',
+      fontSize: 16,
+    },
+  },
+});
+
 export const deleteButton = style({
   padding: '8px 12px',
   background: 'transparent',
@@ -668,7 +748,7 @@ export const deleteButton = style({
   border: '1px solid #e5a3a3',
   borderRadius: 4,
   fontSize: 14,
-  fontWeight: '500',
+  fontWeight: '600',
   cursor: 'pointer',
   whiteSpace: 'nowrap',
   transition: 'all 0.2s',
@@ -918,12 +998,12 @@ export const pricingTimeArrow = style({
 });
 
 export const checkboxLabel = style({
-  display: 'flex',
+  display: 'inline-flex',
   alignItems: 'center',
   gap: 12,
   cursor: 'pointer',
-  paddingTop: 8,
-  marginBottom: 20,
+  paddingTop: 4,
+  marginBottom: 4,
   color: text_primary,
   fontSize: 18,
 });
@@ -1036,7 +1116,6 @@ export const subsectionTitle = style({
 export const redemptionsList = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.75rem',
 });
 
 export const redemptionCard = style({
