@@ -342,9 +342,13 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop }: BarbersTabProps
             </View>
 
             <View className={styles.formActions}>
-              {editingBarber && (
+              {editingBarber ? (
                 <button type="button" className={styles.cancelButton} onClick={handleCancel}>
                   Cancel
+                </button>
+              ) : (
+                <button type="button" className={styles.cancelButton} onClick={() => setBarberForm(DEFAULT_BARBER_FORM)}>
+                  Clear
                 </button>
               )}
               <button type="submit" className={styles.submitButton}>

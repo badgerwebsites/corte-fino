@@ -3,16 +3,28 @@ import { style } from "@vanilla-extract/css";
 import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_subtle } from './globalStyles.css';
 
 export const container = style({
-  minHeight: "100vh",
+  height: "100dvh",
+  backgroundColor: darker_bg,
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
+});
+
+export const stickyTop = style({
+  flexShrink: 0,
   backgroundColor: darker_bg,
   paddingTop: 60,
-  paddingBottom: 100,
-  gap: 20,
   "@media": {
     "screen and (min-width: 768px)": {
       paddingTop: 78,
     },
   },
+});
+
+export const scrollBody = style({
+  flex: 1,
+  overflowY: "auto",
+  paddingBottom: 100,
 });
 
 export const content = style({

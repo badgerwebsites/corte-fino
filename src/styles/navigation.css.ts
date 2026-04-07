@@ -144,18 +144,17 @@ export const loginButton = style({
 
 export const logoutButton = style({
   ...baseButton,
-
-  color: '#c24141',
+  color: "#dc2626",
   backgroundColor: 'transparent',
-  border: '3px solid #c24141',
+  border: "3px solid #dc2626",
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '6px 12px',
     },
   },
   ':hover': {
-    color: '#a93232',
-    border: '3px solid #a93232',
+    color: "#b91c1c",
+    borderColor: "#b91c1c",
   },
   ':active': {
     transform: 'scale(0.97)',

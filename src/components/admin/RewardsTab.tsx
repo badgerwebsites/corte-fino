@@ -401,9 +401,13 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
             </View>
 
             <View className={styles.formActions}>
-              {editingReward && (
+              {editingReward ? (
                 <button type="button" className={styles.cancelButton} onClick={handleCancel}>
                   Cancel
+                </button>
+              ) : (
+                <button type="button" className={styles.cancelButton} onClick={() => setRewardForm(DEFAULT_REWARD_FORM)}>
+                  Clear
                 </button>
               )}
               <button type="submit" className={styles.submitButton}>

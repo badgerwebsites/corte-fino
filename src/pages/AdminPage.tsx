@@ -46,7 +46,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const scrollToTop = () => { containerRef.current?.scrollIntoView({ block: 'start' }); };
+  const scrollToTop = () => { containerRef.current?.scrollTo({ top: 0 }); };
 
   const [activeTab, setActiveTab] = useState<AdminTab>(() => {
     const saved = localStorage.getItem('adminActiveTab');
@@ -55,6 +55,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     localStorage.setItem('adminActiveTab', activeTab);
+    scrollToTop();
   }, [activeTab]);
 
   useEffect(() => {
@@ -119,81 +120,85 @@ export default function AdminPage() {
   return (
     <>
       <Navigation />
-      <div ref={containerRef} className={styles.container}>
+      <div className={styles.container}>
 
         {/* Tab bar */}
-        <View className={styles.tabs}>
-          {(['calendar', 'pricing', 'services', 'barbers', 'rewards', 'settings'] as AdminTab[]).map((tab) => (
-            <button
-              key={tab}
-              className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              {tab === 'rewards' && pendingRedemptions.length > 0 && (
-                <span className={styles.tabBadge}>{pendingRedemptions.length}</span>
-              )}
-            </button>
-          ))}
-        </View>
+        <div className={styles.adminStickyTop}>
+          <View className={styles.tabs}>
+            {(['calendar', 'pricing', 'services', 'barbers', 'rewards', 'settings'] as AdminTab[]).map((tab) => (
+              <button
+                key={tab}
+                className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ''}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === 'rewards' && pendingRedemptions.length > 0 && (
+                  <span className={styles.tabBadge}>{pendingRedemptions.length}</span>
+                )}
+              </button>
+            ))}
+          </View>
+        </div>
 
         {/* Tab content */}
-        {activeTab === 'calendar' && (
-          <AdminCalendar
-            barbers={barbers}
-            services={services}
-            pricing={pricing}
-            availability={availability}
-            timeOff={timeOff}
-            onBookingUpdate={loadData}
-          />
-        )}
+        <div ref={containerRef} className={styles.adminScrollBody}>
+          <div style={{ display: activeTab === 'calendar' ? undefined : 'none' }}>
+            <AdminCalendar
+              barbers={barbers}
+              services={services}
+              pricing={pricing}
+              availability={availability}
+              timeOff={timeOff}
+              onBookingUpdate={loadData}
+            />
+          </div>
 
-        {activeTab === 'pricing' && (
-          <PricingTab
-            services={services}
-            barbers={barbers}
-            barberServices={barberServices}
-            pricing={pricing}
-            availability={availability}
-            onUpdate={loadData}
-          />
-        )}
+          <div style={{ display: activeTab === 'pricing' ? undefined : 'none' }}>
+            <PricingTab
+              services={services}
+              barbers={barbers}
+              barberServices={barberServices}
+              pricing={pricing}
+              availability={availability}
+              onUpdate={loadData}
+            />
+          </div>
 
-        {activeTab === 'services' && (
-          <ServicesTab
-            services={services}
-            barbers={barbers}
-            barberServices={barberServices}
-            onUpdate={loadData}
-            onScrollToTop={scrollToTop}
-          />
-        )}
+          <div style={{ display: activeTab === 'services' ? undefined : 'none' }}>
+            <ServicesTab
+              services={services}
+              barbers={barbers}
+              barberServices={barberServices}
+              onUpdate={loadData}
+              onScrollToTop={scrollToTop}
+            />
+          </div>
 
-        {activeTab === 'barbers' && (
-          <BarbersTab
-            barbers={barbers}
-            onUpdate={loadData}
-            onScrollToTop={scrollToTop}
-          />
-        )}
+          <div style={{ display: activeTab === 'barbers' ? undefined : 'none' }}>
+            <BarbersTab
+              barbers={barbers}
+              onUpdate={loadData}
+              onScrollToTop={scrollToTop}
+            />
+          </div>
 
-        {activeTab === 'settings' && (
-          <SettingsTab
-            siteSettings={siteSettings}
-            onUpdate={loadData}
-          />
-        )}
+          <div style={{ display: activeTab === 'settings' ? undefined : 'none' }}>
+            <SettingsTab
+              siteSettings={siteSettings}
+              onUpdate={loadData}
+            />
+          </div>
 
-        {activeTab === 'rewards' && (
-          <RewardsTab
-            pendingRedemptions={pendingRedemptions}
-            rewards={rewards}
-            siteSettings={siteSettings}
-            onUpdate={loadData}
-            onScrollToTop={scrollToTop}
-          />
-        )}
+          <div style={{ display: activeTab === 'rewards' ? undefined : 'none' }}>
+            <RewardsTab
+              pendingRedemptions={pendingRedemptions}
+              rewards={rewards}
+              siteSettings={siteSettings}
+              onUpdate={loadData}
+              onScrollToTop={scrollToTop}
+            />
+          </div>
+        </div>
 
       </div>
     </>

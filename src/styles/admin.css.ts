@@ -3,15 +3,38 @@ import { style } from '@vanilla-extract/css';
 import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_subtle, border_hover } from './globalStyles.css';
 
 export const container = style({
-  minHeight: '100vh',
+  height: '100dvh',
+  backgroundColor: darker_bg,
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden',
+});
+
+export const adminStickyTop = style({
+  flexShrink: 0,
   backgroundColor: darker_bg,
   padding: 16,
   paddingTop: 68,
-  paddingBottom: 100,
+  paddingBottom: 0,
   '@media': {
     'screen and (min-width: 768px)': {
       padding: 48,
       paddingTop: 84,
+      paddingBottom: 0,
+    },
+  },
+});
+
+export const adminScrollBody = style({
+  flex: 1,
+  overflowY: 'auto',
+  padding: 16,
+  paddingTop: 0,
+  paddingBottom: 100,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: 48,
+      paddingTop: 0,
       paddingBottom: 100,
     },
   },
@@ -399,7 +422,7 @@ export const unscheduledDay = style({
       position: 'absolute',
       left: '50%',
       transform: 'translateX(-50%)',
-      backgroundColor: '#1e2530',
+      backgroundColor: dark_bg,
       color: text_primary,
       fontSize: 14,
       fontWeight: 500,

@@ -135,10 +135,12 @@ export function ServicesTab({ services, barbers: allBarbers, barberServices, onU
               <View className={styles.barberInfo}>
                 <Text className={styles.barberName}>{service.name}</Text>
                 {(() => {
-                  const names = barberServices
-                    .filter((bs) => bs.service_id === service.id)
-                    .map((bs) => allBarbers.find((b) => b.id === bs.barber_id)?.name)
-                    .filter(Boolean);
+                  const assignedIds = new Set(
+                    barberServices.filter((bs) => bs.service_id === service.id).map((bs) => bs.barber_id)
+                  );
+                  const names = allBarbers
+                    .filter((b) => assignedIds.has(b.id))
+                    .map((b) => b.name);
                   return names.length > 0
                     ? <Text className={styles.barberDetail}>{names.join(' • ')}</Text>
                     : null;
@@ -278,9 +280,13 @@ export function ServicesTab({ services, barbers: allBarbers, barberServices, onU
             </View>
 
             <View className={styles.formActions}>
-              {editingService && (
+              {editingService ? (
                 <button type="button" className={styles.cancelButton} onClick={handleCancel}>
                   Cancel
+                </button>
+              ) : (
+                <button type="button" className={styles.cancelButton} onClick={() => { setServiceForm(DEFAULT_SERVICE_FORM); setSelectedBarberIds([]); }}>
+                  Clear
                 </button>
               )}
               <button type="submit" className={styles.submitButton}>

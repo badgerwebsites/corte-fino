@@ -273,54 +273,60 @@ export default function CustomerDashboardPage() {
     <>
       <Navigation />
       <View className={styles.container}>
-        <View className={styles.content}>
-          <DashboardHeader
-            firstName={customer?.first_name}
-            hasBookings={bookings.length > 0}
-            rewardsEnabled={rewardsEnabled}
-            rewardPoints={customer?.reward_points || 0}
-            onEditProfile={() => setShowEditProfile(true)}
-          />
+        <View className={styles.stickyTop}>
+          <View className={styles.content}>
+            <DashboardHeader
+              firstName={customer?.first_name}
+              hasBookings={bookings.length > 0}
+              rewardsEnabled={rewardsEnabled}
+              rewardPoints={customer?.reward_points || 0}
+              onEditProfile={() => setShowEditProfile(true)}
+            />
+          </View>
+        </View>
 
-          <PendingRedemptions
-            redemptions={pendingRedemptions}
-            onCancel={handleCancelRedemption}
-          />
+        <View className={styles.scrollBody}>
+          <View className={styles.content}>
+            <PendingRedemptions
+              redemptions={pendingRedemptions}
+              onCancel={handleCancelRedemption}
+            />
 
-          <View className={styles.section}>
-            {bookings.length === 0 ? (
-              <EmptyBookingsState rewardsEnabled={rewardsEnabled} />
-            ) : (
-              <View className={styles.bookingsList}>
-                {recurringGroups.map((group) => (
-                  <RecurringBookingCard
-                    key={group.groupId}
-                    group={group}
-                    isExpanded={expandedRecurring === group.groupId}
-                    isUpcoming={isUpcoming(group.nextBooking)}
-                    formatTime={formatTime}
-                    formatDateShort={formatDateShort}
-                    onToggleExpand={() =>
-                      setExpandedRecurring(
-                        expandedRecurring === group.groupId ? null : group.groupId
-                      )
-                    }
-                    onCancel={() => setCancellingBooking(group.nextBooking)}
-                  />
-                ))}
-                {standaloneBookings.map((booking) => (
-                  <StandaloneBookingCard
-                    key={booking.id}
-                    booking={booking}
-                    isUpcoming={isUpcoming(booking)}
-                    formatTime={formatTime}
-                    formatDateShort={formatDateShort}
-                    onReschedule={() => handleReschedule(booking)}
-                    onCancel={() => setCancellingBooking(booking)}
-                  />
-                ))}
-              </View>
-            )}
+            <View className={styles.section}>
+              {bookings.length === 0 ? (
+                <EmptyBookingsState rewardsEnabled={rewardsEnabled} />
+              ) : (
+                <View className={styles.bookingsList}>
+                  {recurringGroups.map((group) => (
+                    <RecurringBookingCard
+                      key={group.groupId}
+                      group={group}
+                      isExpanded={expandedRecurring === group.groupId}
+                      isUpcoming={isUpcoming(group.nextBooking)}
+                      formatTime={formatTime}
+                      formatDateShort={formatDateShort}
+                      onToggleExpand={() =>
+                        setExpandedRecurring(
+                          expandedRecurring === group.groupId ? null : group.groupId
+                        )
+                      }
+                      onCancel={() => setCancellingBooking(group.nextBooking)}
+                    />
+                  ))}
+                  {standaloneBookings.map((booking) => (
+                    <StandaloneBookingCard
+                      key={booking.id}
+                      booking={booking}
+                      isUpcoming={isUpcoming(booking)}
+                      formatTime={formatTime}
+                      formatDateShort={formatDateShort}
+                      onReschedule={() => handleReschedule(booking)}
+                      onCancel={() => setCancellingBooking(booking)}
+                    />
+                  ))}
+                </View>
+              )}
+            </View>
           </View>
         </View>
       </View>
