@@ -200,12 +200,12 @@ export const addAppointmentButton = style({
 });
 
 globalStyle(`${addAppointmentButton} svg`, {
-  width: 28,
-  height: 28,
+  width: 32,
+  height: 32,
   '@media': {
     'screen and (min-width: 768px)': {
-      width: 32,
-      height: 32,
+      width: 40,
+      height: 40,
     },
   },
 });
