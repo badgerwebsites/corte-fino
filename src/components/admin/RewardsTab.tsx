@@ -23,21 +23,28 @@ interface RewardsTabProps {
   siteSettings: SiteSettings | null;
   onUpdate: () => void;
   onScrollToTop: () => void;
+  onScrollToSection: (el: HTMLElement | null) => void;
 }
 
-export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate, onScrollToTop }: RewardsTabProps) {
+export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate, onScrollToTop, onScrollToSection }: RewardsTabProps) {
   const formRef = useRef<HTMLDivElement>(null);
+  const cardListRef = useRef<HTMLDivElement>(null);
   const [editingReward, setEditingReward] = useState<Reward | null>(null);
   const [rewardForm, setRewardForm] = useState(DEFAULT_REWARD_FORM);
   const [verifyCode, setVerifyCode] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
 
-  useEffect(() => {}, [editingReward]);
+  useEffect(() => {
+    if (editingReward) {
+      const timer = setTimeout(() => onScrollToSection(formRef.current), 150);
+      return () => clearTimeout(timer);
+    }
+  }, [editingReward]);
 
   const handleCancel = () => {
     setEditingReward(null);
     setRewardForm(DEFAULT_REWARD_FORM);
-    onScrollToTop();
+    onScrollToSection(cardListRef.current);
   };
 
   const handleEdit = (reward: Reward) => {
@@ -242,7 +249,7 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
             <Text>Enable rewards program</Text>
           </label>
 
-          <View className={styles.cardList}>
+          <div ref={cardListRef} className={styles.cardList}>
           {rewards.map((reward) => (
             <View key={reward.id} className={styles.barberCard}>
               <View className={styles.barberInfo}>
@@ -279,12 +286,12 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
               </View>
             </View>
           ))}
-          </View>
+          </div>
         </View>
 
         {/* Right column — add/edit reward form */}
-        <View className={styles.adminRightColumn}>
-          <div ref={formRef} className={styles.sectionHeader}>
+        <div ref={formRef} className={styles.adminRightColumn}>
+          <div className={styles.sectionHeader}>
             {editingReward ? (
               <Text className={styles.sectionTitle}>Edit Reward</Text>
             ) : (
@@ -411,11 +418,11 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
                 </button>
               )}
               <button type="submit" className={styles.submitButton}>
-                {editingReward ? 'Save' : 'Add Reward'}
+                Save
               </button>
             </View>
           </form>}
-        </View>
+        </div>
       </View>
     </View>
   );

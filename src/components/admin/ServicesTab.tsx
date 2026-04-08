@@ -27,14 +27,22 @@ interface ServicesTabProps {
   barberServices: BarberServiceLink[];
   onUpdate: () => void;
   onScrollToTop: () => void;
+  onScrollToSection: (el: HTMLElement | null) => void;
 }
 
-export function ServicesTab({ services, barbers: allBarbers, barberServices, onUpdate, onScrollToTop }: ServicesTabProps) {
+export function ServicesTab({ services, barbers: allBarbers, barberServices, onUpdate, onScrollToTop, onScrollToSection }: ServicesTabProps) {
   const formRef = useRef<HTMLDivElement>(null);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [serviceForm, setServiceForm] = useState(DEFAULT_SERVICE_FORM);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedBarberIds, setSelectedBarberIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (editingService) {
+      const timer = setTimeout(() => onScrollToSection(formRef.current), 150);
+      return () => clearTimeout(timer);
+    }
+  }, [editingService]);
 
   useEffect(() => {
     if (editingService) {
@@ -290,7 +298,7 @@ export function ServicesTab({ services, barbers: allBarbers, barberServices, onU
                 </button>
               )}
               <button type="submit" className={styles.submitButton}>
-                {editingService ? 'Save' : 'Add Service'}
+                Save
               </button>
             </View>
           </form>}

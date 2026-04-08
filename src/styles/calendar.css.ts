@@ -1,6 +1,6 @@
 // styles/calendar.css.ts
 import { style, globalStyle } from "@vanilla-extract/css";
-import { darker_bg, dark_bg, text_primary, text_muted, button as accent, border_hover } from './globalStyles.css';
+import { darker_bg, dark_bg, text_primary, text_muted, accent, border_hover } from './globalStyles.css';
 
 export const dateTimeLayout = style({
   display: "flex",

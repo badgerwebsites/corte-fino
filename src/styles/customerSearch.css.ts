@@ -1,6 +1,6 @@
 // styles/customerSearch.css.ts
 import { style } from '@vanilla-extract/css';
-import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_subtle } from './globalStyles.css';
+import { darker_bg, dark_bg, accent, text_primary, text_secondary, text_muted, border_subtle } from './globalStyles.css';
 
 export const searchContainer = style({
   position: 'relative',
@@ -22,7 +22,7 @@ export const searchInput = style({
   transition: 'border-color 0.2s',
   marginTop: 12,
   ':focus': {
-    borderColor: button,
+    borderColor: accent,
   },
   '::placeholder': {
     color: text_muted,
@@ -100,7 +100,7 @@ export const selectedCustomer = style({
   padding: '12px 14px',
   backgroundColor: darker_bg,
   borderRadius: 8,
-  border: `1px solid ${button}`,
+  border: `1px solid ${accent}`,
   marginTop: 12,
 });
 

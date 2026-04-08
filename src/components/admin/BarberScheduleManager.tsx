@@ -10,6 +10,9 @@ import { MinusCircle } from "lucide-react";
 interface Props {
   barbers: Barber[];
   onUpdate: () => void;
+  showSchedule: boolean;
+  onReady?: () => void;
+  children?: React.ReactNode;
 }
 
 interface DaySchedule {
@@ -37,7 +40,7 @@ const localDate = (dateStr: string) => {
 const DEFAULT_START = '09:00';
 const DEFAULT_END = '21:00';
 
-export function BarberScheduleManager({ barbers, onUpdate }: Props) {
+export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady, children }: Props) {
   const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
   const [, setAvailability] = useState<BarberAvailability[]>([]);
   const [timeOff, setTimeOff] = useState<BarberTimeOff[]>([]);
@@ -138,6 +141,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
       alert('Failed to load schedule');
     } finally {
       setLoading(false);
+      if (!silent) onReady?.();
     }
   };
 
@@ -326,7 +330,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
       {/* Schedule */}
       {selectedBarber && !loading && (
         <>
-          <div className={scheduleStyles.scheduleList}>
+          {showSchedule && <div className={scheduleStyles.scheduleList}>
             {DAYS_OF_WEEK.map((day) => {
               const schedule = schedules[day.value] || {
                 isWorking: false,
@@ -385,6 +389,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                           </label>
                           <input
                             type="time"
+                            step={300}
                             value={schedule.startTime}
                             onChange={(e) =>
                               updateSchedule(day.value, { startTime: e.target.value })
@@ -392,6 +397,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                             onBlur={(e) =>
                               saveSchedule(day.value, { ...schedule, startTime: e.target.value })
                             }
+                            onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                             className={scheduleStyles.timeInput}
                           />
                         </div>
@@ -402,6 +408,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                           </label>
                           <input
                             type="time"
+                            step={300}
                             value={schedule.endTime}
                             onChange={(e) =>
                               updateSchedule(day.value, { endTime: e.target.value })
@@ -409,6 +416,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                             onBlur={(e) =>
                               saveSchedule(day.value, { ...schedule, endTime: e.target.value })
                             }
+                            onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                             className={scheduleStyles.timeInput}
                           />
                         </div>
@@ -446,23 +454,27 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                                 <div className={scheduleStyles.breakInputGroup}>
                                   <input
                                     type="time"
+                                    step={300}
                                     value={brk.startTime}
                                     onChange={(e) => updateBreak(day.value, index, 'startTime', e.target.value)}
                                     onBlur={(e) => {
                                       const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: e.target.value } : b);
                                       saveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                     }}
+                                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                                     className={scheduleStyles.breakInput}
                                   />
                                   <span className={scheduleStyles.breakSeparator}>-</span>
                                   <input
                                     type="time"
+                                    step={300}
                                     value={brk.endTime}
                                     onChange={(e) => updateBreak(day.value, index, 'endTime', e.target.value)}
                                     onBlur={(e) => {
                                       const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: e.target.value } : b);
                                       saveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                     }}
+                                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                                     className={scheduleStyles.breakInput}
                                   />
                                 </div>
@@ -498,7 +510,9 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                 </div>
               );
             })}
-          </div>
+          </div>}
+
+          {children}
 
           {/* Time Off Section */}
           <div>
@@ -523,6 +537,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                         end_date: timeOffForm.end_date < e.target.value ? e.target.value : timeOffForm.end_date,
                       })
                     }
+                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     required
                   />
                 </View>
@@ -540,6 +555,7 @@ export function BarberScheduleManager({ barbers, onUpdate }: Props) {
                         end_date: e.target.value,
                       })
                     }
+                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     required
                   />
                 </View>

@@ -1,18 +1,24 @@
 // styles/barberScheduleManager.css.ts
 import { style } from '@vanilla-extract/css';
-import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_hover, border_subtle } from './globalStyles.css';
+import { darker_bg, dark_bg, button, accent, text_primary, text_secondary, text_muted, border_hover, border_subtle } from './globalStyles.css';
 
 export const headerTitle = style({
   fontSize: 20,
   fontWeight: 600,
   color: text_primary,
+  marginBottom: 12,
+});
+
+export const scheduleToggleChevron = style({
+  transition: 'transform 0.2s ease',
 });
 
 export const scheduleList = style({
   display: 'flex',
   flexDirection: 'column',
-  paddingTop: 8,
-  gap: 16,
+  // paddingTop: 8,
+  marginBottom: 20,
+  gap: 12,
 });
 
 export const dayCard = style({
@@ -42,14 +48,14 @@ export const dayHeaderLeft = style({
 });
 
 export const dayCheckbox = style({
-  width: 18,
-  height: 18,
+  width: 20,
+  height: 20,
   cursor: 'pointer',
-  accentColor: button,
+  accentColor: accent,
 });
 
 export const dayLabel = style({
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 600,
   color: text_primary,
 });
@@ -108,28 +114,31 @@ export const timeLabel = style({
 });
 
 export const timeInput = style({
+  width: '100%',
+  minWidth: 0,
   backgroundColor: darker_bg,
   color: text_primary,
-  border: `1px solid ${text_muted}`,
+  border: `1px solid ${text_secondary}`,
   boxSizing: 'border-box',
-  padding: 8,
+  padding: '12px 8px',
   borderRadius: 8,
-  fontSize: '0.875rem',
+  fontSize: '1rem',
+  fontFamily: 'inherit',
   colorScheme: 'dark',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: 12,
-      borderRadius: '0.5rem',
-      fontSize: '1rem',
-      width: '100%',
-    },
-  },
+  cursor: 'pointer',
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
   ':focus': {
     outline: 'none',
-    border: '1px solid #96cfe0',
+    border: `1px solid ${text_secondary}`,
   },
-  '::placeholder': {
-    color: text_muted,
+  selectors: {
+    '&::-webkit-calendar-picker-indicator': {
+      display: 'none',
+    },
+    '&::selection': {
+      background: 'transparent',
+    },
   },
 });
 
@@ -190,30 +199,36 @@ export const breakInputGroup = style({
 });
 
 export const breakInput = style({
+  width: '100%',
+  minWidth: 0,
   backgroundColor: darker_bg,
   color: text_primary,
-  border: `1px solid ${text_muted}`,
+  border: `1px solid ${text_secondary}`,
   boxSizing: 'border-box',
-  padding: 8,
+  padding: '12px 8px',
   borderRadius: 8,
-  fontSize: '0.875rem',
+  fontSize: 14,
+  fontFamily: 'inherit',
   colorScheme: 'dark',
-
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: 12,
-      borderRadius: '0.5rem',
-      fontSize: '1rem',
-      width: '100%',
-    },
-  },
-
+  cursor: 'pointer',
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
   ':focus': {
     outline: 'none',
-    border: '1px solid #96cfe0',
+    border: `1px solid ${text_secondary}`,
   },
-  '::placeholder': {
-    color: text_muted,
+  selectors: {
+    '&::-webkit-calendar-picker-indicator': {
+      display: 'none',
+    },
+    '&::selection': {
+      background: 'transparent',
+    },
+  },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 16,
+    },
   },
 });
 

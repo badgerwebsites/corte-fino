@@ -1,6 +1,6 @@
 // styles/imageUpload.css.ts
 import { style } from '@vanilla-extract/css';
-import { darker_bg, button, text_primary, text_secondary, text_muted } from './globalStyles.css';
+import { darker_bg, text_primary, text_secondary, text_muted, accent } from './globalStyles.css';
 
 export const container = style({
   marginBottom: 16,
@@ -116,7 +116,7 @@ export const changeButtonOverlay = style({
   bottom: 8,
   left: 8,
   padding: '0.35rem 0.75rem',
-  backgroundColor: button,
+  backgroundColor: accent,
   color: darker_bg,
   border: `none`,
   borderRadius: 4,
@@ -126,7 +126,7 @@ export const changeButtonOverlay = style({
   transition: 'all 0.2s',
 
   ':hover': {
-    backgroundColor: '#7fbccd',
+    backgroundColor: '#22b3f0',
   },
 });
 

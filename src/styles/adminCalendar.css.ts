@@ -1,6 +1,6 @@
 // styles/adminCalendar.css.ts
 import { style, globalStyle } from '@vanilla-extract/css';
-import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_hover } from './globalStyles.css';
+import { darker_bg, dark_bg, button, accent, text_primary, text_secondary, text_muted, border_hover } from './globalStyles.css';
 
 export const container = style({
   backgroundColor: dark_bg,
@@ -45,7 +45,7 @@ export const navButton = style({
   color: "#fff",
 
   ":hover": {
-    color: button,
+    color: accent,
   },
 
   ":disabled": {
@@ -70,11 +70,11 @@ export const todayButton = style({
   transition: 'all 0.2s',
   textAlign: 'center',
   ':hover': {
-    color: button,
+    color: accent,
   },
   selectors: {
     '&[aria-pressed="true"]': {
-      color: button,
+      color: accent,
     },
   },
 });
@@ -170,7 +170,7 @@ export const viewButton = style({
   transition: 'all 0.2s',
   minWidth: 80,
   ':hover': {
-    backgroundColor: button,
+    backgroundColor: accent,
     color: '#1a1a1a',
   },
   '@media': {
@@ -181,50 +181,31 @@ export const viewButton = style({
 });
 
 export const viewButtonActive = style({
-  backgroundColor: button,
+  backgroundColor: accent,
   color: '#1a1a1a',
 });
 
-export const bookAppointmentButton = style({
-  padding: '10px 16px',
-  fontSize: 16,
-  fontWeight: 600,
-  backgroundColor: button,
-  color: darker_bg,
-  border: 'none',
-  borderRadius: 8,
-  cursor: 'pointer',
-  transition: 'all 0.2s',
+export const addAppointmentButton = style({
+  all: 'unset',
   display: 'flex',
   alignItems: 'center',
-  gap: 6,
+  justifyContent: 'center',
+  width: '100%',
+  height: '100%',
+  cursor: 'pointer',
+  color: accent,
   ':hover': {
-    backgroundColor: '#7fbccd',
-  },
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '6px 12px',
-      borderRadius: 32,
-    },
+    color: '#22b3f0',
   },
 });
 
-export const plusIcon = style({
-  fontSize: 20,
-  fontWeight: 600,
-  lineHeight: 1,
+globalStyle(`${addAppointmentButton} svg`, {
+  width: 28,
+  height: 28,
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: 24,
-    },
-  },
-});
-
-export const mobileOnlyText = style({
-  display: 'inline',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      display: 'none',
+      width: 32,
+      height: 32,
     },
   },
 });
@@ -250,12 +231,15 @@ export const dayHeader = style({
 });
 
 export const dayHeaderToday = style({
-  backgroundColor: button,
+  backgroundColor: accent,
 });
 
 export const dayTimeColumnHeader = style({
   borderRight: '1px solid #e2e8f0',
   backgroundColor: dark_bg,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 });
 
 export const dayColumnHeader = style({
@@ -434,6 +418,9 @@ export const weekHeader = style({
 export const timeColumnHeader = style({
   borderRight: '1px solid #f1f5f9',
   backgroundColor: dark_bg,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 });
 
 export const weekDayHeader = style({
@@ -450,7 +437,7 @@ export const weekDayHeader = style({
 });
 
 export const todayHeader = style({
-  backgroundColor: button,
+  backgroundColor: accent,
 });
 
 export const weekDayNameShort = style({
@@ -809,7 +796,7 @@ const actionButtonBase = {
 
 export const actionConfirm = style({
   ...actionButtonBase,
-  backgroundColor: '#0ea5e9',
+  backgroundColor: accent,
   color: dark_bg,
   ':hover': {
     backgroundColor: '#0284c7',
@@ -938,9 +925,9 @@ export const monthCellOther = style({
 });
 
 export const monthCellToday = style({
-  backgroundColor: button,
+  backgroundColor: accent,
   ':hover': {
-    backgroundColor: button,
+    backgroundColor: accent,
   },
 });
 

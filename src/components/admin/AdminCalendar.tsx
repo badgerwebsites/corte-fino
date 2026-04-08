@@ -8,7 +8,7 @@ import type { Barber, BookingWithDetails, Service, BarberServicePricing, BarberA
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';
 import * as styles from '../../styles/adminCalendar.css';
-import { ChevronLeft, ChevronRight, Check, Ban, Circle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, Ban, Circle, PlusCircle } from "lucide-react";
 import { canRescheduleToSlot, calculateEndTime } from '../../utils/bookingHelpers';
 import { useNavigate } from 'react-router-dom';
 
@@ -574,6 +574,18 @@ const getBarberColors = (booking: BookingWithDetails) => {
   }) => {
     const { setNodeRef, isOver, active } = useDroppable({ id });
 
+    const handleClick = () => {
+      if (draggedBooking) return;
+      navigate('/book', {
+        state: {
+          adminMode: true,
+          date: format(date, 'yyyy-MM-dd'),
+          time: timeSlot,
+          ...(selectedBarberId !== 'all' && { barberId: selectedBarberId }),
+        },
+      });
+    };
+
     // Check if this is a valid drop target (only for the primary hover slot)
     let isValidTarget = false;
     if (active && draggedBooking && isOver) {
@@ -604,7 +616,7 @@ const getBarberColors = (booking: BookingWithDetails) => {
     ].filter(Boolean).join(' ');
 
     return (
-      <div ref={setNodeRef} className={slotClasses}>
+      <div ref={setNodeRef} className={slotClasses} onClick={handleClick}>
         {children}
       </div>
     );
@@ -690,19 +702,6 @@ const getBarberColors = (booking: BookingWithDetails) => {
               Month
             </button>
           </View>
-            <button
-              className={styles.bookAppointmentButton}
-              onClick={() =>
-                navigate('/book', {
-                  state: { adminMode: true },
-                })
-              }
-            >
-              <span className={styles.plusIcon}>+</span>
-              <span className={styles.mobileOnlyText}>
-                Add Appointment
-              </span>
-            </button>
         </View>
       </View>
         <>
@@ -715,7 +714,15 @@ const getBarberColors = (booking: BookingWithDetails) => {
                   isSameDay(currentDate, new Date()) ? styles.dayHeaderToday : ''
                 }`}
               >
-                <View className={styles.dayTimeColumnHeader} />
+                <View className={styles.dayTimeColumnHeader}>
+                  <button
+                    className={styles.addAppointmentButton}
+                    onClick={() => navigate('/book', { state: { adminMode: true } })}
+                    aria-label="Add appointment"
+                  >
+                    <PlusCircle />
+                  </button>
+                </View>
 
                 <View className={styles.dayColumnHeader}>
                   <Text className={styles.dayColumnDayName}>
@@ -832,7 +839,15 @@ const getBarberColors = (booking: BookingWithDetails) => {
             <View className={styles.weekView}>
               {/* Header with day names */}
               <View className={styles.weekHeader}>
-                <View className={styles.timeColumnHeader}></View>
+                <View className={styles.timeColumnHeader}>
+                  <button
+                    className={styles.addAppointmentButton}
+                    onClick={() => navigate('/book', { state: { adminMode: true } })}
+                    aria-label="Add appointment"
+                  >
+                    <PlusCircle />
+                  </button>
+                </View>
                 {getWeekDays().map((day, index) => (
                   <View
                     key={day.toISOString()}

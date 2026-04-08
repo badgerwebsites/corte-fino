@@ -35,6 +35,8 @@ interface LocationState {
   rescheduleFrom?: string;
   serviceId?: string;
   barberId?: string;
+  date?: string;
+  time?: string;
 }
 
 export default function BookingPage() {
@@ -128,6 +130,12 @@ export default function BookingPage() {
           setSelectedService(service);
           if (locationState.barberId) setStep(3);
         }
+      }
+      if (locationState.date) {
+        setSelectedDate(new Date(locationState.date + 'T00:00:00'));
+      }
+      if (locationState.time) {
+        setSelectedTime(locationState.time);
       }
     }
   }, [loading, locationState, services, barbers]);
@@ -845,7 +853,7 @@ export default function BookingPage() {
   const timePeriodLabel = (() => {
     if (!selectedBarber || !selectedTime || !selectedDate) return '';
     if (getTimePeriod(selectedTime, selectedBarber) === 'evening') {
-      return `Evening rate (${formatTimeTo12Hour(selectedBarber.evening_hours_start)}-${formatTimeTo12Hour(selectedBarber.evening_hours_end)})`;
+      return `Evening Rate (${formatTimeTo12Hour(selectedBarber.evening_hours_start)} - ${formatTimeTo12Hour(selectedBarber.evening_hours_end)})`;
     }
     const dayOfWeek = getDay(selectedDate);
     const dayBlocks = availability.filter(
@@ -862,9 +870,9 @@ export default function BookingPage() {
     const [eh, em] = selectedBarber.evening_hours_start.split(':').map(Number);
     const eveningStartMinutes = eh * 60 + em;
     if (timeMinutes < eveningStartMinutes) {
-      return `Regular rate (${formatTimeTo12Hour(workStart)}-${formatTimeTo12Hour(selectedBarber.evening_hours_start)})`;
+      return `Regular Rate (${formatTimeTo12Hour(workStart)} - ${formatTimeTo12Hour(selectedBarber.evening_hours_start)})`;
     }
-    return `Regular rate (${formatTimeTo12Hour(selectedBarber.evening_hours_end)}-${formatTimeTo12Hour(workEnd)})`;
+    return `Regular Rate (${formatTimeTo12Hour(selectedBarber.evening_hours_end)} - ${formatTimeTo12Hour(workEnd)})`;
   })();
 
   const today = startOfDay(new Date());

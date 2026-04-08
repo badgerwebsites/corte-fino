@@ -1,6 +1,6 @@
 // styles/home.css.ts
 import { style, keyframes } from "@vanilla-extract/css";
-import { darker_bg, dark_bg, text_primary, text_secondary, text_muted, border_subtle, border_hover } from './globalStyles.css';
+import { darker_bg, dark_bg, text_primary, text_secondary, text_muted, border_subtle, border_hover, accent } from './globalStyles.css';
 
 const fadeIn = keyframes({
   from: { opacity: 0, transform: "translateY(20px)" },
@@ -478,7 +478,7 @@ export const contactInfo = style({
 
 export const contactText = style({
   fontSize: 15,
-  color: '#96cfe0',
+  color: accent,
   "@media": {
     "screen and (min-width: 768px)": {
       fontSize: 20,
@@ -489,7 +489,7 @@ export const contactText = style({
 export const contactIcon = style({
   width: 18,
   height: 18,
-  color: '#96cfe0',
+  color: accent,
   "@media": {
     "screen and (min-width: 768px)": {
       width: 24,
@@ -501,7 +501,7 @@ export const contactIcon = style({
 export const contactLink = style({
   textDecoration: "none",
   transition: "opacity 0.2s ease",
-  color: '#96cfe0',
+  color: accent,
   ":hover": {
     opacity: 0.85,
   },

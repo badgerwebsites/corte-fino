@@ -1,6 +1,6 @@
 // styles/rewards.css.ts
 import { style } from "@vanilla-extract/css";
-import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_subtle } from './globalStyles.css';
+import { darker_bg, dark_bg, button, accent, text_primary, text_secondary, text_muted, border_subtle } from './globalStyles.css';
 
 export const container = style({
   minHeight: "100vh",
@@ -162,9 +162,9 @@ export const pendingSection = style({
 });
 
 export const pendingTitle = style({
-  fontSize: 22,
+  fontSize: 24,
   fontWeight: 500,
-  color: button,
+  color: accent,
   flex: 1,
   letterSpacing: "-0.01em",
   "@media": {

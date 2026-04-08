@@ -1,5 +1,5 @@
 // components/admin/BarbersTab.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import type { Barber } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
@@ -28,13 +28,16 @@ interface BarbersTabProps {
   barbers: Barber[];
   onUpdate: () => void;
   onScrollToTop: () => void;
+  onScrollToSection: (el: HTMLElement | null) => void;
 }
 
-export function BarbersTab({ barbers, onUpdate, onScrollToTop }: BarbersTabProps) {
+export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection }: BarbersTabProps) {
+  const rightColumnRef = useRef<HTMLDivElement>(null);
   const [editingBarber, setEditingBarber] = useState<Barber | null>(null);
   const [schedulingBarber, setSchedulingBarber] = useState<Barber | null>(null);
   const [barberForm, setBarberForm] = useState(DEFAULT_BARBER_FORM);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
   const [pricingForm, setPricingForm] = useState({
     regular_hours_start: '09:00',
     regular_hours_end: '17:00',
@@ -43,7 +46,19 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop }: BarbersTabProps
   });
 
 
-  useEffect(() => {}, [editingBarber]);
+  useEffect(() => {
+    if (editingBarber) {
+      const timer = setTimeout(() => onScrollToSection(rightColumnRef.current), 150);
+      return () => clearTimeout(timer);
+    }
+  }, [editingBarber]);
+
+  useEffect(() => {
+    if (schedulingBarber) {
+      const timer = setTimeout(() => onScrollToSection(rightColumnRef.current), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [schedulingBarber]);
 
   useEffect(() => {
     if (schedulingBarber) {
@@ -181,6 +196,7 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop }: BarbersTabProps
                     } else {
                       setEditingBarber(null);
                       setShowAddForm(false);
+                      setShowSchedule(false);
                       setSchedulingBarber(barber);
                     }
                   }}
@@ -197,12 +213,23 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop }: BarbersTabProps
         </View>
 
         {/* Add / Edit form */}
-        <View className={styles.adminRightColumn}>
+        <div ref={rightColumnRef} className={styles.adminRightColumn}>
           <View className={styles.sectionHeader}>
             {editingBarber ? (
               <Text className={styles.sectionTitle}>Edit {editingBarber.name}</Text>
             ) : schedulingBarber ? (
-              <Text className={styles.sectionTitle}>Schedule — {schedulingBarber.name}</Text>
+              <button
+                type="button"
+                className={styles.scheduleToggleButton}
+                onClick={() => setShowSchedule(v => !v)}
+              >
+                {schedulingBarber.name.split(' ')[0]}'s Weekly Schedule
+                <ChevronDown
+                  size={20}
+                  className={styles.addToggleChevron}
+                  style={{ transform: showSchedule ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                />
+              </button>
             ) : (
               <button
                 type="button"
@@ -220,35 +247,37 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop }: BarbersTabProps
           </View>
 
           {schedulingBarber && (
-            <>
+            <BarberScheduleManager barbers={[schedulingBarber]} onUpdate={onUpdate} showSchedule={showSchedule} onReady={() => setShowSchedule(true)}>
               <View>
-                <span className={styles.pricingPeriodsTitle}>Set Evening Premium Pricing</span>
                 <View className={styles.pricingTimeline}>
                   <View className={styles.pricingTimeBlock}>
-                    <label className={styles.pricingTimeLabel}>Evening Starts</label>
+                    <label className={styles.pricingTimeLabel}>Evening Pricing Starts</label>
                     <input
                       type="time"
+                      step={300}
                       className={styles.timeInput}
                       value={pricingForm.evening_hours_start}
                       onChange={(e) => setPricingForm({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
                       onBlur={(e) => handleSavePricing({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
+                      onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     />
                   </View>
                   <View className={styles.pricingTimeArrow}>→</View>
                   <View className={styles.pricingTimeBlock}>
-                    <label className={styles.pricingTimeLabel}>Evening Ends</label>
+                    <label className={styles.pricingTimeLabel}>Evening Pricing Ends</label>
                     <input
                       type="time"
+                      step={300}
                       className={styles.timeInput}
                       value={pricingForm.evening_hours_end}
                       onChange={(e) => setPricingForm({ ...pricingForm, evening_hours_end: e.target.value })}
                       onBlur={(e) => handleSavePricing({ ...pricingForm, evening_hours_end: e.target.value })}
+                      onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     />
                   </View>
                 </View>
               </View>
-              <BarberScheduleManager barbers={[schedulingBarber]} onUpdate={onUpdate} />
-            </>
+            </BarberScheduleManager>
           )}
 
           {(editingBarber || showAddForm) && <form onSubmit={handleSubmit} className={styles.form}>
@@ -352,12 +381,12 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop }: BarbersTabProps
                 </button>
               )}
               <button type="submit" className={styles.submitButton}>
-                {editingBarber ? 'Save' : 'Add Barber'}
+                Save
               </button>
             </View>
           </form>}
 
-        </View>
+        </div>
       </View>
     </View>
   );

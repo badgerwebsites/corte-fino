@@ -1,6 +1,6 @@
 // styles/admin.css.ts
 import { style } from '@vanilla-extract/css';
-import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_subtle, border_hover } from './globalStyles.css';
+import { darker_bg, dark_bg, button, accent, text_primary, text_secondary, text_muted, border_subtle, border_hover } from './globalStyles.css';
 
 export const container = style({
   height: '100dvh',
@@ -60,7 +60,7 @@ export const tab = style({
   background: 'none',
   border: 'none',
   color: text_primary,
-  fontSize: 16,
+  fontSize: 18,
   fontWeight: '400',
   cursor: 'pointer',
   borderBottom: '3px solid transparent',
@@ -69,7 +69,7 @@ export const tab = style({
   '@media': {
     'screen and (min-width: 768px)': {
       padding: '12px 24px',
-      fontSize: 20,
+      fontSize: 22,
     },
   },
   ':hover': {
@@ -78,10 +78,10 @@ export const tab = style({
 });
 
 export const activeTab = style({
-  color: button,
+  color: accent,
   fontWeight: 500,
   ':hover': {
-    color: button,
+    color: accent,
   },
 });
 
@@ -113,6 +113,24 @@ export const sectionHeader = style({
 });
 
 export const addToggleButton = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  cursor: 'pointer',
+  fontSize: 18,
+  fontWeight: 500,
+  color: text_primary,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 22,
+    },
+  },
+});
+
+export const scheduleToggleButton = style({
   display: 'flex',
   alignItems: 'center',
   gap: 8,
@@ -207,6 +225,12 @@ export const adminSplitLayout = style({
 
 export const adminLeftColumn = style({
   flex: 1,
+  marginBottom: 8,
+  '@media': {
+    'screen and (min-width: 1024px)': {
+      marginBottom: 0,
+    },
+  },
 });
 
 export const cardList = style({
@@ -490,7 +514,6 @@ export const formGroupWide = style({
 export const formRow = style({
   display: 'grid',
   gridTemplateColumns: '1fr',
-  marginBottom: 4,
   '@media': {
     'screen and (min-width: 768px)': {
       gridTemplateColumns: '1fr 1fr',
@@ -726,7 +749,7 @@ export const scheduleButtonActive = style({
 export const editButton = style({
   padding: '8px 12px',
   background: 'transparent',
-  color: '#0ea5e9',
+  color: accent,
   border: '1px solid #a5d8e6',
   borderRadius: 4,
   fontSize: 14,
@@ -747,7 +770,7 @@ export const editButton = style({
 
 export const editButtonActive = style({
   padding: '8px 12px',
-  background: '#0ea5e9',
+  background: accent,
   color: '#000',
   border: '1px solid #0ea5e9',
   borderRadius: 4,
@@ -939,8 +962,8 @@ export const scheduleDayHeader = style({
 // Pricing Time Periods styles
 export const pricingPeriodsTitle = style({
   display: 'block',
-  fontSize: 16,
-  fontWeight: '600',
+  fontSize: 20,
+  fontWeight: 600,
   color: text_primary,
   marginBottom: 12,
   paddingTop: 4,
@@ -981,28 +1004,30 @@ export const pricingTimeLabel = style({
 });
 
 export const timeInput = style({
+  width: '100%',
   backgroundColor: darker_bg,
   color: text_primary,
-  border: `1px solid ${text_muted}`,
+  border: `1px solid ${text_secondary}`,
   boxSizing: 'border-box',
-  padding: '0.625rem',
+  padding: '12px 8px',
   borderRadius: 8,
-  fontSize: '0.875rem',
+  fontSize: '1rem',
+  fontFamily: 'inherit',
   colorScheme: 'dark',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '0.75rem',
-      borderRadius: '0.5rem',
-      fontSize: '1rem',
-      width: '100%',
-    },
-  },
+  cursor: 'pointer',
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
   ':focus': {
     outline: 'none',
-    border: '1px solid #96cfe0',
+    border: `1px solid ${text_secondary}`,
   },
-  '::placeholder': {
-    color: text_muted,
+  selectors: {
+    '&::-webkit-calendar-picker-indicator': {
+      display: 'none',
+    },
+    '&::selection': {
+      background: 'transparent',
+    },
   },
 });
 
@@ -1032,10 +1057,10 @@ export const checkboxLabel = style({
 });
 
 export const checkbox = style({
-  transform: 'scale(1.3)',
+  transform: 'scale(1.5)',
   transformOrigin: 'left center',
   cursor: 'pointer',
-  accentColor: button,
+  accentColor: accent,
 });
 
 // Tab badge for notifications
@@ -1049,7 +1074,7 @@ export const tabBadge = style({
   padding: '0 2px',
   fontSize: 13,
   fontWeight: 600,
-  backgroundColor: '#0ea5e9',
+  backgroundColor: accent,
   color: darker_bg,
   borderRadius: '9999px',
   transform: 'translateY(-1px)',
@@ -1175,7 +1200,7 @@ export const redemptionCustomer = style({
 export const redemptionReward = style({
   fontSize: 18,
   fontWeight: '500',
-  color: '#0ea5e9',
+  color: accent,
 });
 
 export const redemptionPoints = style({
@@ -1208,7 +1233,7 @@ export const redemptionCodeDisplay = style({
   justifyContent: 'center',
   padding: '0.625rem 1rem',
   backgroundColor: '#f0f9ff',
-  border: "3px dashed #0ea5e9",
+  border: `3px dashed ${accent}`,  
   borderRadius: '0.375rem',
 });
 

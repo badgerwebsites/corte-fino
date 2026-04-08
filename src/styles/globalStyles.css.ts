@@ -4,6 +4,7 @@ import { style } from '@vanilla-extract/css';
 export const darker_bg     = "#101214";
 export const dark_bg       = "#222222";
 export const button        = "#96cfe0";
+export const accent        = "#0ea5e9";
 export const text_primary  = "#f5f5f5";
 export const text_secondary = "#b0b0b0";
 export const text_muted    = "#8a8a8a";

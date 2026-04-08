@@ -47,6 +47,11 @@ export default function AdminPage() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollToTop = () => { containerRef.current?.scrollTo({ top: 0 }); };
+  const scrollToSection = (el: HTMLElement | null) => {
+    if (!el || !containerRef.current) return;
+    const offset = el.getBoundingClientRect().top - containerRef.current.getBoundingClientRect().top + containerRef.current.scrollTop - 8;
+    containerRef.current.scrollTo({ top: offset, behavior: 'smooth' });
+  };
 
   const [activeTab, setActiveTab] = useState<AdminTab>(() => {
     const saved = localStorage.getItem('adminActiveTab');
@@ -171,6 +176,7 @@ export default function AdminPage() {
               barberServices={barberServices}
               onUpdate={loadData}
               onScrollToTop={scrollToTop}
+              onScrollToSection={scrollToSection}
             />
           </div>
 
@@ -179,6 +185,7 @@ export default function AdminPage() {
               barbers={barbers}
               onUpdate={loadData}
               onScrollToTop={scrollToTop}
+              onScrollToSection={scrollToSection}
             />
           </div>
 
@@ -196,6 +203,7 @@ export default function AdminPage() {
               siteSettings={siteSettings}
               onUpdate={loadData}
               onScrollToTop={scrollToTop}
+              onScrollToSection={scrollToSection}
             />
           </div>
         </div>

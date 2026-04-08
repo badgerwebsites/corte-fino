@@ -1,6 +1,6 @@
 // styles/booking.css.ts
 import { style, keyframes } from "@vanilla-extract/css";
-import { darker_bg, dark_bg, button, text_primary, text_secondary, text_muted, border_subtle } from './globalStyles.css';
+import { darker_bg, dark_bg, button, accent, text_primary, text_secondary, text_muted, border_subtle } from './globalStyles.css';
 
 const fadeIn = keyframes({
   from: { opacity: 0 },
@@ -305,8 +305,8 @@ export const serviceDuration = style({
 });
 
 export const servicePoints = style({
-  fontSize: 14,
-  color: button,
+  fontSize: 16,
+  color: accent,
   fontWeight: 400,
 });
 
@@ -386,8 +386,8 @@ export const barberBio = style({
 });
 
 export const barberSocial = style({
-  fontSize: 14,
-  color: button,
+  fontSize: 16,
+  color: accent,
   fontWeight: 400,
 });
 
@@ -434,8 +434,8 @@ export const timeButton = style({
     },
   },
   ":hover": {
-    borderColor: button,
-    color: button,
+    borderColor: accent,
+    color: accent,
   },
   ":active": {
     transform: "scale(0.95)",
@@ -443,8 +443,8 @@ export const timeButton = style({
 });
 
 export const timeButtonActive = style({
-  borderColor: button,
-  color: button,
+  borderColor: accent,
+  color: accent,
 });
 
 export const noTimesMessage = style({
@@ -583,8 +583,8 @@ export const backButton = style({
     },
   },
   ":hover": {
-    borderColor: button,
-    color: button,
+    borderColor: accent,
+    color: accent,
   },
 });
 
@@ -957,14 +957,14 @@ export const recurringCheckboxLabel = style({
 });
 
 export const recurringCheckbox = style({
-  width: 18,
-  height: 18,
-  accentColor: button,
+  width: 20,
+  height: 20,
+  accentColor: accent,
   cursor: "pointer",
 });
 
 export const recurringCheckboxText = style({
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 500,
   color: text_primary,
 });

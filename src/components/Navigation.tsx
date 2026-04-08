@@ -1,6 +1,6 @@
 // components/Navigation.tsx
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { View } from '../ui/View';
 import * as styles from '../styles/navigation.css';
@@ -65,7 +65,6 @@ export function Navigation() {
 
 
   const location = useLocation();
-  const navigate = useNavigate();
 
   const hideNav =
     location.pathname === '/login' ||
@@ -96,7 +95,7 @@ export function Navigation() {
   const handleLogout = async () => {
     localStorage.removeItem('adminActiveTab');
     await supabase.auth.signOut();
-    navigate('/login', { replace: true });
+    window.location.href = '/login';
   };
 
   if (hideNav) {
