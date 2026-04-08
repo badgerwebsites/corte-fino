@@ -345,7 +345,7 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
               />
             </View>
 
-            <View className={styles.formRow}>
+            <View className={styles.formRowAlways}>
               <View className={styles.formGroup}>
                 <label className={styles.label}>Points Required *</label>
                 <input
@@ -380,7 +380,7 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
               </View>
             </View>
 
-            <View className={styles.formRow}>
+            <View className={styles.formRowAlways}>
               <View className={styles.formGroup}>
                 <label className={styles.label}>Item Name *</label>
                 <input
@@ -388,7 +388,7 @@ export function RewardsTab({ pendingRedemptions, rewards, siteSettings, onUpdate
                   className={styles.input}
                   value={rewardForm.item_name}
                   onChange={(e) => setRewardForm({ ...rewardForm, item_name: e.target.value })}
-                  placeholder="e.g., Corte Fino Hoodie"
+                  placeholder="e.g., Hoodie"
                   required
                 />
               </View>

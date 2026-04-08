@@ -4,7 +4,7 @@ import { darker_bg, dark_bg, button, accent, text_primary, text_secondary, text_
 
 export const headerTitle = style({
   fontSize: 20,
-  fontWeight: 600,
+  fontWeight: 500,
   color: text_primary,
   marginBottom: 12,
 });

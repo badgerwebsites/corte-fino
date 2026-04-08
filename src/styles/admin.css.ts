@@ -120,7 +120,7 @@ export const addToggleButton = style({
   border: 'none',
   padding: 0,
   cursor: 'pointer',
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 500,
   color: text_primary,
   '@media': {
@@ -138,7 +138,7 @@ export const scheduleToggleButton = style({
   border: 'none',
   padding: 0,
   cursor: 'pointer',
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 500,
   color: text_primary,
   '@media': {
@@ -520,6 +520,12 @@ export const formRow = style({
       gap: 16,
     },
   },
+});
+
+export const formRowAlways = style({
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: 16,
 });
 
 export const label = style({
@@ -1001,6 +1007,7 @@ export const pricingTimeLabel = style({
   color: text_secondary,
   textTransform: 'uppercase',
   letterSpacing: '0.03em',
+  marginBottom: 4,
 });
 
 export const timeInput = style({
@@ -1059,7 +1066,7 @@ export const checkboxLabel = style({
 });
 
 export const checkbox = style({
-  transform: 'scale(1.5)',
+  transform: 'scale(1.4)',
   transformOrigin: 'left center',
   cursor: 'pointer',
   accentColor: accent,

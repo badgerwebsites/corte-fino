@@ -219,11 +219,11 @@ export function ServicesTab({ services, barbers: allBarbers, barberServices, onU
             {allBarbers.length > 0 && (
               <View className={styles.formGroup}>
                 <label className={styles.label}>Offered By</label>
-                <View style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <View style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {[...allBarbers].sort((a, b) => a.name.localeCompare(b.name)).map((barber) => (
                     <label
                       key={barber.id}
-                      style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
                     >
                       <input
                         type="checkbox"
