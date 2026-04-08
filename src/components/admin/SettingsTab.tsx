@@ -14,7 +14,9 @@ type SiteSettingField =
   | 'nav_logo_1_url'
   | 'nav_logo_2_url'
   | 'nav_logo_3_url'
-  | 'rewards_enabled';
+  | 'rewards_enabled'
+  | 'merch_image_url'
+  | 'merch_visible';
 
 interface SettingsTabProps {
   siteSettings: SiteSettings | null;
@@ -32,8 +34,8 @@ export function SettingsTab({ siteSettings, onUpdate }: SettingsTabProps) {
         if (error) throw error;
       }
       onUpdate();
-      if (field !== 'rewards_enabled') {
-        const fieldName = field === 'hero_background_url' ? 'Hero background' : 'Hero logo';
+      if (field !== 'rewards_enabled' && field !== 'merch_visible') {
+        const fieldName = field === 'hero_background_url' ? 'Hero background' : field === 'merch_image_url' ? 'Merch image' : 'Hero logo';
         alert(`${fieldName} updated successfully!`);
       }
     } catch (error) {
@@ -154,6 +156,36 @@ export function SettingsTab({ siteSettings, onUpdate }: SettingsTabProps) {
             onImageChange={(url) => handleSettingChange('hero_background_url', url)}
             bucket="site-images"
             label="Hero Background"
+          />
+        </View>
+      </View>
+      {/* Merch Section */}
+      <View className={styles.formGroup}>
+        <View className={styles.sectionHeader}>
+          <Text className={styles.subsectionTitle}>Merch Section</Text>
+        </View>
+        <Text className={styles.sectionDescription}>
+          Show a merch card on the home page alongside the barber cards. Toggle visibility and upload a merch image.
+        </Text>
+
+        <View className={styles.formGroup} style={{ marginTop: '1rem' }}>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              className={styles.checkbox}
+              checked={siteSettings?.merch_visible ?? false}
+              onChange={(e) => handleSettingChange('merch_visible', e.target.checked)}
+            />
+            <Text>Show Merch section on home page</Text>
+          </label>
+        </View>
+
+        <View style={{ marginTop: '1rem' }}>
+          <ImageUpload
+            currentImageUrl={siteSettings?.merch_image_url || undefined}
+            onImageChange={(url) => handleSettingChange('merch_image_url', url)}
+            bucket="site-images"
+            label="Merch Image"
           />
         </View>
       </View>

@@ -381,6 +381,72 @@ export const barberPhone = style({
   },
 });
 
+export const merchCard = style({
+  backgroundColor: darker_bg,
+  borderRadius: 8,
+  overflow: 'hidden',
+  border: `1px solid ${border_subtle}`,
+  transition: 'all 0.3s ease',
+
+  ':hover': {
+    transform: 'translateY(-6px)',
+    boxShadow: '0 12px 32px rgba(0,0,0,0.6)',
+    borderColor: border_hover,
+  },
+});
+
+export const merchImage = style({
+  width: '100%',
+  height: 200,
+  objectFit: 'cover',
+  display: 'block',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      height: 280,
+    },
+  },
+});
+
+export const merchImagePlaceholder = style({
+  width: '100%',
+  height: 200,
+  backgroundColor: darker_bg,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 12,
+  color: text_muted,
+  fontWeight: 500,
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase',
+  border: `1px dashed ${border_subtle}`,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      height: 280,
+    },
+  },
+});
+
+export const merchInfo = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  textAlign: 'center',
+  padding: 20,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: 24,
+    },
+  },
+});
+
+export const merchLabel = style({
+  fontSize: 18,
+  fontWeight: 500,
+  color: text_primary,
+  letterSpacing: '0.05em',
+});
+
 export const features = style({
   display: "grid",
   gridTemplateColumns: "1fr",

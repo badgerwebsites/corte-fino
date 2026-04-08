@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import type { Barber } from '../types/database.types';
+import type { Barber, SiteSettings } from '../types/database.types';
 import { Navigation } from '../components/Navigation';
 import { HeroSection } from '../components/home/HeroSection';
 import { BarbersSection } from '../components/home/BarbersSection';
@@ -18,6 +18,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [heroLogoIndex, setHeroLogoIndex] = useState(0);
   const [heroCarouselLogos, setHeroCarouselLogos] = useState<(string | null)[]>([null, null, null]);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -39,6 +40,8 @@ export default function HomePage() {
           settingsData?.hero_logo_2_url || null,
           settingsData?.hero_logo_3_url || null,
         ]);
+
+        if (settingsData) setSiteSettings(settingsData);
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -72,7 +75,11 @@ export default function HomePage() {
         heroLogoIndex={heroLogoIndex}
         onBook={() => navigate('/book')}
       />
-      <BarbersSection barbers={barbers} />
+      <BarbersSection
+        barbers={barbers}
+        merchImageUrl={siteSettings?.merch_image_url}
+        merchVisible={siteSettings?.merch_visible ?? false}
+      />
       <FeaturesSection />
       <HomeFooter />
     </>

@@ -7,10 +7,12 @@ import { formatPhone } from '../../../utils/formatPhone';
 
 interface BarbersSectionProps {
   barbers: Barber[];
+  merchImageUrl?: string;
+  merchVisible?: boolean;
 }
 
-export function BarbersSection({ barbers }: BarbersSectionProps) {
-  if (barbers.length === 0) return null;
+export function BarbersSection({ barbers, merchImageUrl, merchVisible }: BarbersSectionProps) {
+  if (barbers.length === 0 && !merchVisible) return null;
 
   return (
     <View className={styles.sectionDark}>
@@ -84,6 +86,25 @@ export function BarbersSection({ barbers }: BarbersSectionProps) {
             </View>
           </View>
         ))}
+
+        {merchVisible && (
+          <View className={styles.merchCard}>
+            {merchImageUrl ? (
+              <img
+                src={merchImageUrl}
+                alt="Merch"
+                className={styles.merchImage}
+              />
+            ) : (
+              <View className={styles.merchImagePlaceholder}>
+                Merch Photo
+              </View>
+            )}
+            <View className={styles.merchInfo}>
+              <Text className={styles.merchLabel}>Merch Available</Text>
+            </View>
+          </View>
+        )}
       </View>
     </View>
   );

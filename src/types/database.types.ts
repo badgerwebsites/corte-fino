@@ -229,6 +229,8 @@ export interface SiteSettings {
   nav_logo_2_url?: string;
   nav_logo_3_url?: string;
   rewards_enabled?: boolean;
+  merch_image_url?: string;
+  merch_visible?: boolean;
   created_at: string;
   updated_at: string;
 }
