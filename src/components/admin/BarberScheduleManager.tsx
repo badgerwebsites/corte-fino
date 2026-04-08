@@ -483,7 +483,7 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                                   onClick={() => removeBreak(day.value, index)}
                                   className={scheduleStyles.removeBreakButton}
                                 >
-                                  <MinusCircle size={24} strokeWidth={2.5} />
+                                  <MinusCircle size={26} strokeWidth={2.5} />
                                 </button>
                               </div>
                             ))}

@@ -99,13 +99,10 @@ export const saveDayOffButton = style({
 
 export const workingHoursCard = style({
   display: 'grid',
-  gridTemplateColumns: '1fr',
+  gridTemplateColumns: '1fr 1fr',
   gap: 12,
-  '@media': {
-    'screen and (min-width: 480px)': {
-      gridTemplateColumns: '1fr 1fr',
-    },
-  },
+  maxWidth: 480,
+  margin: '0 auto',
 });
 
 export const timeLabel = style({
@@ -195,6 +192,8 @@ export const breakRow = style({
   alignItems: 'center',
   gap: 8,
   width: '100%',
+  maxWidth: 480,
+  margin: '0 auto',
 });
 
 export const breakInputGroup = style({
@@ -216,7 +215,7 @@ export const breakInput = style({
   boxSizing: 'border-box',
   padding: '12px 8px',
   borderRadius: 8,
-  fontSize: 14,
+  fontSize: 16,
   fontFamily: 'inherit',
   colorScheme: 'dark',
   cursor: 'pointer',
