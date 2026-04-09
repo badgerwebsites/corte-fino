@@ -7,6 +7,35 @@ const sharedBorder = {
   backgroundColor: darker_bg,
 };
 
+// ─── Shared native input (date + select) ────────────────────────────────────
+
+export const nativeInput = style({
+  ...sharedBorder,
+  color: text_primary,
+  padding: '14px 12px',
+  fontSize: 16,
+  fontFamily: 'inherit',
+  colorScheme: 'dark',
+  cursor: 'pointer',
+  ':focus': {
+    outline: 'none',
+    border: `1px solid ${text_primary}`,
+  },
+  '@media': {
+    'screen and (min-width: 480px)': {
+      padding: '16px 14px',
+      fontSize: 17,
+    },
+  },
+  selectors: {
+    '&::-webkit-calendar-picker-indicator': {
+      filter: 'invert(1)',
+      opacity: 0.5,
+      cursor: 'pointer',
+    },
+  },
+});
+
 // ─── Web (native <input type="time">) ───────────────────────────────────────
 
 export const webInput = style({
@@ -21,7 +50,7 @@ export const webInput = style({
   colorScheme: 'dark',
   cursor: 'pointer',
   display: 'block',
-  textAlign: 'center',
+  // textAlign: 'center',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,
@@ -42,7 +71,7 @@ export const webInput = style({
 
 export const mobileWrapper = style({
   ...sharedBorder,
-  width: '100%',
+  // width: '100%',
   minWidth: 0,
   boxSizing: 'border-box',
   display: 'flex',
@@ -142,4 +171,5 @@ export const pickerLabel = style({
   marginBottom: 8,
   textTransform: 'uppercase',
   letterSpacing: '0.06em',
+  whiteSpace: 'nowrap',
 });

@@ -1,14 +1,11 @@
 // components/booking/StepDateTimeSelect.tsx
-import { useState } from 'react';
+import { DayPicker } from 'react-day-picker';
+import { isBefore } from 'date-fns';
 import type { Barber } from '../../types/database.types';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';
 import * as styles from '../../styles/booking.css';
-import * as pickerStyles from '../../styles/timePicker.css';
-
-const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
-const toLocalYYYYMMDD = (d: Date) =>
-  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+import * as calendarStyles from '../../styles/calendar.css';
 
 interface StepDateTimeSelectProps {
   selectedDate: Date | undefined;
@@ -39,82 +36,75 @@ export function StepDateTimeSelect({
   onTimeSelect,
   onBack,
 }: StepDateTimeSelectProps) {
-  const [dateError, setDateError] = useState('');
-
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (!value) {
-      onDateSelect(undefined);
-      setDateError('');
-      return;
-    }
-    const [y, m, d] = value.split('-').map(Number);
-    const date = new Date(y, m - 1, d);
-    if (!isDateAvailable(date)) {
-      setDateError('This date is unavailable. Please select another date.');
-      onDateSelect(undefined);
-    } else {
-      setDateError('');
-      onDateSelect(date);
-    }
-  };
-
   return (
     <View className={styles.stepContainer}>
       <button className={styles.backButton} onClick={onBack}>
         ← Back to Service
       </button>
 
-      <View className={styles.dateTimeStack}>
-        {/* DATE */}
-        <View className={styles.pickerSection}>
-          <Text className={pickerStyles.pickerLabel}>Date</Text>
-          <input
-            type="date"
-            className={pickerStyles.dateInput}
-            min={toLocalYYYYMMDD(today)}
-            max={toLocalYYYYMMDD(endMonth)}
-            value={selectedDate ? toLocalYYYYMMDD(selectedDate) : ''}
-            onChange={handleDateChange}
-            onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-          />
-          {dateError && (
-            <Text className={styles.noTimesMessage}>{dateError}</Text>
-          )}
+      <View className={calendarStyles.dateTimeLayout}>
+
+        {/* DATE COLUMN */}
+        <View className={calendarStyles.dateColumn}>
+          <View className={calendarStyles.calendarContainer}>
+            <DayPicker
+              mode="single"
+              selected={selectedDate}
+              onSelect={onDateSelect}
+              disabled={(date) => isBefore(date, today) || !isDateAvailable(date)}
+              startMonth={today}
+              endMonth={endMonth}
+              modifiers={{
+                unavailable: (date) => !isDateAvailable(date),
+              }}
+              classNames={{
+                root: calendarStyles.rdpRoot,
+                caption_label: calendarStyles.captionLabel,
+                nav: calendarStyles.nav,
+                day: calendarStyles.day,
+                day_button: calendarStyles.dayButton,
+              }}
+            />
+          </View>
         </View>
 
-        {/* TIME */}
+        {/* TIME COLUMN */}
         {selectedDate && (
-          <View className={styles.pickerSection}>
-            <Text className={styles.timeLabel}>
-              {selectedDate.toLocaleDateString('en-US', {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </Text>
-
-            {timeSlots.length > 0 ? (
-              <View className={styles.timeGrid}>
-                {timeSlots.map((time) => {
-                  const period =
-                    selectedBarber &&
-                    getTimePeriod(time, selectedBarber) === 'evening'
-                      ? ' (Evening)'
-                      : '';
-                  return (
-                    <button
-                      key={time}
-                      className={`${styles.timeButton} ${selectedTime === time ? styles.timeButtonActive : ''}`}
-                      onClick={() => onTimeSelect(time)}
-                    >
-                      {formatTimeTo12Hour(time)}
-                      {period}
-                    </button>
-                  );
+          <View className={styles.timeColumn}>
+            <View className={calendarStyles.calendarContainer}>
+              <Text className={styles.timeLabel}>
+                {selectedDate.toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  month: 'long',
+                  day: 'numeric',
                 })}
-              </View>
-            ) : (
+              </Text>
+
+              {timeSlots.length > 0 && (
+                <View className={styles.timeGrid}>
+                  {timeSlots.map((time) => {
+                    const timePeriodLabel = selectedBarber
+                      ? getTimePeriod(time, selectedBarber) === 'evening'
+                        ? ' (Evening)'
+                        : ''
+                      : '';
+
+                    return (
+                      <button
+                        key={time}
+                        className={`${styles.timeButton} ${selectedTime === time ? styles.timeButtonActive : ''}`}
+                        onClick={() => onTimeSelect(time)}
+                      >
+                        {formatTimeTo12Hour(time)}
+                        {timePeriodLabel}
+                      </button>
+                    );
+                  })}
+                </View>
+              )}
+            </View>
+
+            {timeSlots.length === 0 && (
               <Text className={styles.noTimesMessage}>
                 No available times. Please select another date.
               </Text>

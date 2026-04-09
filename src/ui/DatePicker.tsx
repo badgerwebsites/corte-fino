@@ -29,11 +29,10 @@ export function DatePicker({ value, onChange, onPreview, min, label, required }:
         onChange={(e) => {
           if (!e.target.value) return;
           onPreview?.(e.target.value);
+          onChange(e.target.value);
         }}
         onBlur={(e) => {
-          if (!e.target.value) return;
-          onPreview?.(e.target.value);
-          onChange(e.target.value);
+          if (!e.target.value && value) onChange('');
         }}
         className={styles.dateInput}
       />
