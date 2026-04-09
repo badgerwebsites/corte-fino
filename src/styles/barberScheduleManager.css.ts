@@ -7,6 +7,7 @@ export const headerTitle = style({
   fontWeight: 500,
   color: text_primary,
   marginBottom: 12,
+  textAlign: 'center',
 });
 
 export const scheduleToggleChevron = style({

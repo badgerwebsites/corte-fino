@@ -1,5 +1,5 @@
 // components/admin/BarberScheduleManager.tsx
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { Barber, BarberAvailability, BarberTimeOff } from '../../types/database.types';
 import { View } from '../../ui/View';
@@ -50,12 +50,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
   // Schedule state for each day
   const [schedules, setSchedules] = useState<Record<number, DaySchedule>>({});
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const debouncedSaveSchedule = (dayOfWeek: number, schedule: DaySchedule) => {
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => saveSchedule(dayOfWeek, schedule), 800);
-  };
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -399,20 +393,22 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                           label="Start Time"
                           value={schedule.startTime}
                           invalid={schedule.startTime >= schedule.endTime}
+                          onPreview={(val) => updateSchedule(day.value, { startTime: val })}
                           onChange={(val) => {
                             const updated = { ...schedule, startTime: val };
                             updateSchedule(day.value, { startTime: val });
-                            debouncedSaveSchedule(day.value, updated);
+                            saveSchedule(day.value, updated);
                           }}
                         />
                         <TimePicker
                           label="End Time"
                           value={schedule.endTime}
                           invalid={schedule.startTime >= schedule.endTime}
+                          onPreview={(val) => updateSchedule(day.value, { endTime: val })}
                           onChange={(val) => {
                             const updated = { ...schedule, endTime: val };
                             updateSchedule(day.value, { endTime: val });
-                            debouncedSaveSchedule(day.value, updated);
+                            saveSchedule(day.value, updated);
                           }}
                         />
                       </div>
@@ -454,20 +450,22 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                                     <TimePicker
                                       value={brk.startTime}
                                       invalid={brk.startTime >= brk.endTime}
+                                      onPreview={(val) => updateBreak(day.value, index, 'startTime', val)}
                                       onChange={(val) => {
                                         const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: val } : b);
                                         updateBreak(day.value, index, 'startTime', val);
-                                        debouncedSaveSchedule(day.value, { ...schedule, breaks: newBreaks });
+                                        saveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                       }}
                                     />
                                     <span className={scheduleStyles.breakSeparator}>-</span>
                                     <TimePicker
                                       value={brk.endTime}
                                       invalid={brk.startTime >= brk.endTime}
+                                      onPreview={(val) => updateBreak(day.value, index, 'endTime', val)}
                                       onChange={(val) => {
                                         const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: val } : b);
                                         updateBreak(day.value, index, 'endTime', val);
-                                        debouncedSaveSchedule(day.value, { ...schedule, breaks: newBreaks });
+                                        saveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                       }}
                                     />
                                   </div>
@@ -541,7 +539,7 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                 />
               </View>
 
-              <View className={styles.formGroup}>
+              <View className={styles.formGroup} style={{ marginTop: 16 }}>
                 <label className={styles.label}>Reason (Optional)</label>
                 <input
                   type="text"

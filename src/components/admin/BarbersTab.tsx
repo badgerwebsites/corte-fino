@@ -9,6 +9,7 @@ import { ImageUpload } from './ImageUpload';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';
 import * as styles from '../../styles/admin.css';
+import * as scheduleStyles from '../../styles/barberScheduleManager.css';
 
 const DEFAULT_BARBER_FORM = {
   name: '',
@@ -34,12 +35,6 @@ interface BarbersTabProps {
 
 export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection }: BarbersTabProps) {
   const rightColumnRef = useRef<HTMLDivElement>(null);
-  const pricingSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const debouncedSavePricing = (values: typeof pricingForm) => {
-    if (pricingSaveTimerRef.current) clearTimeout(pricingSaveTimerRef.current);
-    pricingSaveTimerRef.current = setTimeout(() => handleSavePricing(values), 800);
-  };
   const [editingBarber, setEditingBarber] = useState<Barber | null>(null);
   const [schedulingBarber, setSchedulingBarber] = useState<Barber | null>(null);
   const [barberForm, setBarberForm] = useState(DEFAULT_BARBER_FORM);
@@ -261,17 +256,18 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
 
           {schedulingBarber && (
             <BarberScheduleManager barbers={[schedulingBarber]} onUpdate={onUpdate} showSchedule={showSchedule} onReady={() => setShowSchedule(true)}>
-              <View>
+              <View className={scheduleStyles.timeOffForm}>
                 <View className={styles.pricingTimeline}>
                   <View className={styles.pricingTimeBlock}>
                     <TimePicker
                       label="Evening Pricing Starts"
                       value={pricingForm.evening_hours_start}
                       invalid={pricingForm.evening_hours_start >= pricingForm.evening_hours_end}
+                      onPreview={(val) => setPricingForm(f => ({ ...f, regular_hours_end: val, evening_hours_start: val }))}
                       onChange={(val) => {
                         const updated = { ...pricingForm, regular_hours_end: val, evening_hours_start: val };
                         setPricingForm(updated);
-                        debouncedSavePricing(updated);
+                        handleSavePricing(updated);
                       }}
                     />
                   </View>
@@ -280,10 +276,11 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
                       label="Evening Pricing Ends"
                       value={pricingForm.evening_hours_end}
                       invalid={pricingForm.evening_hours_start >= pricingForm.evening_hours_end}
+                      onPreview={(val) => setPricingForm(f => ({ ...f, evening_hours_end: val }))}
                       onChange={(val) => {
                         const updated = { ...pricingForm, evening_hours_end: val };
                         setPricingForm(updated);
-                        debouncedSavePricing(updated);
+                        handleSavePricing(updated);
                       }}
                     />
                   </View>

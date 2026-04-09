@@ -984,8 +984,6 @@ export const pricingTimeline = style({
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
   gap: 16,
-  maxWidth: 480,
-  margin: '0 auto',
   marginBottom: 12,
 });
 
