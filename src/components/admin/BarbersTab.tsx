@@ -76,6 +76,7 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
     try {
       const { error } = await supabase.from('barbers').update(values).eq('id', schedulingBarber.id);
       if (error) throw error;
+      setPricingForm(values);
       onUpdate();
     } catch (error) {
       console.error('Error saving pricing:', error);

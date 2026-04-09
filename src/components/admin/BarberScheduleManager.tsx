@@ -519,10 +519,11 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                 <View className={styles.formGroup}>
                   <label className={styles.label}>End Date</label>
                   <input
+                    key={endDateMin}
                     ref={endDateRef}
                     type="date"
                     className={scheduleStyles.timeInput}
-                    defaultValue={today}
+                    defaultValue={endDateMin}
                     min={endDateMin}
                     required
                   />

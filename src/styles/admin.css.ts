@@ -999,6 +999,7 @@ export const pricingTimeBlock = style({
   display: 'flex',
   flexDirection: 'column',
   gap: 4,
+  marginTop: 4,
 });
 
 export const pricingTimeLabel = style({
