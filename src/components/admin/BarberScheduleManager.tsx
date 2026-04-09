@@ -231,15 +231,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
     saveSchedule(dayOfWeek, newSchedule);
   };
 
-  const updateBreak = (dayOfWeek: number, breakIndex: number, field: 'startTime' | 'endTime', value: string) => {
-    const schedule = schedules[dayOfWeek];
-    if (!schedule) return;
-
-    const newBreaks = [...schedule.breaks];
-    newBreaks[breakIndex] = { ...newBreaks[breakIndex], [field]: value };
-    updateSchedule(dayOfWeek, { breaks: newBreaks });
-  };
-
   const removeBreak = (dayOfWeek: number, breakIndex: number) => {
     const schedule = schedules[dayOfWeek];
     if (!schedule) return;
@@ -388,12 +379,10 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                             Start Time
                           </label>
                           <input
+                            key={schedule.startTime}
                             type="time"
                             step={300}
-                            value={schedule.startTime}
-                            onChange={(e) =>
-                              updateSchedule(day.value, { startTime: e.target.value })
-                            }
+                            defaultValue={schedule.startTime}
                             onBlur={(e) =>
                               saveSchedule(day.value, { ...schedule, startTime: e.target.value })
                             }
@@ -406,12 +395,10 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                             End Time
                           </label>
                           <input
+                            key={schedule.endTime}
                             type="time"
                             step={300}
-                            value={schedule.endTime}
-                            onChange={(e) =>
-                              updateSchedule(day.value, { endTime: e.target.value })
-                            }
+                            defaultValue={schedule.endTime}
                             onBlur={(e) =>
                               saveSchedule(day.value, { ...schedule, endTime: e.target.value })
                             }
@@ -451,10 +438,10 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                               >
                                 <div className={scheduleStyles.breakInputGroup}>
                                   <input
+                                    key={`${index}-start-${brk.startTime}`}
                                     type="time"
                                     step={300}
-                                    value={brk.startTime}
-                                    onChange={(e) => updateBreak(day.value, index, 'startTime', e.target.value)}
+                                    defaultValue={brk.startTime}
                                     onBlur={(e) => {
                                       const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: e.target.value } : b);
                                       saveSchedule(day.value, { ...schedule, breaks: newBreaks });
@@ -463,10 +450,10 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                                   />
                                   <span className={scheduleStyles.breakSeparator}>-</span>
                                   <input
+                                    key={`${index}-end-${brk.endTime}`}
                                     type="time"
                                     step={300}
-                                    value={brk.endTime}
-                                    onChange={(e) => updateBreak(day.value, index, 'endTime', e.target.value)}
+                                    defaultValue={brk.endTime}
                                     onBlur={(e) => {
                                       const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: e.target.value } : b);
                                       saveSchedule(day.value, { ...schedule, breaks: newBreaks });
