@@ -110,7 +110,7 @@ export const mobileSelect = style({
 
 export const mobileSelectPeriod = style({
   flex: '0 0 auto',
-  width: 42,
+  // width: 42,
 });
 
 export const mobileColon = style({
@@ -134,6 +134,9 @@ export const dateInput = style({
   colorScheme: 'dark',
   cursor: 'pointer',
   display: 'block',
+  // Remove native control skin on iOS so our bg/border render correctly
+  appearance: 'none',
+  WebkitAppearance: 'none',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,
