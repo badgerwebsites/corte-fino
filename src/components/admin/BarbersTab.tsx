@@ -259,7 +259,6 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
                       value={pricingForm.evening_hours_start}
                       onChange={(e) => setPricingForm({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
                       onBlur={(e) => handleSavePricing({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
-                      onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     />
                   </View>
                   <View className={styles.pricingTimeArrow}>→</View>
@@ -272,7 +271,6 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
                       value={pricingForm.evening_hours_end}
                       onChange={(e) => setPricingForm({ ...pricingForm, evening_hours_end: e.target.value })}
                       onBlur={(e) => handleSavePricing({ ...pricingForm, evening_hours_end: e.target.value })}
-                      onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     />
                   </View>
                 </View>

@@ -397,7 +397,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                             onBlur={(e) =>
                               saveSchedule(day.value, { ...schedule, startTime: e.target.value })
                             }
-                            onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                             className={scheduleStyles.timeInput}
                           />
                         </div>
@@ -416,7 +415,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                             onBlur={(e) =>
                               saveSchedule(day.value, { ...schedule, endTime: e.target.value })
                             }
-                            onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                             className={scheduleStyles.timeInput}
                           />
                         </div>
@@ -461,7 +459,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                                       const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: e.target.value } : b);
                                       saveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                     }}
-                                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                                     className={scheduleStyles.breakInput}
                                   />
                                   <span className={scheduleStyles.breakSeparator}>-</span>
@@ -474,7 +471,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                                       const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: e.target.value } : b);
                                       saveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                     }}
-                                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                                     className={scheduleStyles.breakInput}
                                   />
                                 </div>
@@ -537,7 +533,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                         end_date: timeOffForm.end_date < e.target.value ? e.target.value : timeOffForm.end_date,
                       })
                     }
-                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     required
                   />
                 </View>
@@ -555,7 +550,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                         end_date: e.target.value,
                       })
                     }
-                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     required
                   />
                 </View>

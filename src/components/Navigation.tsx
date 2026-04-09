@@ -94,7 +94,12 @@ export function Navigation() {
 
   const handleLogout = async () => {
     localStorage.removeItem('adminActiveTab');
-    await supabase.auth.signOut();
+    localStorage.removeItem('cf_customer_cache');
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // session may already be invalid after a new deploy — redirect regardless
+    }
     window.location.href = '/login';
   };
 
