@@ -1,5 +1,5 @@
 // components/admin/BarberScheduleManager.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { Barber, BarberAvailability, BarberTimeOff } from '../../types/database.types';
 import { View } from '../../ui/View';
@@ -51,12 +51,11 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
   const today = new Date().toISOString().split('T')[0];
 
-  // Time off form state
-  const [timeOffForm, setTimeOffForm] = useState({
-    start_date: today,
-    end_date: today,
-    reason: '',
-  });
+  const [timeOffFormKey, setTimeOffFormKey] = useState(0);
+  const [endDateMin, setEndDateMin] = useState(today);
+  const startDateRef = useRef<HTMLInputElement>(null);
+  const endDateRef = useRef<HTMLInputElement>(null);
+  const reasonRef = useRef<HTMLInputElement>(null);
 
   // Auto-select the barber if only one is provided
   useEffect(() => {
@@ -263,7 +262,11 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
     e.preventDefault();
     if (!selectedBarber) return;
 
-    if (!timeOffForm.start_date || !timeOffForm.end_date) {
+    const start_date = startDateRef.current?.value ?? '';
+    const end_date = endDateRef.current?.value ?? '';
+    const reason = reasonRef.current?.value ?? '';
+
+    if (!start_date || !end_date) {
       alert('Please fill in both start and end dates');
       return;
     }
@@ -273,22 +276,17 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
         .from('barber_time_off')
         .insert({
           barber_id: selectedBarber.id,
-          start_date: timeOffForm.start_date,
-          end_date: timeOffForm.end_date,
-          reason: timeOffForm.reason || null,
+          start_date,
+          end_date,
+          reason: reason || null,
         });
 
       if (error) throw error;
 
-      setTimeOffForm({
-        start_date: '',
-        end_date: '',
-        reason: '',
-      });
-
+      setTimeOffFormKey(k => k + 1);
+      setEndDateMin(today);
       loadBarberSchedule(selectedBarber.id, true);
       onUpdate();
-      // alert('Time off added successfully!');
     } catch (error) {
       console.error('Error adding time off:', error);
       alert('Failed to add time off');
@@ -503,23 +501,17 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
               Time Off / Vacation Days
             </h3>
 
-            <form onSubmit={handleAddTimeOff} className={styles.form}>
+            <form key={timeOffFormKey} onSubmit={handleAddTimeOff} className={styles.form}>
               <View className={styles.formRow}>
                 <View className={styles.formGroup}>
                   <label className={styles.label}>Start Date</label>
                   <input
+                    ref={startDateRef}
                     type="date"
                     className={scheduleStyles.timeInput}
-                    value={timeOffForm.start_date}
+                    defaultValue={today}
                     min={today}
-                    onChange={(e) =>
-                      setTimeOffForm({
-                        ...timeOffForm,
-                        start_date: e.target.value,
-                        // if end is now before the new start, bump it forward
-                        end_date: timeOffForm.end_date < e.target.value ? e.target.value : timeOffForm.end_date,
-                      })
-                    }
+                    onChange={(e) => setEndDateMin(e.target.value || today)}
                     required
                   />
                 </View>
@@ -527,16 +519,11 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                 <View className={styles.formGroup}>
                   <label className={styles.label}>End Date</label>
                   <input
+                    ref={endDateRef}
                     type="date"
                     className={scheduleStyles.timeInput}
-                    value={timeOffForm.end_date}
-                    min={timeOffForm.start_date || today}
-                    onChange={(e) =>
-                      setTimeOffForm({
-                        ...timeOffForm,
-                        end_date: e.target.value,
-                      })
-                    }
+                    defaultValue={today}
+                    min={endDateMin}
                     required
                   />
                 </View>
@@ -545,16 +532,10 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
               <View className={styles.formGroup}>
                 <label className={styles.label}>Reason (Optional)</label>
                 <input
+                  ref={reasonRef}
                   type="text"
                   className={styles.input}
                   placeholder="Vacation, Personal, Sick Leave"
-                  value={timeOffForm.reason}
-                  onChange={(e) =>
-                    setTimeOffForm({
-                      ...timeOffForm,
-                      reason: e.target.value,
-                    })
-                  }
                 />
               </View>
 

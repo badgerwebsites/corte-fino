@@ -223,7 +223,7 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
                 className={styles.scheduleToggleButton}
                 onClick={() => setShowSchedule(v => !v)}
               >
-                {schedulingBarber.name.split(' ')[0]}'s Weekly Schedule
+                {schedulingBarber.name.split(' ')[0]}'s Schedule
                 <ChevronDown
                   size={20}
                   className={styles.addToggleChevron}
