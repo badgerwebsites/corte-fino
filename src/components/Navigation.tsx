@@ -7,10 +7,6 @@ import * as styles from '../styles/navigation.css';
 
 export function Navigation() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(
-    window.matchMedia('(min-width: 768px)').matches
-  );
-
   const [logoIndex, setLogoIndex] = useState(0);
   const [carouselLogos, setCarouselLogos] = useState<(string | null)[]>([null, null, null]);
 
@@ -84,14 +80,6 @@ export function Navigation() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const media = window.matchMedia('(min-width: 768px)');
-    const handler = () => setIsDesktop(media.matches);
-
-    media.addEventListener('change', handler);
-    return () => media.removeEventListener('change', handler);
-  }, []);
-
   const handleLogout = async () => {
     localStorage.removeItem('adminActiveTab');
     localStorage.removeItem('cf_customer_cache');
@@ -146,15 +134,6 @@ export function Navigation() {
                 Logout
               </button>
             )
-          ) : isDesktop ? (
-            <a
-              href="/login"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.loginButton}
-            >
-              Login
-            </a>
           ) : (
             <Link
               to="/login"

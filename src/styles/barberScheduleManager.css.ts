@@ -115,27 +115,22 @@ export const timeLabel = style({
   letterSpacing: '0.05em',
 });
 
-export const timeInput = style({
+const scheduleInputBase = {
   width: '100%',
   minWidth: 0,
   backgroundColor: darker_bg,
   color: text_primary,
-  border: `1px solid ${text_secondary}`,
-  boxSizing: 'border-box',
-  padding: '12px 8px',
+  boxSizing: 'border-box' as const,
+  padding: '8px 6px',
   borderRadius: 8,
-  fontSize: 16,
+  fontSize: 15,
   fontFamily: 'inherit',
-  colorScheme: 'dark',
-  cursor: 'pointer',
-  position: 'relative',
-  ':focus': {
-    outline: 'none',
-    border: `1px solid ${text_secondary}`,
-  },
+  colorScheme: 'dark' as const,
+  cursor: 'pointer' as const,
+  position: 'relative' as const,
   selectors: {
     '&::-webkit-calendar-picker-indicator': {
-      position: 'absolute',
+      position: 'absolute' as const,
       top: 0,
       left: 0,
       right: 0,
@@ -143,8 +138,23 @@ export const timeInput = style({
       width: '100%',
       height: '100%',
       opacity: 0,
-      cursor: 'pointer',
+      cursor: 'pointer' as const,
     },
+  },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '12px 8px',
+      fontSize: 16,
+    },
+  },
+};
+
+export const timeInput = style({
+  ...scheduleInputBase,
+  border: `1px solid ${text_secondary}`,
+  ':focus': {
+    outline: 'none',
+    border: `1px solid ${text_secondary}`,
   },
 });
 
@@ -209,35 +219,11 @@ export const breakInputGroup = style({
 });
 
 export const breakInput = style({
-  width: '100%',
-  minWidth: 0,
-  backgroundColor: darker_bg,
-  color: text_primary,
+  ...scheduleInputBase,
   border: `1px solid ${text_secondary}`,
-  boxSizing: 'border-box',
-  padding: '12px 8px',
-  borderRadius: 8,
-  fontSize: 16,
-  fontFamily: 'inherit',
-  colorScheme: 'dark',
-  cursor: 'pointer',
-  position: 'relative',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,
-  },
-  selectors: {
-    '&::-webkit-calendar-picker-indicator': {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      width: '100%',
-      height: '100%',
-      opacity: 0,
-      cursor: 'pointer',
-    },
   },
 });
 
@@ -256,35 +242,11 @@ export const breakSeparator = style({
 });
 
 export const breakInputInvalid = style({
-  width: '100%',
-  minWidth: 0,
-  backgroundColor: darker_bg,
-  color: text_primary,
+  ...scheduleInputBase,
   border: '1px solid #dc2626',
-  boxSizing: 'border-box',
-  padding: '12px 8px',
-  borderRadius: 8,
-  fontSize: 16,
-  fontFamily: 'inherit',
-  colorScheme: 'dark',
-  cursor: 'pointer',
-  position: 'relative',
   ':focus': {
     outline: 'none',
     border: '1px solid #dc2626',
-  },
-  selectors: {
-    '&::-webkit-calendar-picker-indicator': {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      width: '100%',
-      height: '100%',
-      opacity: 0,
-      cursor: 'pointer',
-    },
   },
 });
 

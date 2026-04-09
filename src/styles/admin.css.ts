@@ -1011,26 +1011,25 @@ export const pricingTimeLabel = style({
   marginBottom: 4,
 });
 
-export const timeInput = style({
+const timeInputBase = {
   width: '100%',
+  minWidth: 0,
   backgroundColor: darker_bg,
   color: text_primary,
-  border: `1px solid ${text_secondary}`,
-  boxSizing: 'border-box',
-  padding: '12px 8px',
+  boxSizing: 'border-box' as const,
+  padding: '8px 6px',
   borderRadius: 8,
-  fontSize: 16,
+  fontSize: 15,
   fontFamily: 'inherit',
-  colorScheme: 'dark',
-  cursor: 'pointer',
-  position: 'relative',
+  colorScheme: 'dark' as const,
+  cursor: 'pointer' as const,
+  position: 'relative' as const,
   ':focus': {
     outline: 'none',
-    border: `1px solid ${text_secondary}`,
   },
   selectors: {
     '&::-webkit-calendar-picker-indicator': {
-      position: 'absolute',
+      position: 'absolute' as const,
       top: 0,
       left: 0,
       right: 0,
@@ -1038,9 +1037,40 @@ export const timeInput = style({
       width: '100%',
       height: '100%',
       opacity: 0,
-      cursor: 'pointer',
+      cursor: 'pointer' as const,
     },
   },
+  '@media': {
+    'screen and (min-width: 768px)': {
+      padding: '12px 8px',
+      fontSize: 16,
+    },
+  },
+};
+
+export const timeInput = style({
+  ...timeInputBase,
+  border: `1px solid ${text_secondary}`,
+  ':focus': {
+    outline: 'none',
+    border: `1px solid ${text_secondary}`,
+  },
+});
+
+export const timeInputInvalid = style({
+  ...timeInputBase,
+  border: '1px solid #dc2626',
+  ':focus': {
+    outline: 'none',
+    border: '1px solid #dc2626',
+  },
+});
+
+export const pricingWarning = style({
+  fontSize: 14,
+  color: '#dc2626',
+  marginTop: 6,
+  marginLeft: 2,
 });
 
 export const pricingTimeArrow = style({

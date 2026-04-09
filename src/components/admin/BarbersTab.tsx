@@ -5,6 +5,7 @@ import type { Barber } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 import { BarberScheduleManager } from './BarberScheduleManager';
 import { ImageUpload } from './ImageUpload';
+import { TimeSelect } from '../../ui/TimeSelect';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';
 import * as styles from '../../styles/admin.css';
@@ -253,34 +254,37 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
                 <View className={styles.pricingTimeline}>
                   <View className={styles.pricingTimeBlock}>
                     <label className={styles.pricingTimeLabel}>Evening Pricing Starts</label>
-                    <input
-                      type="time"
-                      step={300}
-                      className={styles.timeInput}
+                    <TimeSelect
                       value={pricingForm.evening_hours_start}
-                      onChange={(e) => {
-                        const updated = { ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value };
+                      invalid={pricingForm.evening_hours_start >= pricingForm.evening_hours_end}
+                      onChange={(val) => {
+                        const updated = { ...pricingForm, regular_hours_end: val, evening_hours_start: val };
                         setPricingForm(updated);
-                        handleSavePricing(updated);
+                        if (val < updated.evening_hours_end) handleSavePricing(updated);
                       }}
                     />
                   </View>
                   <View className={styles.pricingTimeArrow}>→</View>
                   <View className={styles.pricingTimeBlock}>
                     <label className={styles.pricingTimeLabel}>Evening Pricing Ends</label>
-                    <input
-                      type="time"
-                      step={300}
-                      className={styles.timeInput}
+                    <TimeSelect
                       value={pricingForm.evening_hours_end}
-                      onChange={(e) => {
-                        const updated = { ...pricingForm, evening_hours_end: e.target.value };
+                      invalid={pricingForm.evening_hours_start >= pricingForm.evening_hours_end}
+                      onChange={(val) => {
+                        const updated = { ...pricingForm, evening_hours_end: val };
                         setPricingForm(updated);
-                        handleSavePricing(updated);
+                        if (pricingForm.evening_hours_start < val) handleSavePricing(updated);
                       }}
                     />
                   </View>
                 </View>
+                {pricingForm.evening_hours_start >= pricingForm.evening_hours_end && (
+                  <p className={styles.pricingWarning}>
+                    {pricingForm.evening_hours_start === pricingForm.evening_hours_end
+                      ? 'Start and end time cannot be the same'
+                      : 'Start time must be before end time'}
+                  </p>
+                )}
               </View>
             </BarberScheduleManager>
           )}
