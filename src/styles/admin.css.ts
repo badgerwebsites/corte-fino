@@ -120,7 +120,7 @@ export const addToggleButton = style({
   border: 'none',
   padding: 0,
   cursor: 'pointer',
-  fontSize: 20,
+  fontSize: 18,
   fontWeight: 500,
   color: text_primary,
   '@media': {
@@ -138,7 +138,7 @@ export const scheduleToggleButton = style({
   border: 'none',
   padding: 0,
   cursor: 'pointer',
-  fontSize: 20,
+  fontSize: 18,
   fontWeight: 500,
   color: text_primary,
   '@media': {
@@ -520,12 +520,6 @@ export const formRow = style({
       gap: 16,
     },
   },
-});
-
-export const formRowAlways = style({
-  display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  gap: 16,
 });
 
 export const label = style({
@@ -981,13 +975,21 @@ export const pricingPeriodsTitle = style({
 });
 
 export const pricingTimeline = style({
-  display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  gap: 16,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
   marginBottom: 12,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      gap: '0.75rem',
+    },
+  },
 });
 
 export const pricingTimeBlock = style({
+  flex: 1,
   display: 'flex',
   flexDirection: 'column',
   gap: 4,
@@ -999,7 +1001,6 @@ export const pricingTimeLabel = style({
   color: text_secondary,
   textTransform: 'uppercase',
   letterSpacing: '0.03em',
-  marginBottom: 4,
 });
 
 export const timeInput = style({
@@ -1008,48 +1009,42 @@ export const timeInput = style({
   color: text_primary,
   border: `1px solid ${text_secondary}`,
   boxSizing: 'border-box',
-  padding: '8px 4px',
+  padding: '12px 8px',
   borderRadius: 8,
-  fontSize: 14,
+  fontSize: 16,
   fontFamily: 'inherit',
   colorScheme: 'dark',
   cursor: 'pointer',
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
+  WebkitAppearance: 'none',
+  appearance: 'none',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,
   },
-  '@media': {
-    'screen and (min-width: 480px)': {
-      padding: '12px 8px',
-      fontSize: 16,
-    },
-  },
   selectors: {
-    '&::-webkit-clear-button': {
+    '&::-webkit-calendar-picker-indicator': {
       display: 'none',
     },
-    '&::-webkit-inner-spin-button': {
-      display: 'none',
+    '&::selection': {
+      background: 'transparent',
     },
   },
 });
 
 export const pricingTimeArrow = style({
   display: 'none',
-});
-
-export const timeInputInvalid = style({
-  border: '1px solid #dc2626',
-  ':focus': {
-    outline: 'none',
-    border: '1px solid #dc2626',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: text_secondary,
+      fontSize: 20,
+      paddingBottom: '0.5rem',
+    },
   },
-});
-
-export const pricingWarning = style({
-  fontSize: 15,
-  color: '#dc2626',
-  marginTop: 4,
 });
 
 export const checkboxLabel = style({
@@ -1064,7 +1059,7 @@ export const checkboxLabel = style({
 });
 
 export const checkbox = style({
-  transform: 'scale(1.4)',
+  transform: 'scale(1.5)',
   transformOrigin: 'left center',
   cursor: 'pointer',
   accentColor: accent,

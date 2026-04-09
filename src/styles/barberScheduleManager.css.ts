@@ -4,10 +4,9 @@ import { darker_bg, dark_bg, button, accent, text_primary, text_secondary, text_
 
 export const headerTitle = style({
   fontSize: 20,
-  fontWeight: 500,
+  fontWeight: 600,
   color: text_primary,
   marginBottom: 12,
-  textAlign: 'center',
 });
 
 export const scheduleToggleChevron = style({
@@ -100,13 +99,11 @@ export const saveDayOffButton = style({
 
 export const workingHoursCard = style({
   display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  gap: 16,
-  maxWidth: 480,
-  margin: '0 auto',
+  gridTemplateColumns: '1fr',
+  gap: 12,
   '@media': {
-    'screen and (max-width: 380px)': {
-      gridTemplateColumns: '1fr',
+    'screen and (min-width: 480px)': {
+      gridTemplateColumns: '1fr 1fr',
     },
   },
 });
@@ -128,28 +125,26 @@ export const timeInput = style({
   color: text_primary,
   border: `1px solid ${text_secondary}`,
   boxSizing: 'border-box',
-  padding: '8px 4px',
+  padding: '12px 8px',
   borderRadius: 8,
-  fontSize: 14,
+  fontSize: 16,
   fontFamily: 'inherit',
   colorScheme: 'dark',
   cursor: 'pointer',
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
+  WebkitAppearance: 'none',
+  appearance: 'none',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,
   },
-  '@media': {
-    'screen and (min-width: 480px)': {
-      padding: '12px 8px',
-      fontSize: 16,
-    },
-  },
   selectors: {
-    '&::-webkit-clear-button': {
+    '&::-webkit-calendar-picker-indicator': {
       display: 'none',
     },
-    '&::-webkit-inner-spin-button': {
-      display: 'none',
+    '&::selection': {
+      background: 'transparent',
     },
   },
 });
@@ -158,11 +153,6 @@ export const centerButton = style({
   display: 'flex',
   justifyContent: 'center',
   paddingTop: 8,
-});
-
-export const timeOffForm = style({
-  maxWidth: 480,
-  margin: '0 auto',
 });
 
 export const breaksCard = style({
@@ -202,31 +192,19 @@ export const addBreakButton = style({
 
 export const breakRow = style({
   display: 'flex',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   gap: 8,
   width: '100%',
-  maxWidth: 480,
-  margin: '0 auto',
-});
-
-export const breakRowInner = style({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  minWidth: 0,
 });
 
 export const breakInputGroup = style({
   display: 'grid',
-  gridTemplateColumns: '1fr',
+  gridTemplateColumns: '1fr auto 1fr',
   alignItems: 'center',
   gap: 4,
+  flex: 1,
   minWidth: 0,
-  '@media': {
-    'screen and (min-width: 380px)': {
-      gridTemplateColumns: '1fr auto 1fr',
-    },
-  },
+  overflow: 'hidden',
 });
 
 export const breakInput = style({
@@ -236,42 +214,45 @@ export const breakInput = style({
   color: text_primary,
   border: `1px solid ${text_secondary}`,
   boxSizing: 'border-box',
-  padding: '8px 4px',
+  padding: '12px 8px',
   borderRadius: 8,
   fontSize: 14,
   fontFamily: 'inherit',
   colorScheme: 'dark',
   cursor: 'pointer',
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
+  WebkitAppearance: 'none',
+  appearance: 'none',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,
   },
-  '@media': {
-    'screen and (min-width: 480px)': {
-      padding: '12px 8px',
-      fontSize: 16,
+  selectors: {
+    '&::-webkit-calendar-picker-indicator': {
+      display: 'none',
+    },
+    '&::selection': {
+      background: 'transparent',
     },
   },
-  selectors: {
-    '&::-webkit-clear-button': {
-      display: 'none',
-    },
-    '&::-webkit-inner-spin-button': {
-      display: 'none',
+  '@media': {
+    'screen and (min-width: 768px)': {
+      fontSize: 16,
     },
   },
 });
 
 export const breakSeparator = style({
-  display: 'none',
-  padding: '0 8px',
+  display: 'flex',
+  padding: 4,
   justifyContent: 'center',
   alignItems: 'center',
   color: text_secondary,
   fontSize: 16,
   '@media': {
-    'screen and (min-width: 380px)': {
-      display: 'flex',
+    'screen and (min-width: 768px)': {
+      padding: 8,
     },
   },
 });
@@ -281,8 +262,6 @@ export const removeBreakButton = style({
   color: '#dc2626',
   border: 'none',
   cursor: 'pointer',
-  paddingTop: 12,
-  flexShrink: 0,
 });
 
 export const scheduleSummary = style({
@@ -338,19 +317,4 @@ export const deleteTimeOffButton = style({
   ':hover': {
     backgroundColor: '#fcb3b3',
   },
-});
-
-export const timeInputInvalid = style({
-  border: '1px solid #dc2626',
-  ':focus': {
-    outline: 'none',
-    border: '1px solid #dc2626',
-  },
-});
-
-export const timeWarning = style({
-  fontSize: 15,
-  color: '#dc2626',
-  marginTop: 4,
-  marginLeft: 8,
 });

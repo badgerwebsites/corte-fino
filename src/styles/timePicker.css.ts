@@ -45,7 +45,7 @@ export const webInput = style({
   boxSizing: 'border-box',
   color: text_primary,
   padding: '10px 6px',
-  fontSize: 15,
+  fontSize: 16,
   fontFamily: 'inherit',
   colorScheme: 'dark',
   cursor: 'pointer',
@@ -134,9 +134,6 @@ export const dateInput = style({
   colorScheme: 'dark',
   cursor: 'pointer',
   display: 'block',
-  // Remove native control skin on iOS so our bg/border render correctly
-  appearance: 'none',
-  WebkitAppearance: 'none',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,

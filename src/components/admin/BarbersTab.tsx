@@ -4,12 +4,10 @@ import { ChevronDown } from 'lucide-react';
 import type { Barber } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 import { BarberScheduleManager } from './BarberScheduleManager';
-import { TimePicker } from '../../ui/TimePicker';
 import { ImageUpload } from './ImageUpload';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';
 import * as styles from '../../styles/admin.css';
-import * as scheduleStyles from '../../styles/barberScheduleManager.css';
 
 const DEFAULT_BARBER_FORM = {
   name: '',
@@ -64,17 +62,11 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
 
   useEffect(() => {
     if (schedulingBarber) {
-      // Normalize to HH:MM — Supabase returns "HH:MM:SS" from Postgres TIME columns
-      const t = (s: string) => s.slice(0, 5);
-      setPricingForm(prev => {
-        const inProgress = prev.evening_hours_start >= prev.evening_hours_end;
-        if (inProgress) return prev;
-        return {
-          regular_hours_start: t(schedulingBarber.regular_hours_start),
-          regular_hours_end: t(schedulingBarber.regular_hours_end),
-          evening_hours_start: t(schedulingBarber.evening_hours_start),
-          evening_hours_end: t(schedulingBarber.evening_hours_end),
-        };
+      setPricingForm({
+        regular_hours_start: schedulingBarber.regular_hours_start,
+        regular_hours_end: schedulingBarber.regular_hours_end,
+        evening_hours_start: schedulingBarber.evening_hours_start,
+        evening_hours_end: schedulingBarber.evening_hours_end,
       });
     }
   }, [schedulingBarber]);
@@ -256,38 +248,34 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
 
           {schedulingBarber && (
             <BarberScheduleManager barbers={[schedulingBarber]} onUpdate={onUpdate} showSchedule={showSchedule} onReady={() => setShowSchedule(true)}>
-              <View className={scheduleStyles.timeOffForm}>
+              <View>
                 <View className={styles.pricingTimeline}>
                   <View className={styles.pricingTimeBlock}>
-                    <TimePicker
-                      label="Evening Pricing Starts"
+                    <label className={styles.pricingTimeLabel}>Evening Pricing Starts</label>
+                    <input
+                      type="time"
+                      step={300}
+                      className={styles.timeInput}
                       value={pricingForm.evening_hours_start}
-                      invalid={pricingForm.evening_hours_start >= pricingForm.evening_hours_end}
-                      onPreview={(val) => setPricingForm(f => ({ ...f, regular_hours_end: val, evening_hours_start: val }))}
-                      onChange={(val) => {
-                        const updated = { ...pricingForm, regular_hours_end: val, evening_hours_start: val };
-                        setPricingForm(updated);
-                        handleSavePricing(updated);
-                      }}
+                      onChange={(e) => setPricingForm({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
+                      onBlur={(e) => handleSavePricing({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
+                      onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     />
                   </View>
+                  <View className={styles.pricingTimeArrow}>→</View>
                   <View className={styles.pricingTimeBlock}>
-                    <TimePicker
-                      label="Evening Pricing Ends"
+                    <label className={styles.pricingTimeLabel}>Evening Pricing Ends</label>
+                    <input
+                      type="time"
+                      step={300}
+                      className={styles.timeInput}
                       value={pricingForm.evening_hours_end}
-                      invalid={pricingForm.evening_hours_start >= pricingForm.evening_hours_end}
-                      onPreview={(val) => setPricingForm(f => ({ ...f, evening_hours_end: val }))}
-                      onChange={(val) => {
-                        const updated = { ...pricingForm, evening_hours_end: val };
-                        setPricingForm(updated);
-                        handleSavePricing(updated);
-                      }}
+                      onChange={(e) => setPricingForm({ ...pricingForm, evening_hours_end: e.target.value })}
+                      onBlur={(e) => handleSavePricing({ ...pricingForm, evening_hours_end: e.target.value })}
+                      onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                     />
                   </View>
                 </View>
-                {pricingForm.evening_hours_start >= pricingForm.evening_hours_end && (
-                  <p className={styles.pricingWarning}>Start time must be before end time</p>
-                )}
               </View>
             </BarberScheduleManager>
           )}
