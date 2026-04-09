@@ -504,7 +504,14 @@ export const form = style({
 });
 
 export const formGroup = style({
+  width: '100%',
+  maxWidth: 240,
   marginBottom: 12,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      maxWidth: 'unset',
+    },
+  },
 });
 
 export const formGroupWide = style({
@@ -514,9 +521,12 @@ export const formGroupWide = style({
 export const formRow = style({
   display: 'grid',
   gridTemplateColumns: '1fr',
+  justifyItems: 'center',
+  gap: 0,
   '@media': {
     'screen and (min-width: 768px)': {
       gridTemplateColumns: '1fr 1fr',
+      justifyItems: 'stretch',
       gap: 16,
     },
   },
@@ -983,6 +993,7 @@ export const pricingPeriodsTitle = style({
 export const pricingTimeline = style({
   display: 'flex',
   flexDirection: 'column',
+  alignItems: 'center',
   gap: '1rem',
   marginBottom: 12,
   '@media': {
@@ -996,10 +1007,16 @@ export const pricingTimeline = style({
 
 export const pricingTimeBlock = style({
   flex: 1,
-  minWidth: 0,
+  width: '100%',
+  maxWidth: 240,
   display: 'flex',
   flexDirection: 'column',
   gap: 4,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      maxWidth: 'unset',
+    },
+  },
 });
 
 export const pricingTimeLabel = style({
@@ -1013,7 +1030,6 @@ export const pricingTimeLabel = style({
 
 export const timeInput = style({
   width: '100%',
-  minWidth: 0,
   backgroundColor: darker_bg,
   color: text_primary,
   border: `1px solid ${text_secondary}`,
@@ -1032,6 +1048,14 @@ export const timeInput = style({
     'screen and (min-width: 480px)': {
       padding: '12px 8px',
       fontSize: 16,
+    },
+  },
+  selectors: {
+    '&::-webkit-clear-button': {
+      display: 'none',
+    },
+    '&::-webkit-inner-spin-button': {
+      display: 'none',
     },
   },
 });

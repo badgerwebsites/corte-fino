@@ -1,5 +1,5 @@
 // components/admin/BarberScheduleManager.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { Barber, BarberAvailability, BarberTimeOff } from '../../types/database.types';
 import { View } from '../../ui/View';
@@ -48,6 +48,12 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
   // Schedule state for each day
   const [schedules, setSchedules] = useState<Record<number, DaySchedule>>({});
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const debouncedSaveSchedule = (dayOfWeek: number, schedule: DaySchedule) => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => saveSchedule(dayOfWeek, schedule), 800);
+  };
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -397,10 +403,10 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                             value={schedule.startTime}
                             onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
                             onChange={(e) => {
-                              if (e.target.value) updateSchedule(day.value, { startTime: e.target.value });
-                            }}
-                            onBlur={(e) => {
-                              if (e.target.value && e.target.value < schedule.endTime) saveSchedule(day.value, { ...schedule, startTime: e.target.value });
+                              if (!e.target.value) return;
+                              const updated = { ...schedule, startTime: e.target.value };
+                              updateSchedule(day.value, { startTime: e.target.value });
+                              debouncedSaveSchedule(day.value, updated);
                             }}
                             className={`${scheduleStyles.timeInput}${schedule.startTime >= schedule.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
                           />
@@ -416,10 +422,10 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                             value={schedule.endTime}
                             onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
                             onChange={(e) => {
-                              if (e.target.value) updateSchedule(day.value, { endTime: e.target.value });
-                            }}
-                            onBlur={(e) => {
-                              if (e.target.value && schedule.startTime < e.target.value) saveSchedule(day.value, { ...schedule, endTime: e.target.value });
+                              if (!e.target.value) return;
+                              const updated = { ...schedule, endTime: e.target.value };
+                              updateSchedule(day.value, { endTime: e.target.value });
+                              debouncedSaveSchedule(day.value, updated);
                             }}
                             className={`${scheduleStyles.timeInput}${schedule.startTime >= schedule.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
                           />
@@ -465,12 +471,11 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                                       step={300}
                                       value={brk.startTime}
                                       onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                                      onChange={(e) => { if (e.target.value) updateBreak(day.value, index, 'startTime', e.target.value); }}
-                                      onBlur={(e) => {
+                                      onChange={(e) => {
                                         if (!e.target.value) return;
                                         const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: e.target.value } : b);
-                                        const updated = { ...schedule, breaks: newBreaks };
-                                        if (e.target.value < updated.breaks[index].endTime) saveSchedule(day.value, updated);
+                                        updateBreak(day.value, index, 'startTime', e.target.value);
+                                        debouncedSaveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                       }}
                                       className={`${scheduleStyles.breakInput}${brk.startTime >= brk.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
                                     />
@@ -480,12 +485,11 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                                       step={300}
                                       value={brk.endTime}
                                       onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                                      onChange={(e) => { if (e.target.value) updateBreak(day.value, index, 'endTime', e.target.value); }}
-                                      onBlur={(e) => {
+                                      onChange={(e) => {
                                         if (!e.target.value) return;
                                         const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: e.target.value } : b);
-                                        const updated = { ...schedule, breaks: newBreaks };
-                                        if (updated.breaks[index].startTime < e.target.value) saveSchedule(day.value, updated);
+                                        updateBreak(day.value, index, 'endTime', e.target.value);
+                                        debouncedSaveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                       }}
                                       className={`${scheduleStyles.breakInput}${brk.startTime >= brk.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
                                     />
@@ -499,7 +503,7 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                                   onClick={() => removeBreak(day.value, index)}
                                   className={scheduleStyles.removeBreakButton}
                                 >
-                                  <MinusCircle size={28} strokeWidth={2.5} />
+                                  <MinusCircle size={26} strokeWidth={2.5} />
                                 </button>
                               </div>
                             ))}

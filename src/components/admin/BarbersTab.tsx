@@ -33,6 +33,12 @@ interface BarbersTabProps {
 
 export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection }: BarbersTabProps) {
   const rightColumnRef = useRef<HTMLDivElement>(null);
+  const pricingSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const debouncedSavePricing = (values: typeof pricingForm) => {
+    if (pricingSaveTimerRef.current) clearTimeout(pricingSaveTimerRef.current);
+    pricingSaveTimerRef.current = setTimeout(() => handleSavePricing(values), 800);
+  };
   const [editingBarber, setEditingBarber] = useState<Barber | null>(null);
   const [schedulingBarber, setSchedulingBarber] = useState<Barber | null>(null);
   const [barberForm, setBarberForm] = useState(DEFAULT_BARBER_FORM);
@@ -264,8 +270,12 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
                       className={`${styles.timeInput}${pricingForm.evening_hours_start >= pricingForm.evening_hours_end ? ` ${styles.timeInputInvalid}` : ''}`}
                       value={pricingForm.evening_hours_start}
                       onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                      onChange={(e) => { if (e.target.value) setPricingForm({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value }); }}
-                      onBlur={(e) => { if (e.target.value && e.target.value < pricingForm.evening_hours_end) handleSavePricing({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value }); }}
+                      onChange={(e) => {
+                        if (!e.target.value) return;
+                        const updated = { ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value };
+                        setPricingForm(updated);
+                        debouncedSavePricing(updated);
+                      }}
                     />
                   </View>
                   <View className={styles.pricingTimeArrow}>→</View>
@@ -277,8 +287,12 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
                       className={`${styles.timeInput}${pricingForm.evening_hours_start >= pricingForm.evening_hours_end ? ` ${styles.timeInputInvalid}` : ''}`}
                       value={pricingForm.evening_hours_end}
                       onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                      onChange={(e) => { if (e.target.value) setPricingForm({ ...pricingForm, evening_hours_end: e.target.value }); }}
-                      onBlur={(e) => { if (e.target.value && pricingForm.evening_hours_start < e.target.value) handleSavePricing({ ...pricingForm, evening_hours_end: e.target.value }); }}
+                      onChange={(e) => {
+                        if (!e.target.value) return;
+                        const updated = { ...pricingForm, evening_hours_end: e.target.value };
+                        setPricingForm(updated);
+                        debouncedSavePricing(updated);
+                      }}
                     />
                   </View>
                 </View>

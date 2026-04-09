@@ -100,7 +100,7 @@ export const saveDayOffButton = style({
 export const workingHoursCard = style({
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
-  gap: 8,
+  gap: 16,
   maxWidth: 480,
   margin: '0 auto',
   '@media': {
@@ -141,6 +141,14 @@ export const timeInput = style({
     'screen and (min-width: 480px)': {
       padding: '12px 8px',
       fontSize: 16,
+    },
+  },
+  selectors: {
+    '&::-webkit-clear-button': {
+      display: 'none',
+    },
+    '&::-webkit-inner-spin-button': {
+      display: 'none',
     },
   },
 });
@@ -204,11 +212,15 @@ export const breakRowInner = style({
 
 export const breakInputGroup = style({
   display: 'grid',
-  gridTemplateColumns: '1fr auto 1fr',
+  gridTemplateColumns: '1fr',
   alignItems: 'center',
   gap: 4,
   minWidth: 0,
-  overflow: 'hidden',
+  '@media': {
+    'screen and (min-width: 380px)': {
+      gridTemplateColumns: '1fr auto 1fr',
+    },
+  },
 });
 
 export const breakInput = style({
@@ -234,16 +246,27 @@ export const breakInput = style({
       fontSize: 16,
     },
   },
+  selectors: {
+    '&::-webkit-clear-button': {
+      display: 'none',
+    },
+    '&::-webkit-inner-spin-button': {
+      display: 'none',
+    },
+  },
 });
 
 export const breakSeparator = style({
-  display: 'flex',
+  display: 'none',
   padding: 4,
   justifyContent: 'center',
   alignItems: 'center',
   color: text_secondary,
   fontSize: 16,
   '@media': {
+    'screen and (min-width: 380px)': {
+      display: 'flex',
+    },
     'screen and (min-width: 768px)': {
       padding: 8,
     },
@@ -255,7 +278,7 @@ export const removeBreakButton = style({
   color: '#dc2626',
   border: 'none',
   cursor: 'pointer',
-  paddingTop: 10,
+  paddingTop: 12,
   flexShrink: 0,
 });
 
