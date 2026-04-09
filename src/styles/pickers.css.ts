@@ -3,15 +3,12 @@ import { style } from '@vanilla-extract/css';
 import { darker_bg, text_primary, text_secondary } from './globalStyles.css';
 
 const wrapperBase = {
-  display: 'flex' as const,
-  alignItems: 'center' as const,
+  display: 'flex',
+  alignItems: 'center',
   backgroundColor: darker_bg,
   borderRadius: 8,
-  padding: '6px 4px',
-  gap: 2,
-  width: '100%',
+  padding: '6px 8px',
   boxSizing: 'border-box' as const,
-  cursor: 'pointer' as const,
 };
 
 export const timeSelectWrapper = style({
@@ -25,38 +22,33 @@ export const timeSelectWrapperInvalid = style({
 });
 
 const selectPartBase = {
-  flex: 1,
+  flex: '0 0 auto',
   minWidth: 0,
   backgroundColor: 'transparent',
   border: 'none',
   color: text_primary,
-  fontSize: 14,
+  fontSize: 16,
   fontFamily: 'inherit',
   colorScheme: 'dark' as const,
   cursor: 'pointer' as const,
   textAlign: 'center' as const,
-  padding: '2px 0',
+  padding: '4px 0px',
   ':focus': { outline: 'none' },
   '@media': {
     'screen and (min-width: 768px)': {
-      fontSize: 15,
+      fontSize: 18,
     },
   },
 };
 
-export const timeSelectPart = style(selectPartBase);
+export const timeSelectPart = style({
+  ...selectPartBase,
+  width: 48, // 👈 hours & minutes consistent
+});
 
 export const timeSelectPeriod = style({
   ...selectPartBase,
-  flex: '0 0 auto' as unknown as number,
-});
-
-export const timeSelectColon = style({
-  flexShrink: 0,
-  color: text_secondary,
-  fontSize: 14,
-  userSelect: 'none',
-  paddingBottom: 1,
+  width: 56, // 👈 AM/PM slightly wider
 });
 
 // Date select
@@ -64,7 +56,7 @@ export const timeSelectColon = style({
 export const dateSelectWrapper = style({
   ...wrapperBase,
   border: `1px solid ${text_secondary}`,
-  gap: 4,
+  gap: 2,
 });
 
 export const dateSelectPart = style({

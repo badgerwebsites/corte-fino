@@ -39,7 +39,6 @@ export function TimeSelect({ value, onChange, invalid }: Props) {
           <option key={h} value={h}>{h}</option>
         ))}
       </select>
-      <span className={styles.timeSelectColon}>:</span>
       <select
         className={styles.timeSelectPart}
         value={minutes}

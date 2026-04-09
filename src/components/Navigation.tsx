@@ -1,12 +1,15 @@
 // components/Navigation.tsx
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../auth/useAuth';
 import { View } from '../ui/View';
 import * as styles from '../styles/navigation.css';
 
 export function Navigation() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   const [logoIndex, setLogoIndex] = useState(0);
   const [carouselLogos, setCarouselLogos] = useState<(string | null)[]>([null, null, null]);
 
@@ -84,11 +87,11 @@ export function Navigation() {
     localStorage.removeItem('adminActiveTab');
     localStorage.removeItem('cf_customer_cache');
     try {
-      await supabase.auth.signOut();
+      await signOut();
     } catch {
-      // session may already be invalid after a new deploy — redirect regardless
+      // session may already be invalid — navigate away regardless
     }
-    window.location.href = '/login';
+    navigate('/login', { replace: true });
   };
 
   if (hideNav) {
