@@ -99,21 +99,20 @@ export const dateInput = style({
   minWidth: 0,
   boxSizing: 'border-box',
   color: text_primary,
-  padding: '10px 6px',
-  fontSize: 15,
+  padding: '14px 12px',
+  fontSize: 16,
   fontFamily: 'inherit',
   colorScheme: 'dark',
   cursor: 'pointer',
   display: 'block',
-  textAlign: 'center',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,
   },
   '@media': {
     'screen and (min-width: 480px)': {
-      padding: '12px 8px',
-      fontSize: 16,
+      padding: '16px 14px',
+      fontSize: 17,
     },
   },
   selectors: {
@@ -137,10 +136,10 @@ export const inputInvalid = style({
 
 export const pickerLabel = style({
   display: 'block',
-  fontSize: 12,
+  fontSize: 13,
   fontWeight: 600,
   color: text_muted,
-  marginBottom: 6,
+  marginBottom: 8,
   textTransform: 'uppercase',
-  letterSpacing: '0.05em',
+  letterSpacing: '0.06em',
 });

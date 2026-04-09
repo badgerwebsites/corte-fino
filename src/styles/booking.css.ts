@@ -392,6 +392,26 @@ export const barberSocial = style({
 });
 
 // Date & Time Selection Styles
+export const dateTimeStack = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 24,
+  marginTop: 16,
+  '@media': {
+    'screen and (min-width: 768px)': {
+      gap: 32,
+      marginTop: 24,
+    },
+  },
+});
+
+export const pickerSection = style({
+  width: '100%',
+  maxWidth: 420,
+  textAlign: 'left',
+});
+
 export const timeColumn = style({
   flex: "1 1 0",
   minWidth: 0,
