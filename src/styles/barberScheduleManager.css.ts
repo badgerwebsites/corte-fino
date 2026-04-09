@@ -100,9 +100,14 @@ export const saveDayOffButton = style({
 export const workingHoursCard = style({
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
-  gap: 12,
+  gap: 8,
   maxWidth: 480,
   margin: '0 auto',
+  '@media': {
+    'screen and (max-width: 380px)': {
+      gridTemplateColumns: '1fr',
+    },
+  },
 });
 
 export const timeLabel = style({
@@ -115,46 +120,28 @@ export const timeLabel = style({
   letterSpacing: '0.05em',
 });
 
-const scheduleInputBase = {
+export const timeInput = style({
   width: '100%',
   minWidth: 0,
   backgroundColor: darker_bg,
   color: text_primary,
-  boxSizing: 'border-box' as const,
-  padding: '8px 6px',
-  borderRadius: 8,
-  fontSize: 15,
-  fontFamily: 'inherit',
-  colorScheme: 'dark' as const,
-  cursor: 'pointer' as const,
-  position: 'relative' as const,
-  selectors: {
-    '&::-webkit-calendar-picker-indicator': {
-      position: 'absolute' as const,
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      width: '100%',
-      height: '100%',
-      opacity: 0,
-      cursor: 'pointer' as const,
-    },
-  },
-  '@media': {
-    'screen and (min-width: 768px)': {
-      padding: '12px 8px',
-      fontSize: 16,
-    },
-  },
-};
-
-export const timeInput = style({
-  ...scheduleInputBase,
   border: `1px solid ${text_secondary}`,
+  boxSizing: 'border-box',
+  padding: '8px 4px',
+  borderRadius: 8,
+  fontSize: 14,
+  fontFamily: 'inherit',
+  colorScheme: 'dark',
+  cursor: 'pointer',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,
+  },
+  '@media': {
+    'screen and (min-width: 480px)': {
+      padding: '12px 8px',
+      fontSize: 16,
+    },
   },
 });
 
@@ -201,11 +188,18 @@ export const addBreakButton = style({
 
 export const breakRow = style({
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   gap: 8,
   width: '100%',
   maxWidth: 480,
   margin: '0 auto',
+});
+
+export const breakRowInner = style({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  minWidth: 0,
 });
 
 export const breakInputGroup = style({
@@ -213,17 +207,32 @@ export const breakInputGroup = style({
   gridTemplateColumns: '1fr auto 1fr',
   alignItems: 'center',
   gap: 4,
-  flex: 1,
   minWidth: 0,
   overflow: 'hidden',
 });
 
 export const breakInput = style({
-  ...scheduleInputBase,
+  width: '100%',
+  minWidth: 0,
+  backgroundColor: darker_bg,
+  color: text_primary,
   border: `1px solid ${text_secondary}`,
+  boxSizing: 'border-box',
+  padding: '8px 4px',
+  borderRadius: 8,
+  fontSize: 14,
+  fontFamily: 'inherit',
+  colorScheme: 'dark',
+  cursor: 'pointer',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,
+  },
+  '@media': {
+    'screen and (min-width: 480px)': {
+      padding: '12px 8px',
+      fontSize: 16,
+    },
   },
 });
 
@@ -241,31 +250,18 @@ export const breakSeparator = style({
   },
 });
 
-export const breakInputInvalid = style({
-  ...scheduleInputBase,
-  border: '1px solid #dc2626',
-  ':focus': {
-    outline: 'none',
-    border: '1px solid #dc2626',
-  },
-});
-
-export const breakWarning = style({
-  fontSize: 15,
-  color: '#dc2626',
-  marginTop: 4,
-  marginLeft: 8,
-});
-
 export const removeBreakButton = style({
   backgroundColor: 'transparent',
   color: '#dc2626',
   border: 'none',
   cursor: 'pointer',
+  paddingTop: 10,
+  flexShrink: 0,
 });
 
 export const scheduleSummary = style({
-  marginTop: 12,
+  marginTop: 16,
+  borderRadius: '0.375rem',
   fontSize: 16,
   color: text_primary,
   '@media': {
@@ -316,4 +312,19 @@ export const deleteTimeOffButton = style({
   ':hover': {
     backgroundColor: '#fcb3b3',
   },
+});
+
+export const timeInputInvalid = style({
+  border: '1px solid #dc2626',
+  ':focus': {
+    outline: 'none',
+    border: '1px solid #dc2626',
+  },
+});
+
+export const timeWarning = style({
+  fontSize: 15,
+  color: '#dc2626',
+  marginTop: 4,
+  marginLeft: 8,
 });

@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { Barber, BarberAvailability, BarberTimeOff } from '../../types/database.types';
 import { View } from '../../ui/View';
-import { TimeSelect } from '../../ui/TimeSelect';
-import { DateSelect } from '../../ui/DateSelect';
 import * as styles from '../../styles/admin.css';
 import * as scheduleStyles from '../../styles/barberScheduleManager.css';
 import { MinusCircle } from "lucide-react";
@@ -48,16 +46,19 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
   const [timeOff, setTimeOff] = useState<BarberTimeOff[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Schedule state for each day
   const [schedules, setSchedules] = useState<Record<number, DaySchedule>>({});
 
   const today = new Date().toISOString().split('T')[0];
 
+  // Time off form state
   const [timeOffForm, setTimeOffForm] = useState({
     start_date: today,
     end_date: today,
     reason: '',
   });
 
+  // Auto-select the barber if only one is provided
   useEffect(() => {
     if (barbers.length === 1 && !selectedBarber) {
       setSelectedBarber(barbers[0]);
@@ -92,6 +93,7 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
       setAvailability(availabilityRes.data || []);
       setTimeOff(timeOffRes.data || []);
 
+      // Convert availability records to our schedule format
       const newSchedules: Record<number, DaySchedule> = {};
 
       for (let day = 0; day <= 6; day++) {
@@ -107,15 +109,23 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
             breaks: [],
           };
         } else {
-          const overallStart = dayRecords[0].start_time;
-          const overallEnd = dayRecords[dayRecords.length - 1].end_time;
+          // Normalize to HH:MM — Supabase returns "HH:MM:SS" from Postgres TIME columns
+          const t = (s: string) => s.slice(0, 5);
 
+          // Find overall start (earliest) and end (latest) times
+          const overallStart = t(dayRecords[0].start_time);
+          const overallEnd = t(dayRecords[dayRecords.length - 1].end_time);
+
+          // Find breaks (gaps between consecutive blocks)
           const breaks: { startTime: string; endTime: string }[] = [];
           for (let i = 0; i < dayRecords.length - 1; i++) {
-            const currentEnd = dayRecords[i].end_time;
-            const nextStart = dayRecords[i + 1].start_time;
+            const currentEnd = t(dayRecords[i].end_time);
+            const nextStart = t(dayRecords[i + 1].start_time);
             if (currentEnd !== nextStart) {
-              breaks.push({ startTime: currentEnd, endTime: nextStart });
+              breaks.push({
+                startTime: currentEnd,
+                endTime: nextStart,
+              });
             }
           }
 
@@ -138,8 +148,11 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
     }
   };
 
+  // Convert schedule to availability blocks and save
   const saveSchedule = async (dayOfWeek: number, schedule: DaySchedule) => {
     if (!selectedBarber) return;
+    if (schedule.isWorking && schedule.startTime >= schedule.endTime) return;
+    if (schedule.isWorking && schedule.breaks.some(b => b.startTime >= b.endTime)) return;
 
     try {
       const { error: deleteError } = await supabase
@@ -222,6 +235,15 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
     saveSchedule(dayOfWeek, newSchedule);
   };
 
+  const updateBreak = (dayOfWeek: number, breakIndex: number, field: 'startTime' | 'endTime', value: string) => {
+    const schedule = schedules[dayOfWeek];
+    if (!schedule) return;
+
+    const newBreaks = [...schedule.breaks];
+    newBreaks[breakIndex] = { ...newBreaks[breakIndex], [field]: value };
+    updateSchedule(dayOfWeek, { breaks: newBreaks });
+  };
+
   const removeBreak = (dayOfWeek: number, breakIndex: number) => {
     const schedule = schedules[dayOfWeek];
     if (!schedule) return;
@@ -271,9 +293,15 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
       if (error) throw error;
 
-      setTimeOffForm({ start_date: today, end_date: today, reason: '' });
+      setTimeOffForm({
+        start_date: '',
+        end_date: '',
+        reason: '',
+      });
+
       loadBarberSchedule(selectedBarber.id, true);
       onUpdate();
+      // alert('Time off added successfully!');
     } catch (error) {
       console.error('Error adding time off:', error);
       alert('Failed to add time off');
@@ -303,6 +331,7 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
   return (
     <View>
+      {/* Schedule */}
       {selectedBarber && !loading && (
         <>
           {showSchedule && <div className={scheduleStyles.scheduleList}>
@@ -321,6 +350,7 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                     schedule.isWorking ? scheduleStyles.dayCardActive : ''
                   }`}
                 >
+                  {/* Day Header */}
                   <div className={scheduleStyles.dayHeader}>
                     <div className={scheduleStyles.dayHeaderLeft}>
                       <input
@@ -336,7 +366,9 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
                       <span
                         className={`${scheduleStyles.dayLabel} ${
-                          !schedule.isWorking ? scheduleStyles.dayLabelInactive : ''
+                          !schedule.isWorking
+                            ? scheduleStyles.dayLabelInactive
+                            : ''
                         }`}
                       >
                         {day.label}
@@ -350,39 +382,60 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                     </div>
                   </div>
 
+                  {/* Working Content */}
                   {schedule.isWorking && (
                     <>
+                      {/* Working Hours */}
                       <div className={scheduleStyles.workingHoursCard}>
                         <div>
-                          <label className={scheduleStyles.timeLabel}>Start Time</label>
-                          <TimeSelect
+                          <label className={scheduleStyles.timeLabel}>
+                            Start Time
+                          </label>
+                          <input
+                            type="time"
+                            step={300}
                             value={schedule.startTime}
-                            onChange={(val) => {
-                              const newSchedule = { ...schedule, startTime: val };
-                              updateSchedule(day.value, { startTime: val });
-                              saveSchedule(day.value, newSchedule);
+                            onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
+                            onChange={(e) =>
+                              updateSchedule(day.value, { startTime: e.target.value })
+                            }
+                            onBlur={(e) => {
+                              if (e.target.value < schedule.endTime) saveSchedule(day.value, { ...schedule, startTime: e.target.value });
                             }}
+                            className={`${scheduleStyles.timeInput}${schedule.startTime >= schedule.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
                           />
                         </div>
 
                         <div>
-                          <label className={scheduleStyles.timeLabel}>End Time</label>
-                          <TimeSelect
+                          <label className={scheduleStyles.timeLabel}>
+                            End Time
+                          </label>
+                          <input
+                            type="time"
+                            step={300}
                             value={schedule.endTime}
-                            onChange={(val) => {
-                              const newSchedule = { ...schedule, endTime: val };
-                              updateSchedule(day.value, { endTime: val });
-                              saveSchedule(day.value, newSchedule);
+                            onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
+                            onChange={(e) =>
+                              updateSchedule(day.value, { endTime: e.target.value })
+                            }
+                            onBlur={(e) => {
+                              if (schedule.startTime < e.target.value) saveSchedule(day.value, { ...schedule, endTime: e.target.value });
                             }}
+                            className={`${scheduleStyles.timeInput}${schedule.startTime >= schedule.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
                           />
                         </div>
                       </div>
+                      {schedule.startTime >= schedule.endTime && (
+                        <p className={scheduleStyles.timeWarning}>Start time must be before end time</p>
+                      )}
 
+                      {/* Breaks */}
                       <div className={scheduleStyles.breaksCard}>
                         <div className={scheduleStyles.breaksHeader}>
                           <label className={scheduleStyles.breaksLabel}>
                             Breaks
-                            {schedule.breaks.length > 0 && ` (${schedule.breaks.length})`}
+                            {schedule.breaks.length > 0 &&
+                              ` (${schedule.breaks.length})`}
                           </label>
 
                           <button
@@ -396,64 +449,63 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
                         {schedule.breaks.length === 0 ? (
                           <p className={scheduleStyles.notWorkingText}>
-                            No breaks scheduled. Click "Add Break" to add one.
+                            No breaks scheduled. Click “Add Break” to add one.
                           </p>
                         ) : (
                           <div className={scheduleStyles.scheduleList}>
-                            {schedule.breaks.map((brk, index) => {
-                              const breakInvalid = brk.startTime >= brk.endTime;
-                              return (
-                                <div key={index}>
-                                  <div className={scheduleStyles.breakRow}>
-                                    <div className={scheduleStyles.breakInputGroup}>
-                                      <TimeSelect
-                                        value={brk.startTime}
-                                        invalid={breakInvalid}
-                                        onChange={(val) => {
-                                          const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: val } : b);
-                                          updateSchedule(day.value, { breaks: newBreaks });
-                                          const updated = newBreaks[index];
-                                          if (updated.startTime < updated.endTime) {
-                                            saveSchedule(day.value, { ...schedule, breaks: newBreaks });
-                                          }
-                                        }}
-                                      />
-                                      <span className={scheduleStyles.breakSeparator}>–</span>
-                                      <TimeSelect
-                                        value={brk.endTime}
-                                        invalid={breakInvalid}
-                                        onChange={(val) => {
-                                          const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: val } : b);
-                                          updateSchedule(day.value, { breaks: newBreaks });
-                                          const updated = newBreaks[index];
-                                          if (updated.startTime < updated.endTime) {
-                                            saveSchedule(day.value, { ...schedule, breaks: newBreaks });
-                                          }
-                                        }}
-                                      />
-                                    </div>
-                                    <button
-                                      type="button"
-                                      onClick={() => removeBreak(day.value, index)}
-                                      className={scheduleStyles.removeBreakButton}
-                                    >
-                                      <MinusCircle size={26} strokeWidth={2.5} />
-                                    </button>
+                            {schedule.breaks.map((brk, index) => (
+                              <div
+                                key={index}
+                                className={scheduleStyles.breakRow}
+                              >
+                                <div className={scheduleStyles.breakRowInner}>
+                                  <div className={scheduleStyles.breakInputGroup}>
+                                    <input
+                                      type="time"
+                                      step={300}
+                                      value={brk.startTime}
+                                      onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
+                                      onChange={(e) => updateBreak(day.value, index, 'startTime', e.target.value)}
+                                      onBlur={(e) => {
+                                        const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: e.target.value } : b);
+                                        const updated = { ...schedule, breaks: newBreaks };
+                                        if (e.target.value < updated.breaks[index].endTime) saveSchedule(day.value, updated);
+                                      }}
+                                      className={`${scheduleStyles.breakInput}${brk.startTime >= brk.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
+                                    />
+                                    <span className={scheduleStyles.breakSeparator}>-</span>
+                                    <input
+                                      type="time"
+                                      step={300}
+                                      value={brk.endTime}
+                                      onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
+                                      onChange={(e) => updateBreak(day.value, index, 'endTime', e.target.value)}
+                                      onBlur={(e) => {
+                                        const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: e.target.value } : b);
+                                        const updated = { ...schedule, breaks: newBreaks };
+                                        if (updated.breaks[index].startTime < e.target.value) saveSchedule(day.value, updated);
+                                      }}
+                                      className={`${scheduleStyles.breakInput}${brk.startTime >= brk.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
+                                    />
                                   </div>
-                                  {breakInvalid && (
-                                    <p className={scheduleStyles.breakWarning}>
-                                      {brk.startTime === brk.endTime
-                                        ? 'Start and end time cannot be the same'
-                                        : 'Start time must be before end time'}
-                                    </p>
+                                  {brk.startTime >= brk.endTime && (
+                                    <p className={scheduleStyles.timeWarning}>Start time must be before end time</p>
                                   )}
                                 </div>
-                              );
-                            })}
+                                <button
+                                  type="button"
+                                  onClick={() => removeBreak(day.value, index)}
+                                  className={scheduleStyles.removeBreakButton}
+                                >
+                                  <MinusCircle size={28} strokeWidth={2.5} />
+                                </button>
+                              </div>
+                            ))}
                           </div>
                         )}
                       </div>
 
+                      {/* Summary */}
                       <div className={scheduleStyles.scheduleSummary}>
                         <strong>Available:</strong>{' '}
                         {formatTime(schedule.startTime)} –{' '}
@@ -468,6 +520,7 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                       </div>
                     </>
                   )}
+
                 </div>
               );
             })}
@@ -485,27 +538,39 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
               <View className={styles.formRow}>
                 <View className={styles.formGroup}>
                   <label className={styles.label}>Start Date</label>
-                  <DateSelect
+                  <input
+                    type="date"
+                    className={scheduleStyles.timeInput}
                     value={timeOffForm.start_date}
                     min={today}
-                    onChange={(val) =>
+                    onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
+                    onChange={(e) =>
                       setTimeOffForm({
                         ...timeOffForm,
-                        start_date: val,
-                        end_date: timeOffForm.end_date < val ? val : timeOffForm.end_date,
+                        start_date: e.target.value,
+                        // if end is now before the new start, bump it forward
+                        end_date: timeOffForm.end_date < e.target.value ? e.target.value : timeOffForm.end_date,
                       })
                     }
+                    required
                   />
                 </View>
 
                 <View className={styles.formGroup}>
                   <label className={styles.label}>End Date</label>
-                  <DateSelect
+                  <input
+                    type="date"
+                    className={scheduleStyles.timeInput}
                     value={timeOffForm.end_date}
                     min={timeOffForm.start_date || today}
-                    onChange={(val) =>
-                      setTimeOffForm({ ...timeOffForm, end_date: val })
+                    onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
+                    onChange={(e) =>
+                      setTimeOffForm({
+                        ...timeOffForm,
+                        end_date: e.target.value,
+                      })
                     }
+                    required
                   />
                 </View>
               </View>
@@ -518,22 +583,29 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                   placeholder="Vacation, Personal, Sick Leave"
                   value={timeOffForm.reason}
                   onChange={(e) =>
-                    setTimeOffForm({ ...timeOffForm, reason: e.target.value })
+                    setTimeOffForm({
+                      ...timeOffForm,
+                      reason: e.target.value,
+                    })
                   }
                 />
               </View>
 
-              <View className={scheduleStyles.centerButton}>
-                <button type="submit" className={styles.submitButton}>
-                  Add Time Off
-                </button>
-              </View>
+            <View className={scheduleStyles.centerButton}>
+              <button type="submit" className={styles.submitButton}>
+                Add Time Off
+              </button>
+            </View>
+
             </form>
 
             {timeOff.length > 0 && (
               <div className={scheduleStyles.scheduleList}>
                 {timeOff.map((period) => (
-                  <div key={period.id} className={scheduleStyles.timeOffCard}>
+                  <div
+                    key={period.id}
+                    className={scheduleStyles.timeOffCard}
+                  >
                     <div>
                       <div className={scheduleStyles.timeOffDate}>
                         {localDate(period.start_date)}
@@ -551,7 +623,9 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
                     <button
                       type="button"
-                      onClick={() => handleDeleteTimeOff(period.id)}
+                      onClick={() =>
+                        handleDeleteTimeOff(period.id)
+                      }
                       className={scheduleStyles.deleteTimeOffButton}
                     >
                       Delete
