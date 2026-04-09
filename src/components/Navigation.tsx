@@ -1,6 +1,6 @@
 // components/Navigation.tsx
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../auth/useAuth';
 import { View } from '../ui/View';
@@ -9,7 +9,6 @@ import * as styles from '../styles/navigation.css';
 export function Navigation() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { signOut } = useAuth();
-  const navigate = useNavigate();
   const [logoIndex, setLogoIndex] = useState(0);
   const [carouselLogos, setCarouselLogos] = useState<(string | null)[]>([null, null, null]);
 
@@ -83,15 +82,15 @@ export function Navigation() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
-    localStorage.removeItem('adminActiveTab');
-    localStorage.removeItem('cf_customer_cache');
-    try {
-      await signOut();
-    } catch {
-      // session may already be invalid — navigate away regardless
-    }
-    navigate('/login', { replace: true });
+  const handleLogout = () => {
+    // Clear all local storage — Supabase session lives under sb-* keys.
+    // Doing this synchronously before navigating guarantees the next page
+    // load sees no session even if the signOut API call fails or is slow.
+    localStorage.clear();
+    // Invalidate the server-side session in the background (best effort).
+    signOut().catch(() => {});
+    // Full reload so the login page starts with a clean auth state.
+    window.location.replace('/login');
   };
 
   if (hideNav) {
