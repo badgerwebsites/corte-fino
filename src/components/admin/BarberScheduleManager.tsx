@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { Barber, BarberAvailability, BarberTimeOff } from '../../types/database.types';
 import { View } from '../../ui/View';
+import { TimePicker } from '../../ui/TimePicker';
+import { DatePicker } from '../../ui/DatePicker';
 import * as styles from '../../styles/admin.css';
 import * as scheduleStyles from '../../styles/barberScheduleManager.css';
 import { MinusCircle } from "lucide-react";
@@ -393,43 +395,26 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                     <>
                       {/* Working Hours */}
                       <div className={scheduleStyles.workingHoursCard}>
-                        <div>
-                          <label className={scheduleStyles.timeLabel}>
-                            Start Time
-                          </label>
-                          <input
-                            type="time"
-                            step={300}
-                            value={schedule.startTime}
-                            onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                            onChange={(e) => {
-                              if (!e.target.value) return;
-                              const updated = { ...schedule, startTime: e.target.value };
-                              updateSchedule(day.value, { startTime: e.target.value });
-                              debouncedSaveSchedule(day.value, updated);
-                            }}
-                            className={`${scheduleStyles.timeInput}${schedule.startTime >= schedule.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
-                          />
-                        </div>
-
-                        <div>
-                          <label className={scheduleStyles.timeLabel}>
-                            End Time
-                          </label>
-                          <input
-                            type="time"
-                            step={300}
-                            value={schedule.endTime}
-                            onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                            onChange={(e) => {
-                              if (!e.target.value) return;
-                              const updated = { ...schedule, endTime: e.target.value };
-                              updateSchedule(day.value, { endTime: e.target.value });
-                              debouncedSaveSchedule(day.value, updated);
-                            }}
-                            className={`${scheduleStyles.timeInput}${schedule.startTime >= schedule.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
-                          />
-                        </div>
+                        <TimePicker
+                          label="Start Time"
+                          value={schedule.startTime}
+                          invalid={schedule.startTime >= schedule.endTime}
+                          onChange={(val) => {
+                            const updated = { ...schedule, startTime: val };
+                            updateSchedule(day.value, { startTime: val });
+                            debouncedSaveSchedule(day.value, updated);
+                          }}
+                        />
+                        <TimePicker
+                          label="End Time"
+                          value={schedule.endTime}
+                          invalid={schedule.startTime >= schedule.endTime}
+                          onChange={(val) => {
+                            const updated = { ...schedule, endTime: val };
+                            updateSchedule(day.value, { endTime: val });
+                            debouncedSaveSchedule(day.value, updated);
+                          }}
+                        />
                       </div>
                       {schedule.startTime >= schedule.endTime && (
                         <p className={scheduleStyles.timeWarning}>Start time must be before end time</p>
@@ -466,32 +451,24 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                               >
                                 <div className={scheduleStyles.breakRowInner}>
                                   <div className={scheduleStyles.breakInputGroup}>
-                                    <input
-                                      type="time"
-                                      step={300}
+                                    <TimePicker
                                       value={brk.startTime}
-                                      onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                                      onChange={(e) => {
-                                        if (!e.target.value) return;
-                                        const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: e.target.value } : b);
-                                        updateBreak(day.value, index, 'startTime', e.target.value);
+                                      invalid={brk.startTime >= brk.endTime}
+                                      onChange={(val) => {
+                                        const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: val } : b);
+                                        updateBreak(day.value, index, 'startTime', val);
                                         debouncedSaveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                       }}
-                                      className={`${scheduleStyles.breakInput}${brk.startTime >= brk.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
                                     />
                                     <span className={scheduleStyles.breakSeparator}>-</span>
-                                    <input
-                                      type="time"
-                                      step={300}
+                                    <TimePicker
                                       value={brk.endTime}
-                                      onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                                      onChange={(e) => {
-                                        if (!e.target.value) return;
-                                        const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: e.target.value } : b);
-                                        updateBreak(day.value, index, 'endTime', e.target.value);
+                                      invalid={brk.startTime >= brk.endTime}
+                                      onChange={(val) => {
+                                        const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: val } : b);
+                                        updateBreak(day.value, index, 'endTime', val);
                                         debouncedSaveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                       }}
-                                      className={`${scheduleStyles.breakInput}${brk.startTime >= brk.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
                                     />
                                   </div>
                                   {brk.startTime >= brk.endTime && (
@@ -542,43 +519,26 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
             <form onSubmit={handleAddTimeOff} className={`${styles.form} ${scheduleStyles.timeOffForm}`}>
               <View className={styles.formRowAlways}>
-                <View className={styles.formGroup}>
-                  <label className={styles.label}>Start Date</label>
-                  <input
-                    type="date"
-                    className={scheduleStyles.timeInput}
-                    value={timeOffForm.start_date}
-                    min={today}
-                    onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                    onChange={(e) =>
-                      setTimeOffForm({
-                        ...timeOffForm,
-                        start_date: e.target.value,
-                        // if end is now before the new start, bump it forward
-                        end_date: timeOffForm.end_date < e.target.value ? e.target.value : timeOffForm.end_date,
-                      })
-                    }
-                    required
-                  />
-                </View>
-
-                <View className={styles.formGroup}>
-                  <label className={styles.label}>End Date</label>
-                  <input
-                    type="date"
-                    className={scheduleStyles.timeInput}
-                    value={timeOffForm.end_date}
-                    min={timeOffForm.start_date || today}
-                    onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                    onChange={(e) =>
-                      setTimeOffForm({
-                        ...timeOffForm,
-                        end_date: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </View>
+                <DatePicker
+                  label="Start Date"
+                  value={timeOffForm.start_date}
+                  min={today}
+                  required
+                  onChange={(val) =>
+                    setTimeOffForm({
+                      ...timeOffForm,
+                      start_date: val,
+                      end_date: timeOffForm.end_date < val ? val : timeOffForm.end_date,
+                    })
+                  }
+                />
+                <DatePicker
+                  label="End Date"
+                  value={timeOffForm.end_date}
+                  min={timeOffForm.start_date || today}
+                  required
+                  onChange={(val) => setTimeOffForm({ ...timeOffForm, end_date: val })}
+                />
               </View>
 
               <View className={styles.formGroup}>

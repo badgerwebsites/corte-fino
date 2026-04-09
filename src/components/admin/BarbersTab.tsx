@@ -4,6 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import type { Barber } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 import { BarberScheduleManager } from './BarberScheduleManager';
+import { TimePicker } from '../../ui/TimePicker';
 import { ImageUpload } from './ImageUpload';
 import { View } from '../../ui/View';
 import { Text } from '../../ui/Text';
@@ -263,33 +264,24 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
               <View>
                 <View className={styles.pricingTimeline}>
                   <View className={styles.pricingTimeBlock}>
-                    <label className={styles.pricingTimeLabel}>Evening Pricing Starts</label>
-                    <input
-                      type="time"
-                      step={300}
-                      className={`${styles.timeInput}${pricingForm.evening_hours_start >= pricingForm.evening_hours_end ? ` ${styles.timeInputInvalid}` : ''}`}
+                    <TimePicker
+                      label="Evening Pricing Starts"
                       value={pricingForm.evening_hours_start}
-                      onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                      onChange={(e) => {
-                        if (!e.target.value) return;
-                        const updated = { ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value };
+                      invalid={pricingForm.evening_hours_start >= pricingForm.evening_hours_end}
+                      onChange={(val) => {
+                        const updated = { ...pricingForm, regular_hours_end: val, evening_hours_start: val };
                         setPricingForm(updated);
                         debouncedSavePricing(updated);
                       }}
                     />
                   </View>
-                  <View className={styles.pricingTimeArrow}>→</View>
                   <View className={styles.pricingTimeBlock}>
-                    <label className={styles.pricingTimeLabel}>Evening Pricing Ends</label>
-                    <input
-                      type="time"
-                      step={300}
-                      className={`${styles.timeInput}${pricingForm.evening_hours_start >= pricingForm.evening_hours_end ? ` ${styles.timeInputInvalid}` : ''}`}
+                    <TimePicker
+                      label="Evening Pricing Ends"
                       value={pricingForm.evening_hours_end}
-                      onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                      onChange={(e) => {
-                        if (!e.target.value) return;
-                        const updated = { ...pricingForm, evening_hours_end: e.target.value };
+                      invalid={pricingForm.evening_hours_start >= pricingForm.evening_hours_end}
+                      onChange={(val) => {
+                        const updated = { ...pricingForm, evening_hours_end: val };
                         setPricingForm(updated);
                         debouncedSavePricing(updated);
                       }}
