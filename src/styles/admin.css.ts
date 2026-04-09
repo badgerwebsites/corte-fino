@@ -996,6 +996,7 @@ export const pricingTimeline = style({
 
 export const pricingTimeBlock = style({
   flex: 1,
+  minWidth: 0,
   display: 'flex',
   flexDirection: 'column',
   gap: 4,
@@ -1012,6 +1013,7 @@ export const pricingTimeLabel = style({
 
 export const timeInput = style({
   width: '100%',
+  minWidth: 0,
   backgroundColor: darker_bg,
   color: text_primary,
   border: `1px solid ${text_secondary}`,

@@ -264,8 +264,8 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
                       className={`${styles.timeInput}${pricingForm.evening_hours_start >= pricingForm.evening_hours_end ? ` ${styles.timeInputInvalid}` : ''}`}
                       value={pricingForm.evening_hours_start}
                       onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                      onChange={(e) => setPricingForm({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
-                      onBlur={(e) => { if (e.target.value < pricingForm.evening_hours_end) handleSavePricing({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value }); }}
+                      onChange={(e) => { if (e.target.value) setPricingForm({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value }); }}
+                      onBlur={(e) => { if (e.target.value && e.target.value < pricingForm.evening_hours_end) handleSavePricing({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value }); }}
                     />
                   </View>
                   <View className={styles.pricingTimeArrow}>→</View>
@@ -277,8 +277,8 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
                       className={`${styles.timeInput}${pricingForm.evening_hours_start >= pricingForm.evening_hours_end ? ` ${styles.timeInputInvalid}` : ''}`}
                       value={pricingForm.evening_hours_end}
                       onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                      onChange={(e) => setPricingForm({ ...pricingForm, evening_hours_end: e.target.value })}
-                      onBlur={(e) => { if (pricingForm.evening_hours_start < e.target.value) handleSavePricing({ ...pricingForm, evening_hours_end: e.target.value }); }}
+                      onChange={(e) => { if (e.target.value) setPricingForm({ ...pricingForm, evening_hours_end: e.target.value }); }}
+                      onBlur={(e) => { if (e.target.value && pricingForm.evening_hours_start < e.target.value) handleSavePricing({ ...pricingForm, evening_hours_end: e.target.value }); }}
                     />
                   </View>
                 </View>

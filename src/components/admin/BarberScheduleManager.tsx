@@ -396,11 +396,11 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                             step={300}
                             value={schedule.startTime}
                             onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                            onChange={(e) =>
-                              updateSchedule(day.value, { startTime: e.target.value })
-                            }
+                            onChange={(e) => {
+                              if (e.target.value) updateSchedule(day.value, { startTime: e.target.value });
+                            }}
                             onBlur={(e) => {
-                              if (e.target.value < schedule.endTime) saveSchedule(day.value, { ...schedule, startTime: e.target.value });
+                              if (e.target.value && e.target.value < schedule.endTime) saveSchedule(day.value, { ...schedule, startTime: e.target.value });
                             }}
                             className={`${scheduleStyles.timeInput}${schedule.startTime >= schedule.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
                           />
@@ -415,11 +415,11 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                             step={300}
                             value={schedule.endTime}
                             onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                            onChange={(e) =>
-                              updateSchedule(day.value, { endTime: e.target.value })
-                            }
+                            onChange={(e) => {
+                              if (e.target.value) updateSchedule(day.value, { endTime: e.target.value });
+                            }}
                             onBlur={(e) => {
-                              if (schedule.startTime < e.target.value) saveSchedule(day.value, { ...schedule, endTime: e.target.value });
+                              if (e.target.value && schedule.startTime < e.target.value) saveSchedule(day.value, { ...schedule, endTime: e.target.value });
                             }}
                             className={`${scheduleStyles.timeInput}${schedule.startTime >= schedule.endTime ? ` ${scheduleStyles.timeInputInvalid}` : ''}`}
                           />
@@ -465,8 +465,9 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                                       step={300}
                                       value={brk.startTime}
                                       onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                                      onChange={(e) => updateBreak(day.value, index, 'startTime', e.target.value)}
+                                      onChange={(e) => { if (e.target.value) updateBreak(day.value, index, 'startTime', e.target.value); }}
                                       onBlur={(e) => {
+                                        if (!e.target.value) return;
                                         const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: e.target.value } : b);
                                         const updated = { ...schedule, breaks: newBreaks };
                                         if (e.target.value < updated.breaks[index].endTime) saveSchedule(day.value, updated);
@@ -479,8 +480,9 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                                       step={300}
                                       value={brk.endTime}
                                       onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker()}
-                                      onChange={(e) => updateBreak(day.value, index, 'endTime', e.target.value)}
+                                      onChange={(e) => { if (e.target.value) updateBreak(day.value, index, 'endTime', e.target.value); }}
                                       onBlur={(e) => {
+                                        if (!e.target.value) return;
                                         const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: e.target.value } : b);
                                         const updated = { ...schedule, breaks: newBreaks };
                                         if (updated.breaks[index].startTime < e.target.value) saveSchedule(day.value, updated);
