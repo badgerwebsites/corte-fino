@@ -522,6 +522,12 @@ export const formRow = style({
   },
 });
 
+export const formRowAlways = style({
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: 16,
+});
+
 export const label = style({
   display: 'block',
   marginBottom: '0.5rem',
