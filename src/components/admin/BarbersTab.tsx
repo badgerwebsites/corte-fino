@@ -254,24 +254,30 @@ export function BarbersTab({ barbers, onUpdate, onScrollToTop, onScrollToSection
                   <View className={styles.pricingTimeBlock}>
                     <label className={styles.pricingTimeLabel}>Evening Pricing Starts</label>
                     <input
-                      key={pricingForm.evening_hours_start}
                       type="time"
                       step={300}
                       className={styles.timeInput}
-                      defaultValue={pricingForm.evening_hours_start}
-                      onBlur={(e) => handleSavePricing({ ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value })}
+                      value={pricingForm.evening_hours_start}
+                      onChange={(e) => {
+                        const updated = { ...pricingForm, regular_hours_end: e.target.value, evening_hours_start: e.target.value };
+                        setPricingForm(updated);
+                        handleSavePricing(updated);
+                      }}
                     />
                   </View>
                   <View className={styles.pricingTimeArrow}>→</View>
                   <View className={styles.pricingTimeBlock}>
                     <label className={styles.pricingTimeLabel}>Evening Pricing Ends</label>
                     <input
-                      key={pricingForm.evening_hours_end}
                       type="time"
                       step={300}
                       className={styles.timeInput}
-                      defaultValue={pricingForm.evening_hours_end}
-                      onBlur={(e) => handleSavePricing({ ...pricingForm, evening_hours_end: e.target.value })}
+                      value={pricingForm.evening_hours_end}
+                      onChange={(e) => {
+                        const updated = { ...pricingForm, evening_hours_end: e.target.value };
+                        setPricingForm(updated);
+                        handleSavePricing(updated);
+                      }}
                     />
                   </View>
                 </View>

@@ -1,5 +1,5 @@
 // components/admin/BarberScheduleManager.tsx
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { Barber, BarberAvailability, BarberTimeOff } from '../../types/database.types';
 import { View } from '../../ui/View';
@@ -46,18 +46,16 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
   const [timeOff, setTimeOff] = useState<BarberTimeOff[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Schedule state for each day
   const [schedules, setSchedules] = useState<Record<number, DaySchedule>>({});
 
   const today = new Date().toISOString().split('T')[0];
 
-  const [timeOffFormKey, setTimeOffFormKey] = useState(0);
-  const [endDateMin, setEndDateMin] = useState(today);
-  const startDateRef = useRef<HTMLInputElement>(null);
-  const endDateRef = useRef<HTMLInputElement>(null);
-  const reasonRef = useRef<HTMLInputElement>(null);
+  const [timeOffForm, setTimeOffForm] = useState({
+    start_date: today,
+    end_date: today,
+    reason: '',
+  });
 
-  // Auto-select the barber if only one is provided
   useEffect(() => {
     if (barbers.length === 1 && !selectedBarber) {
       setSelectedBarber(barbers[0]);
@@ -92,7 +90,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
       setAvailability(availabilityRes.data || []);
       setTimeOff(timeOffRes.data || []);
 
-      // Convert availability records to our schedule format
       const newSchedules: Record<number, DaySchedule> = {};
 
       for (let day = 0; day <= 6; day++) {
@@ -108,20 +105,15 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
             breaks: [],
           };
         } else {
-          // Find overall start (earliest) and end (latest) times
           const overallStart = dayRecords[0].start_time;
           const overallEnd = dayRecords[dayRecords.length - 1].end_time;
 
-          // Find breaks (gaps between consecutive blocks)
           const breaks: { startTime: string; endTime: string }[] = [];
           for (let i = 0; i < dayRecords.length - 1; i++) {
             const currentEnd = dayRecords[i].end_time;
             const nextStart = dayRecords[i + 1].start_time;
             if (currentEnd !== nextStart) {
-              breaks.push({
-                startTime: currentEnd,
-                endTime: nextStart,
-              });
+              breaks.push({ startTime: currentEnd, endTime: nextStart });
             }
           }
 
@@ -144,7 +136,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
     }
   };
 
-  // Convert schedule to availability blocks and save
   const saveSchedule = async (dayOfWeek: number, schedule: DaySchedule) => {
     if (!selectedBarber) return;
 
@@ -262,11 +253,7 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
     e.preventDefault();
     if (!selectedBarber) return;
 
-    const start_date = startDateRef.current?.value ?? '';
-    const end_date = endDateRef.current?.value ?? '';
-    const reason = reasonRef.current?.value ?? '';
-
-    if (!start_date || !end_date) {
+    if (!timeOffForm.start_date || !timeOffForm.end_date) {
       alert('Please fill in both start and end dates');
       return;
     }
@@ -276,15 +263,14 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
         .from('barber_time_off')
         .insert({
           barber_id: selectedBarber.id,
-          start_date,
-          end_date,
-          reason: reason || null,
+          start_date: timeOffForm.start_date,
+          end_date: timeOffForm.end_date,
+          reason: timeOffForm.reason || null,
         });
 
       if (error) throw error;
 
-      setTimeOffFormKey(k => k + 1);
-      setEndDateMin(today);
+      setTimeOffForm({ start_date: today, end_date: today, reason: '' });
       loadBarberSchedule(selectedBarber.id, true);
       onUpdate();
     } catch (error) {
@@ -316,7 +302,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
   return (
     <View>
-      {/* Schedule */}
       {selectedBarber && !loading && (
         <>
           {showSchedule && <div className={scheduleStyles.scheduleList}>
@@ -335,7 +320,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                     schedule.isWorking ? scheduleStyles.dayCardActive : ''
                   }`}
                 >
-                  {/* Day Header */}
                   <div className={scheduleStyles.dayHeader}>
                     <div className={scheduleStyles.dayHeaderLeft}>
                       <input
@@ -351,9 +335,7 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
                       <span
                         className={`${scheduleStyles.dayLabel} ${
-                          !schedule.isWorking
-                            ? scheduleStyles.dayLabelInactive
-                            : ''
+                          !schedule.isWorking ? scheduleStyles.dayLabelInactive : ''
                         }`}
                       >
                         {day.label}
@@ -367,51 +349,45 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                     </div>
                   </div>
 
-                  {/* Working Content */}
                   {schedule.isWorking && (
                     <>
-                      {/* Working Hours */}
                       <div className={scheduleStyles.workingHoursCard}>
                         <div>
-                          <label className={scheduleStyles.timeLabel}>
-                            Start Time
-                          </label>
+                          <label className={scheduleStyles.timeLabel}>Start Time</label>
                           <input
-                            key={schedule.startTime}
                             type="time"
                             step={300}
-                            defaultValue={schedule.startTime}
-                            onBlur={(e) =>
-                              saveSchedule(day.value, { ...schedule, startTime: e.target.value })
-                            }
+                            value={schedule.startTime}
+                            onChange={(e) => {
+                              const newSchedule = { ...schedule, startTime: e.target.value };
+                              updateSchedule(day.value, { startTime: e.target.value });
+                              saveSchedule(day.value, newSchedule);
+                            }}
                             className={scheduleStyles.timeInput}
                           />
                         </div>
 
                         <div>
-                          <label className={scheduleStyles.timeLabel}>
-                            End Time
-                          </label>
+                          <label className={scheduleStyles.timeLabel}>End Time</label>
                           <input
-                            key={schedule.endTime}
                             type="time"
                             step={300}
-                            defaultValue={schedule.endTime}
-                            onBlur={(e) =>
-                              saveSchedule(day.value, { ...schedule, endTime: e.target.value })
-                            }
+                            value={schedule.endTime}
+                            onChange={(e) => {
+                              const newSchedule = { ...schedule, endTime: e.target.value };
+                              updateSchedule(day.value, { endTime: e.target.value });
+                              saveSchedule(day.value, newSchedule);
+                            }}
                             className={scheduleStyles.timeInput}
                           />
                         </div>
                       </div>
 
-                      {/* Breaks */}
                       <div className={scheduleStyles.breaksCard}>
                         <div className={scheduleStyles.breaksHeader}>
                           <label className={scheduleStyles.breaksLabel}>
                             Breaks
-                            {schedule.breaks.length > 0 &&
-                              ` (${schedule.breaks.length})`}
+                            {schedule.breaks.length > 0 && ` (${schedule.breaks.length})`}
                           </label>
 
                           <button
@@ -425,35 +401,32 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
                         {schedule.breaks.length === 0 ? (
                           <p className={scheduleStyles.notWorkingText}>
-                            No breaks scheduled. Click “Add Break” to add one.
+                            No breaks scheduled. Click "Add Break" to add one.
                           </p>
                         ) : (
                           <div className={scheduleStyles.scheduleList}>
                             {schedule.breaks.map((brk, index) => (
-                              <div
-                                key={index}
-                                className={scheduleStyles.breakRow}
-                              >
+                              <div key={index} className={scheduleStyles.breakRow}>
                                 <div className={scheduleStyles.breakInputGroup}>
                                   <input
-                                    key={`${index}-start-${brk.startTime}`}
                                     type="time"
                                     step={300}
-                                    defaultValue={brk.startTime}
-                                    onBlur={(e) => {
+                                    value={brk.startTime}
+                                    onChange={(e) => {
                                       const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: e.target.value } : b);
+                                      updateSchedule(day.value, { breaks: newBreaks });
                                       saveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                     }}
                                     className={scheduleStyles.breakInput}
                                   />
                                   <span className={scheduleStyles.breakSeparator}>-</span>
                                   <input
-                                    key={`${index}-end-${brk.endTime}`}
                                     type="time"
                                     step={300}
-                                    defaultValue={brk.endTime}
-                                    onBlur={(e) => {
+                                    value={brk.endTime}
+                                    onChange={(e) => {
                                       const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: e.target.value } : b);
+                                      updateSchedule(day.value, { breaks: newBreaks });
                                       saveSchedule(day.value, { ...schedule, breaks: newBreaks });
                                     }}
                                     className={scheduleStyles.breakInput}
@@ -472,7 +445,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                         )}
                       </div>
 
-                      {/* Summary */}
                       <div className={scheduleStyles.scheduleSummary}>
                         <strong>Available:</strong>{' '}
                         {formatTime(schedule.startTime)} –{' '}
@@ -487,7 +459,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                       </div>
                     </>
                   )}
-
                 </div>
               );
             })}
@@ -501,17 +472,22 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
               Time Off / Vacation Days
             </h3>
 
-            <form key={timeOffFormKey} onSubmit={handleAddTimeOff} className={styles.form}>
+            <form onSubmit={handleAddTimeOff} className={styles.form}>
               <View className={styles.formRow}>
                 <View className={styles.formGroup}>
                   <label className={styles.label}>Start Date</label>
                   <input
-                    ref={startDateRef}
                     type="date"
                     className={scheduleStyles.timeInput}
-                    defaultValue={today}
+                    value={timeOffForm.start_date}
                     min={today}
-                    onChange={(e) => setEndDateMin(e.target.value || today)}
+                    onChange={(e) =>
+                      setTimeOffForm({
+                        ...timeOffForm,
+                        start_date: e.target.value,
+                        end_date: timeOffForm.end_date < e.target.value ? e.target.value : timeOffForm.end_date,
+                      })
+                    }
                     required
                   />
                 </View>
@@ -519,12 +495,13 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                 <View className={styles.formGroup}>
                   <label className={styles.label}>End Date</label>
                   <input
-                    key={endDateMin}
-                    ref={endDateRef}
                     type="date"
                     className={scheduleStyles.timeInput}
-                    defaultValue={endDateMin}
-                    min={endDateMin}
+                    value={timeOffForm.end_date}
+                    min={timeOffForm.start_date || today}
+                    onChange={(e) =>
+                      setTimeOffForm({ ...timeOffForm, end_date: e.target.value })
+                    }
                     required
                   />
                 </View>
@@ -533,28 +510,27 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
               <View className={styles.formGroup}>
                 <label className={styles.label}>Reason (Optional)</label>
                 <input
-                  ref={reasonRef}
                   type="text"
                   className={styles.input}
                   placeholder="Vacation, Personal, Sick Leave"
+                  value={timeOffForm.reason}
+                  onChange={(e) =>
+                    setTimeOffForm({ ...timeOffForm, reason: e.target.value })
+                  }
                 />
               </View>
 
-            <View className={scheduleStyles.centerButton}>
-              <button type="submit" className={styles.submitButton}>
-                Add Time Off
-              </button>
-            </View>
-
+              <View className={scheduleStyles.centerButton}>
+                <button type="submit" className={styles.submitButton}>
+                  Add Time Off
+                </button>
+              </View>
             </form>
 
             {timeOff.length > 0 && (
               <div className={scheduleStyles.scheduleList}>
                 {timeOff.map((period) => (
-                  <div
-                    key={period.id}
-                    className={scheduleStyles.timeOffCard}
-                  >
+                  <div key={period.id} className={scheduleStyles.timeOffCard}>
                     <div>
                       <div className={scheduleStyles.timeOffDate}>
                         {localDate(period.start_date)}
@@ -572,9 +548,7 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
 
                     <button
                       type="button"
-                      onClick={() =>
-                        handleDeleteTimeOff(period.id)
-                      }
+                      onClick={() => handleDeleteTimeOff(period.id)}
                       className={scheduleStyles.deleteTimeOffButton}
                     >
                       Delete

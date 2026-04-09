@@ -128,20 +128,22 @@ export const timeInput = style({
   fontFamily: 'inherit',
   colorScheme: 'dark',
   cursor: 'pointer',
-  userSelect: 'none',
-  WebkitUserSelect: 'none',
-  WebkitAppearance: 'none',
-  appearance: 'none',
+  position: 'relative',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,
   },
   selectors: {
     '&::-webkit-calendar-picker-indicator': {
-      display: 'none',
-    },
-    '&::selection': {
-      background: 'transparent',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100%',
+      height: '100%',
+      opacity: 0,
+      cursor: 'pointer',
     },
   },
 });
@@ -219,25 +221,22 @@ export const breakInput = style({
   fontFamily: 'inherit',
   colorScheme: 'dark',
   cursor: 'pointer',
-  userSelect: 'none',
-  WebkitUserSelect: 'none',
-  WebkitAppearance: 'none',
-  appearance: 'none',
+  position: 'relative',
   ':focus': {
     outline: 'none',
     border: `1px solid ${text_secondary}`,
   },
   selectors: {
     '&::-webkit-calendar-picker-indicator': {
-      display: 'none',
-    },
-    '&::selection': {
-      background: 'transparent',
-    },
-  },
-  '@media': {
-    'screen and (min-width: 768px)': {
-      fontSize: 16,
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100%',
+      height: '100%',
+      opacity: 0,
+      cursor: 'pointer',
     },
   },
 });
