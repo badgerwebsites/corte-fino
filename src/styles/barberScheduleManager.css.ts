@@ -255,6 +255,46 @@ export const breakSeparator = style({
   },
 });
 
+export const breakInputInvalid = style({
+  width: '100%',
+  minWidth: 0,
+  backgroundColor: darker_bg,
+  color: text_primary,
+  border: '1px solid #dc2626',
+  boxSizing: 'border-box',
+  padding: '12px 8px',
+  borderRadius: 8,
+  fontSize: 16,
+  fontFamily: 'inherit',
+  colorScheme: 'dark',
+  cursor: 'pointer',
+  position: 'relative',
+  ':focus': {
+    outline: 'none',
+    border: '1px solid #dc2626',
+  },
+  selectors: {
+    '&::-webkit-calendar-picker-indicator': {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100%',
+      height: '100%',
+      opacity: 0,
+      cursor: 'pointer',
+    },
+  },
+});
+
+export const breakWarning = style({
+  fontSize: 15,
+  color: '#dc2626',
+  marginTop: 4,
+  marginLeft: 8,
+});
+
 export const removeBreakButton = style({
   backgroundColor: 'transparent',
   color: '#dc2626',
@@ -263,8 +303,7 @@ export const removeBreakButton = style({
 });
 
 export const scheduleSummary = style({
-  marginTop: 16,
-  borderRadius: '0.375rem',
+  marginTop: 12,
   fontSize: 16,
   color: text_primary,
   '@media': {

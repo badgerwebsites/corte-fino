@@ -187,7 +187,6 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
         if (insertError) throw insertError;
       }
 
-      loadBarberSchedule(selectedBarber.id, true);
       onUpdate();
     } catch (error) {
       console.error('Error saving schedule:', error);
@@ -405,42 +404,60 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
                           </p>
                         ) : (
                           <div className={scheduleStyles.scheduleList}>
-                            {schedule.breaks.map((brk, index) => (
-                              <div key={index} className={scheduleStyles.breakRow}>
-                                <div className={scheduleStyles.breakInputGroup}>
-                                  <input
-                                    type="time"
-                                    step={300}
-                                    value={brk.startTime}
-                                    onChange={(e) => {
-                                      const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: e.target.value } : b);
-                                      updateSchedule(day.value, { breaks: newBreaks });
-                                      saveSchedule(day.value, { ...schedule, breaks: newBreaks });
-                                    }}
-                                    className={scheduleStyles.breakInput}
-                                  />
-                                  <span className={scheduleStyles.breakSeparator}>-</span>
-                                  <input
-                                    type="time"
-                                    step={300}
-                                    value={brk.endTime}
-                                    onChange={(e) => {
-                                      const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: e.target.value } : b);
-                                      updateSchedule(day.value, { breaks: newBreaks });
-                                      saveSchedule(day.value, { ...schedule, breaks: newBreaks });
-                                    }}
-                                    className={scheduleStyles.breakInput}
-                                  />
+                            {schedule.breaks.map((brk, index) => {
+                              const breakInvalid = brk.startTime >= brk.endTime;
+                              return (
+                                <div key={index}>
+                                  <div className={scheduleStyles.breakRow}>
+                                    <div className={scheduleStyles.breakInputGroup}>
+                                      <input
+                                        type="time"
+                                        step={300}
+                                        value={brk.startTime}
+                                        onChange={(e) => {
+                                          const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, startTime: e.target.value } : b);
+                                          updateSchedule(day.value, { breaks: newBreaks });
+                                          const updated = newBreaks[index];
+                                          if (updated.startTime < updated.endTime) {
+                                            saveSchedule(day.value, { ...schedule, breaks: newBreaks });
+                                          }
+                                        }}
+                                        className={breakInvalid ? scheduleStyles.breakInputInvalid : scheduleStyles.breakInput}
+                                      />
+                                      <span className={scheduleStyles.breakSeparator}>-</span>
+                                      <input
+                                        type="time"
+                                        step={300}
+                                        value={brk.endTime}
+                                        onChange={(e) => {
+                                          const newBreaks = schedule.breaks.map((b, i) => i === index ? { ...b, endTime: e.target.value } : b);
+                                          updateSchedule(day.value, { breaks: newBreaks });
+                                          const updated = newBreaks[index];
+                                          if (updated.startTime < updated.endTime) {
+                                            saveSchedule(day.value, { ...schedule, breaks: newBreaks });
+                                          }
+                                        }}
+                                        className={breakInvalid ? scheduleStyles.breakInputInvalid : scheduleStyles.breakInput}
+                                      />
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeBreak(day.value, index)}
+                                      className={scheduleStyles.removeBreakButton}
+                                    >
+                                      <MinusCircle size={26} strokeWidth={2.5} />
+                                    </button>
+                                  </div>
+                                  {breakInvalid && (
+                                    <p className={scheduleStyles.breakWarning}>
+                                      {brk.startTime === brk.endTime
+                                        ? 'Start and end time cannot be the same'
+                                        : 'Start time must be before end time'}
+                                    </p>
+                                  )}
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => removeBreak(day.value, index)}
-                                  className={scheduleStyles.removeBreakButton}
-                                >
-                                  <MinusCircle size={26} strokeWidth={2.5} />
-                                </button>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         )}
                       </div>
