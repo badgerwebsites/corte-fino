@@ -540,8 +540,8 @@ export function BarberScheduleManager({ barbers, onUpdate, showSchedule, onReady
               Time Off / Vacation Days
             </h3>
 
-            <form onSubmit={handleAddTimeOff} className={styles.form}>
-              <View className={styles.formRow}>
+            <form onSubmit={handleAddTimeOff} className={`${styles.form} ${scheduleStyles.timeOffForm}`}>
+              <View className={styles.formRowAlways}>
                 <View className={styles.formGroup}>
                   <label className={styles.label}>Start Date</label>
                   <input

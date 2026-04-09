@@ -504,14 +504,7 @@ export const form = style({
 });
 
 export const formGroup = style({
-  width: '100%',
-  maxWidth: 240,
   marginBottom: 12,
-  '@media': {
-    'screen and (min-width: 768px)': {
-      maxWidth: 'unset',
-    },
-  },
 });
 
 export const formGroupWide = style({
@@ -521,12 +514,9 @@ export const formGroupWide = style({
 export const formRow = style({
   display: 'grid',
   gridTemplateColumns: '1fr',
-  justifyItems: 'center',
-  gap: 0,
   '@media': {
     'screen and (min-width: 768px)': {
       gridTemplateColumns: '1fr 1fr',
-      justifyItems: 'stretch',
       gap: 16,
     },
   },
@@ -991,32 +981,18 @@ export const pricingPeriodsTitle = style({
 });
 
 export const pricingTimeline = style({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: '1rem',
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: 16,
+  maxWidth: 480,
+  margin: '0 auto',
   marginBottom: 12,
-  '@media': {
-    'screen and (min-width: 768px)': {
-      flexDirection: 'row',
-      alignItems: 'flex-end',
-      gap: '0.75rem',
-    },
-  },
 });
 
 export const pricingTimeBlock = style({
-  flex: 1,
-  width: '100%',
-  maxWidth: 240,
   display: 'flex',
   flexDirection: 'column',
   gap: 4,
-  '@media': {
-    'screen and (min-width: 768px)': {
-      maxWidth: 'unset',
-    },
-  },
 });
 
 export const pricingTimeLabel = style({
@@ -1062,16 +1038,6 @@ export const timeInput = style({
 
 export const pricingTimeArrow = style({
   display: 'none',
-  '@media': {
-    'screen and (min-width: 768px)': {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: text_secondary,
-      fontSize: 20,
-      paddingBottom: '0.5rem',
-    },
-  },
 });
 
 export const timeInputInvalid = style({

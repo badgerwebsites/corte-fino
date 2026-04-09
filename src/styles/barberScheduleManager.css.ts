@@ -159,6 +159,11 @@ export const centerButton = style({
   paddingTop: 8,
 });
 
+export const timeOffForm = style({
+  maxWidth: 480,
+  margin: '0 auto',
+});
+
 export const breaksCard = style({
   marginTop: 12,
   marginBottom: 12,
@@ -258,7 +263,7 @@ export const breakInput = style({
 
 export const breakSeparator = style({
   display: 'none',
-  padding: 4,
+  padding: '0 8px',
   justifyContent: 'center',
   alignItems: 'center',
   color: text_secondary,
@@ -266,9 +271,6 @@ export const breakSeparator = style({
   '@media': {
     'screen and (min-width: 380px)': {
       display: 'flex',
-    },
-    'screen and (min-width: 768px)': {
-      padding: 8,
     },
   },
 });
